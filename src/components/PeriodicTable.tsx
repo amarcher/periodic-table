@@ -4,7 +4,7 @@ import { ElementCell } from './ElementCell';
 import './PeriodicTable.css';
 
 interface PeriodicTableProps {
-  onElementClick: (element: Element) => void;
+  onElementClick: (element: Element, e: React.MouseEvent) => void;
 }
 
 export function PeriodicTable({ onElementClick }: PeriodicTableProps) {

@@ -1,0 +1,24 @@
+.atom-visualizer {
+  width: 100%;
+  height: 40vh;
+  min-height: 220px;
+  max-height: 380px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.atom-visualizer canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  touch-action: none;
+}
+
+@media (max-width: 560px) {
+  .atom-visualizer {
+    height: 32vh;
+    min-height: 180px;
+  }
+}
