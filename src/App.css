@@ -79,3 +79,18 @@ body::before {
   color: #667;
   margin-top: 6px;
 }
+
+/* Floating voice agent orb on main table */
+.app__voice-float {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 50;
+}
+
+@media (max-width: 560px) {
+  .app__voice-float {
+    bottom: 16px;
+    right: 16px;
+  }
+}
