@@ -1,0 +1,71 @@
+.element-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  padding: 4px 2px;
+  border: 1px solid color-mix(in srgb, var(--cat-color) 25%, transparent);
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--cat-color) 18%, transparent),
+    color-mix(in srgb, var(--cat-color) 8%, transparent)
+  );
+  color: #e8e8f0;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  aspect-ratio: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.element-cell:hover {
+  box-shadow:
+    0 0 16px color-mix(in srgb, var(--cat-color) 40%, transparent),
+    0 4px 12px rgba(0, 0, 0, 0.3);
+  border-color: color-mix(in srgb, var(--cat-color) 60%, transparent);
+}
+
+.element-cell:focus-visible {
+  outline: 2px solid var(--cat-color);
+  outline-offset: 2px;
+}
+
+.element-cell__number {
+  font-size: 0.55em;
+  opacity: 0.7;
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  line-height: 1;
+}
+
+.element-cell__symbol {
+  font-family: 'Space Grotesk', 'JetBrains Mono', monospace;
+  font-size: 1.3em;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--cat-color);
+  text-shadow: 0 0 12px color-mix(in srgb, var(--cat-color) 30%, transparent);
+}
+
+.element-cell__name {
+  font-size: 0.45em;
+  opacity: 0.8;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.element-cell__mass {
+  font-size: 0.4em;
+  opacity: 0.5;
+  line-height: 1;
+}

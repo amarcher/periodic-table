@@ -1,0 +1,237 @@
+.detail-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 24px;
+}
+
+.detail-card {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  max-height: 85vh;
+  overflow-y: auto;
+  border-radius: 20px;
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--cat-color) 12%, hsl(220, 15%, 11%)) 0%,
+    hsl(220, 15%, 11%) 40%,
+    hsl(220, 15%, 9%) 100%
+  );
+  border: 1px solid color-mix(in srgb, var(--cat-color) 30%, transparent);
+  box-shadow:
+    0 0 60px color-mix(in srgb, var(--cat-color) 15%, transparent),
+    0 20px 60px rgba(0, 0, 0, 0.5);
+  padding: 40px 36px;
+  color: #e8e8f0;
+}
+
+/* Orbital rings */
+.detail__orbitals {
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  width: 120px;
+  height: 120px;
+  pointer-events: none;
+}
+
+.detail__orbit {
+  position: absolute;
+  inset: 0;
+  border: 1px solid color-mix(in srgb, var(--cat-color) 20%, transparent);
+  border-radius: 50%;
+}
+
+.detail__orbit--1 {
+  inset: 10%;
+  animation: orbit-spin 8s linear infinite;
+}
+
+.detail__orbit--2 {
+  inset: 0;
+  transform: rotateX(65deg);
+  animation: orbit-spin 12s linear infinite reverse;
+}
+
+.detail__orbit--3 {
+  inset: 5%;
+  transform: rotateX(65deg) rotateZ(60deg);
+  animation: orbit-spin 10s linear infinite;
+}
+
+@keyframes orbit-spin {
+  from { transform: rotateX(65deg) rotateZ(0deg); }
+  to { transform: rotateX(65deg) rotateZ(360deg); }
+}
+
+/* Content */
+.detail__content {
+  position: relative;
+  z-index: 1;
+}
+
+.detail__header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 20px;
+}
+
+.detail__number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--cat-color) 20%, transparent);
+  border: 1px solid color-mix(in srgb, var(--cat-color) 35%, transparent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--cat-color);
+  margin-bottom: 8px;
+}
+
+.detail__symbol {
+  font-family: 'Space Grotesk', 'JetBrains Mono', monospace;
+  font-size: 3.5rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--cat-color);
+  text-shadow: 0 0 30px color-mix(in srgb, var(--cat-color) 30%, transparent);
+}
+
+.detail__name {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #f0f0f8;
+}
+
+.detail__category {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--cat-color);
+  opacity: 0.8;
+}
+
+.detail__summary {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #b0b0c0;
+  margin-bottom: 24px;
+}
+
+/* Properties grid */
+.detail__props {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.detail__prop {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.detail__prop-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #888;
+}
+
+.detail__prop-value {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #d8d8e4;
+  word-break: break-word;
+}
+
+/* Fun facts */
+.detail__facts-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--cat-color);
+}
+
+.detail__fact {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #c0c0d0;
+  margin-bottom: 10px;
+}
+
+.detail__fact-icon {
+  color: var(--cat-color);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Close button */
+.detail__close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  color: #aaa;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s;
+  z-index: 2;
+}
+
+.detail__close:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+/* Responsive */
+@media (max-width: 560px) {
+  .detail-card {
+    padding: 28px 20px;
+  }
+
+  .detail__symbol {
+    font-size: 2.5rem;
+  }
+
+  .detail__name {
+    font-size: 1.2rem;
+  }
+
+  .detail__props {
+    grid-template-columns: 1fr;
+  }
+
+  .detail__orbitals {
+    width: 80px;
+    height: 80px;
+    top: 20px;
+    right: 20px;
+  }
+}
