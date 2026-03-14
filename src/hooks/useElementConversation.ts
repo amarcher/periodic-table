@@ -10,6 +10,40 @@ function dbg(...args: unknown[]) {
   if (DEBUG_VOICE) console.log('[VoiceDebug]', ...args);
 }
 
+// Patch fetch and WebSocket to trace all ElevenLabs network activity
+if (DEBUG_VOICE) {
+  const origFetch = window.fetch;
+  window.fetch = function (...args: Parameters<typeof fetch>) {
+    const url = typeof args[0] === 'string' ? args[0] : args[0] instanceof Request ? args[0].url : String(args[0]);
+    if (url.includes('elevenlabs')) {
+      dbg('fetch →', url, args[1]?.method || 'GET');
+      return origFetch.apply(this, args).then(
+        (res) => { dbg('fetch ←', url, res.status); return res; },
+        (err) => { console.error('[VoiceDebug] fetch FAILED →', url, err); throw err; },
+      );
+    }
+    return origFetch.apply(this, args);
+  };
+
+  const OrigWS = window.WebSocket;
+  // @ts-expect-error -- monkey-patching for debug
+  window.WebSocket = function (url: string | URL, protocols?: string | string[]) {
+    const urlStr = String(url);
+    if (urlStr.includes('elevenlabs')) {
+      dbg('WebSocket opening →', urlStr);
+    }
+    const ws = new OrigWS(url, protocols);
+    if (urlStr.includes('elevenlabs')) {
+      ws.addEventListener('open', () => dbg('WebSocket OPEN →', urlStr));
+      ws.addEventListener('error', (e) => console.error('[VoiceDebug] WebSocket ERROR →', urlStr, e));
+      ws.addEventListener('close', (e) => dbg('WebSocket CLOSE →', urlStr, 'code:', e.code, 'reason:', e.reason));
+    }
+    return ws;
+  } as unknown as typeof WebSocket;
+  Object.assign(window.WebSocket, OrigWS);
+  window.WebSocket.prototype = OrigWS.prototype;
+}
+
 interface ConversationCallbacks {
   onNavigate: (element: Element) => void;
   onGoBack: () => void;
@@ -122,10 +156,12 @@ export function useElementConversation({ onNavigate, onGoBack }: ConversationCal
     dbg('setting sessionStarted=true');
     setSessionStarted(true);
 
+    // Quick sanity check that timers work at all
+    window.setTimeout(() => dbg('3s heartbeat — timers are working'), 3_000);
+
     // Timeout sentinel — logs a warning if startSession hasn't resolved in 10 s
     const timeoutId = window.setTimeout(() => {
       console.warn('[VoiceDebug] TIMEOUT: startSession() has not resolved after 10 s — the call appears to be hanging');
-      console.warn('[VoiceDebug] conversation.status at timeout:', conversation.status);
     }, 10_000);
 
     try {
