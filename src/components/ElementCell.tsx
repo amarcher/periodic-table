@@ -5,15 +5,19 @@ import './ElementCell.css';
 interface ElementCellProps {
   element: Element;
   onClick: (element: Element, e: React.MouseEvent) => void;
+  tabIndex?: number;
 }
 
-export function ElementCell({ element, onClick }: ElementCellProps) {
+export function ElementCell({ element, onClick, tabIndex = -1 }: ElementCellProps) {
   const color = categoryColors[element.category];
 
   return (
     <button
       className="element-cell"
       onClick={(e) => onClick(element, e)}
+      tabIndex={tabIndex}
+      data-row={element.gridRow}
+      data-col={element.gridColumn}
       style={{
         gridRow: element.gridRow,
         gridColumn: element.gridColumn,
