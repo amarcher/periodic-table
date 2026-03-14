@@ -1,5 +1,8 @@
+import { useEffect } from 'react';
 import type { VoiceStatus } from '../hooks/useElementConversation';
 import './VoiceAgent.css';
+
+const DEBUG_VOICE = true;
 
 interface VoiceAgentProps {
   status: VoiceStatus;
@@ -26,6 +29,11 @@ function statusText(status: VoiceStatus, isSpeaking: boolean): string {
 }
 
 export function VoiceAgent({ status, isSpeaking, onToggle, catColor }: VoiceAgentProps) {
+  useEffect(() => {
+    if (!DEBUG_VOICE) return;
+    console.log('[VoiceDebug] VoiceAgent props changed — status:', status, '| isSpeaking:', isSpeaking);
+  }, [status, isSpeaking]);
+
   const orbClass = [
     'voice-agent__orb',
     status === 'connecting' && 'voice-agent__orb--connecting',

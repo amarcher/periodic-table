@@ -4,6 +4,12 @@ import type { Element } from '../types/element';
 import { categoryLabels } from '../utils/colors';
 import { elements } from '../data/elements';
 
+const DEBUG_VOICE = true;
+
+function dbg(...args: unknown[]) {
+  if (DEBUG_VOICE) console.log('[VoiceDebug]', ...args);
+}
+
 interface ConversationCallbacks {
   onNavigate: (element: Element) => void;
   onGoBack: () => void;
@@ -51,45 +57,107 @@ export function useElementConversation({ onNavigate, onGoBack }: ConversationCal
       },
     },
     onConnect: () => {
+      dbg('onConnect fired — SDK reports connection established');
+      dbg('onConnect: pendingElement =', pendingElementRef.current?.name ?? 'none');
       // If an element was clicked before connection completed, send it now
       if (pendingElementRef.current) {
         const ctx = buildElementContext(pendingElementRef.current);
+        dbg('onConnect: flushing pending element context');
         conversation.sendContextualUpdate(ctx);
         currentElementRef.current = pendingElementRef.current.atomicNumber;
         pendingElementRef.current = null;
       }
     },
-    onError: (error) => {
-      console.error('ElevenLabs conversation error:', error);
+    onDisconnect: () => {
+      dbg('onDisconnect fired — SDK reports session ended');
+    },
+    onMessage: (message: unknown) => {
+      dbg('onMessage received:', message);
+    },
+    onError: (error: unknown) => {
+      console.error('[VoiceDebug] onError fired:', error);
+      if (error && typeof error === 'object') {
+        console.error('[VoiceDebug] onError details:', JSON.stringify(error, null, 2));
+      }
     },
   });
 
   /** Toggle session on/off — must be called from a user gesture (click) */
   const toggle = useCallback(async () => {
-    if (!agentId) return;
+    console.group('[VoiceDebug] toggle()');
+    dbg('entered toggle — agentId:', agentId ? `${agentId.slice(0, 8)}…` : 'MISSING');
+    dbg('current state — sessionStarted:', sessionStarted, '| conversation.status:', conversation.status);
 
-    // If connected, disconnect
-    if (sessionStarted) {
-      await conversation.endSession().catch(() => {});
-      setSessionStarted(false);
+    if (!agentId) {
+      dbg('aborting: no agentId configured');
+      console.groupEnd();
       return;
     }
 
+    // If connected, disconnect
+    if (sessionStarted) {
+      dbg('sessionStarted=true → calling endSession()');
+      await conversation.endSession().catch((err) => {
+        dbg('endSession() threw:', err);
+      });
+      dbg('endSession() settled — setting sessionStarted=false');
+      setSessionStarted(false);
+      console.groupEnd();
+      return;
+    }
+
+    // --- Check mic permission before startSession (diagnostic read only) ---
+    try {
+      if (navigator.permissions) {
+        const permResult = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+        dbg('microphone permission state:', permResult.state);
+      } else {
+        dbg('navigator.permissions API not available in this browser');
+      }
+    } catch (permErr) {
+      dbg('navigator.permissions.query threw (expected on Firefox):', permErr);
+    }
+
+    dbg('setting sessionStarted=true');
     setSessionStarted(true);
 
+    // Timeout sentinel — logs a warning if startSession hasn't resolved in 10 s
+    const timeoutId = window.setTimeout(() => {
+      console.warn('[VoiceDebug] TIMEOUT: startSession() has not resolved after 10 s — the call appears to be hanging');
+      console.warn('[VoiceDebug] conversation.status at timeout:', conversation.status);
+    }, 10_000);
+
     try {
-      // Let the SDK handle getUserMedia internally — calling it ourselves
-      // first can exhaust Chrome's user-gesture context, causing the SDK's
-      // own mic request to fail silently.
-      await conversation.startSession({
+      dbg('calling conversation.startSession() with connectionType=websocket');
+      const sessionResult = await conversation.startSession({
         agentId,
         connectionType: 'websocket',
       });
+      clearTimeout(timeoutId);
+      dbg('startSession() resolved successfully — result:', sessionResult);
     } catch (err) {
-      console.error('Failed to start conversation:', err);
+      clearTimeout(timeoutId);
+      console.error('[VoiceDebug] startSession() rejected with error:', err);
+      if (err && typeof err === 'object') {
+        console.error('[VoiceDebug] startSession error details:', JSON.stringify(err, null, 2));
+      }
       setSessionStarted(false);
     }
+
+    console.groupEnd();
   }, [agentId, sessionStarted, conversation]);
+
+  // Watch conversation.status for every transition
+  useEffect(() => {
+    if (!DEBUG_VOICE) return;
+    dbg('conversation.status changed →', conversation.status);
+  }, [conversation.status]);
+
+  // Watch sessionStarted state
+  useEffect(() => {
+    if (!DEBUG_VOICE) return;
+    dbg('sessionStarted state changed →', sessionStarted);
+  }, [sessionStarted]);
 
   const notifyElementChange = useCallback((element: Element) => {
     if (!agentId) return;
