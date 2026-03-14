@@ -10,8 +10,24 @@ function dbg(...args: unknown[]) {
   if (DEBUG_VOICE) console.log('[VoiceDebug]', ...args);
 }
 
-// Patch fetch and WebSocket to trace all ElevenLabs network activity
+// Patch getUserMedia, fetch, and WebSocket to trace the full connection lifecycle
 if (DEBUG_VOICE) {
+  const origGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+  navigator.mediaDevices.getUserMedia = function (constraints?: MediaStreamConstraints) {
+    dbg('getUserMedia called with constraints:', JSON.stringify(constraints));
+    const t0 = performance.now();
+    return origGetUserMedia(constraints).then(
+      (stream) => {
+        dbg('getUserMedia resolved in', Math.round(performance.now() - t0), 'ms — tracks:', stream.getTracks().map(t => t.kind));
+        return stream;
+      },
+      (err) => {
+        console.error('[VoiceDebug] getUserMedia REJECTED in', Math.round(performance.now() - t0), 'ms —', err.name, err.message);
+        throw err;
+      },
+    );
+  };
+
   const origFetch = window.fetch;
   window.fetch = function (...args: Parameters<typeof fetch>) {
     const url = typeof args[0] === 'string' ? args[0] : args[0] instanceof Request ? args[0].url : String(args[0]);
