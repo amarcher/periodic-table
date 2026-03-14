@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import type { Element } from '../types/element';
 import { categoryColors } from '../utils/colors';
 import './ElementCell.css';
@@ -8,7 +9,7 @@ interface ElementCellProps {
   tabIndex?: number;
 }
 
-export function ElementCell({ element, onClick, tabIndex = -1 }: ElementCellProps) {
+export const ElementCell = memo(function ElementCell({ element, onClick, tabIndex = -1 }: ElementCellProps) {
   const color = categoryColors[element.category];
 
   return (
@@ -30,4 +31,8 @@ export function ElementCell({ element, onClick, tabIndex = -1 }: ElementCellProp
       <span className="element-cell__mass">{element.atomicMass.toFixed(2)}</span>
     </button>
   );
-}
+}, (prev, next) =>
+  prev.element.atomicNumber === next.element.atomicNumber &&
+  prev.onClick === next.onClick &&
+  prev.tabIndex === next.tabIndex
+);

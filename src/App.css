@@ -32,6 +32,7 @@ body::before {
     radial-gradient(ellipse 60% 80% at 80% 90%, hsla(200, 60%, 25%, 0.1), transparent);
   pointer-events: none;
   z-index: 0;
+  will-change: opacity;
   animation: ambient-shift 20s ease-in-out infinite alternate;
 }
 
@@ -92,5 +93,12 @@ body::before {
   .app__voice-float {
     bottom: 16px;
     right: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    animation: none;
+    will-change: auto;
   }
 }

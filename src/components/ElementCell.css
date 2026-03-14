@@ -12,13 +12,11 @@
   font-family: inherit;
   background: linear-gradient(
     135deg,
-    color-mix(in srgb, var(--cat-color) 18%, transparent),
-    color-mix(in srgb, var(--cat-color) 8%, transparent)
+    color-mix(in srgb, var(--cat-color) 25%, hsl(220, 15%, 8%)),
+    color-mix(in srgb, var(--cat-color) 12%, hsl(220, 15%, 8%))
   );
   color: #e8e8f0;
   transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
   aspect-ratio: 1;
   min-width: 0;
   overflow: hidden;
@@ -53,7 +51,7 @@
   font-weight: 700;
   line-height: 1;
   color: var(--cat-color);
-  text-shadow: 0 0 12px color-mix(in srgb, var(--cat-color) 30%, transparent);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .element-cell__name {
@@ -70,4 +68,14 @@
   font-size: 0.4em;
   opacity: 0.5;
   line-height: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .element-cell {
+    transition: none;
+  }
+
+  .element-cell:hover {
+    transform: none;
+  }
 }
