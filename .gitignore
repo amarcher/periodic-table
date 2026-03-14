@@ -26,3 +26,16 @@ dist-ssr
 # Environment variables
 .env
 .env.local
+
+# ElevenLabs CLI — ID mapping files (contain agent/tool IDs specific to each environment)
+agents.json
+tools.json
+tests.json
+
+# ElevenLabs agent configs not related to this project
+agent_configs/Mark-My-Words-Host.json
+agent_configs/Crossword-Game-Host.json
+agent_configs/Kaia.json
+agent_configs/Milo.json
+agent_configs/New-agent.json
+test_configs/

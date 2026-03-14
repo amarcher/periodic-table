@@ -9,14 +9,13 @@ An interactive, visually stunning periodic table web app designed to make scienc
 ## Features
 
 - **All 118 elements** with accurate atomic masses, electron configurations, melting/boiling points, density, and electronegativity
-- **Hero animation** — clicking an element smoothly expands it from its grid position into a centered detail card using Framer Motion's `layoutId`
+- **Hero animation** — clicking an element smoothly expands it from its grid position into a centered detail card using View Transitions with clip-path
 - **Glass-morphism design** — dark theme with luminous, category-colored element cells
 - **10 category colors** — alkali metals, noble gases, transition metals, lanthanides, and more each have a distinct hue
 - **Kid-friendly fun facts** — 3–4 engaging facts per element
-- **Decorative orbital rings** — animated CSS ellipses behind the element symbol in the detail view
-- **Keyboard accessible** — press Escape to close the detail view
+- **Voice agent** — ElevenLabs-powered voice buddy that talks to kids about elements, navigates the app by voice, and responds to questions
+- **Keyboard accessible** — focus-trapped modal with Escape to close, focus restoration to originating cell
 - **Responsive** — works on desktop and mobile
-- **Zero images** — pure CSS/SVG, instant load
 
 ## Getting Started
 
@@ -42,6 +41,30 @@ npm run preview
 - **CSS Grid** — 18-column periodic table layout with explicit element placement
 - **Google Fonts** — Inter (UI) + Space Grotesk (element symbols)
 
+## Voice Agent
+
+The app includes an ElevenLabs conversational AI voice agent that acts as a "science buddy" for kids. It can:
+
+- Talk about whichever element is currently open
+- Navigate to elements by voice ("show me gold", "what about Ca?")
+- Return to the periodic table grid on request
+
+### Setup
+
+1. Copy `.env.example` to `.env` and fill in your ElevenLabs agent ID and API key
+2. Install the ElevenLabs CLI: `npm install -g @elevenlabs/cli`
+3. Pull agent/tool ID mappings: `elevenlabs agents pull && elevenlabs tools pull`
+4. Agent and tool configs are in `agent_configs/` and `tool_configs/` — edit locally, then push with `elevenlabs agents push && elevenlabs tools push`
+
+### Architecture
+
+The voice agent registers two **client tools** via the ElevenLabs SDK — functions that run in the browser and let the agent control the UI:
+
+- `navigate_to_element` — opens a specific element's detail view (matched by name or symbol)
+- `go_back_to_table` — closes the detail view and returns to the grid
+
+Tool schemas and the agent prompt are version-controlled in `agent_configs/` and `tool_configs/`. The ID mapping files (`agents.json`, `tools.json`) are gitignored since agent IDs grant conversation access.
+
 ## Project Structure
 
 ```
@@ -52,13 +75,19 @@ src/
 │   ├── PeriodicTable.tsx/.css   # CSS Grid layout
 │   ├── ElementCell.tsx/.css     # Individual element buttons
 │   ├── ElementDetail.tsx/.css   # Fullscreen detail overlay
+│   ├── VoiceAgent.tsx/.css      # Mic button + voice status
 │   └── CategoryLegend.tsx/.css  # Color legend
+├── hooks/
+│   └── useElementConversation.ts # ElevenLabs voice session + client tools
 ├── data/
 │   └── elements.ts              # All 118 elements
 ├── types/
 │   └── element.ts               # TypeScript interfaces
 └── utils/
     └── colors.ts                # Category color mapping
+
+agent_configs/                   # ElevenLabs agent prompt & settings
+tool_configs/                    # ElevenLabs client tool schemas
 ```
 
 ## License

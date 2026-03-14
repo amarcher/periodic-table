@@ -2,6 +2,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useConversation } from '@elevenlabs/react';
 import type { Element } from '../types/element';
 import { categoryLabels } from '../utils/colors';
+import { elements } from '../data/elements';
+
+interface ConversationCallbacks {
+  onNavigate: (element: Element) => void;
+  onGoBack: () => void;
+}
 
 export type VoiceStatus = 'off' | 'connecting' | 'connected' | 'error';
 
@@ -21,14 +27,29 @@ function buildElementContext(element: Element): string {
  * Starts immediately on page load — greets the kid on the periodic table.
  * Element clicks are sent as contextual updates.
  */
-export function useElementConversation() {
+export function useElementConversation({ onNavigate, onGoBack }: ConversationCallbacks) {
   const agentId = import.meta.env.VITE_ELEVENLABS_AGENT_ID as string | undefined;
   const [sessionStarted, setSessionStarted] = useState(false);
   const pendingElementRef = useRef<Element | null>(null);
   const currentElementRef = useRef<number | null>(null);
-  const startAttemptedRef = useRef(false);
 
   const conversation = useConversation({
+    clientTools: {
+      navigate_to_element: (params: { name: string }) => {
+        const match = elements.find(el =>
+          el.name.toLowerCase() === params.name.toLowerCase() ||
+          el.symbol.toLowerCase() === params.name.toLowerCase()
+        );
+        if (!match) return `No element found matching "${params.name}"`;
+        onNavigate(match);
+        return `Navigated to ${match.name}`;
+      },
+      go_back_to_table: () => {
+        currentElementRef.current = null;
+        onGoBack();
+        return "Returned to periodic table";
+      },
+    },
     onConnect: () => {
       // If an element was clicked before connection completed, send it now
       if (pendingElementRef.current) {
@@ -43,32 +64,32 @@ export function useElementConversation() {
     },
   });
 
-  // Start session on mount — agent greets the kid on the homepage
-  useEffect(() => {
-    if (!agentId || startAttemptedRef.current) return;
-    startAttemptedRef.current = true;
+  /** Toggle session on/off — must be called from a user gesture (click) */
+  const toggle = useCallback(async () => {
+    if (!agentId) return;
 
-    (async () => {
-      try {
-        await navigator.mediaDevices.getUserMedia({ audio: true });
-      } catch (err) {
-        console.error('Mic permission denied:', err);
-        return;
-      }
+    // If connected, disconnect
+    if (sessionStarted) {
+      await conversation.endSession().catch(() => {});
+      setSessionStarted(false);
+      return;
+    }
 
-      setSessionStarted(true);
+    setSessionStarted(true);
 
-      try {
-        await conversation.startSession({
-          agentId,
-          connectionType: 'websocket',
-        });
-      } catch (err) {
-        console.error('Failed to start conversation:', err);
-        setSessionStarted(false);
-      }
-    })();
-  }, [agentId]); // eslint-disable-line react-hooks/exhaustive-deps
+    try {
+      // Let the SDK handle getUserMedia internally — calling it ourselves
+      // first can exhaust Chrome's user-gesture context, causing the SDK's
+      // own mic request to fail silently.
+      await conversation.startSession({
+        agentId,
+        connectionType: 'websocket',
+      });
+    } catch (err) {
+      console.error('Failed to start conversation:', err);
+      setSessionStarted(false);
+    }
+  }, [agentId, sessionStarted, conversation]);
 
   const notifyElementChange = useCallback((element: Element) => {
     if (!agentId) return;
@@ -118,6 +139,7 @@ export function useElementConversation() {
     isSpeaking: conversation.isSpeaking,
     notifyElementChange,
     notifyElementClosed,
+    toggle,
     agentId,
   };
 }

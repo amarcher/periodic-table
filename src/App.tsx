@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import type { Element } from './types/element';
 import { PeriodicTable } from './components/PeriodicTable';
 import { ElementDetail } from './components/ElementDetail';
@@ -27,20 +27,51 @@ function viewTransition(update: () => void, types: string[]) {
   (document as any).startViewTransition({ update, types });
 }
 
+function findCellForElement(element: Element): HTMLElement | null {
+  return document.querySelector(
+    `.element-cell[style*="grid-row: ${element.gridRow}"][style*="grid-column: ${element.gridColumn}"]`
+  );
+}
+
 function App() {
   const [selected, setSelected] = useState<Element | null>(null);
-  const voice = useElementConversation();
+  const originCellRef = useRef<HTMLElement | null>(null);
 
-  const handleElementClick = useCallback((element: Element, e: React.MouseEvent) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setClipVars(rect);
+  const openElement = useCallback((element: Element, originCell: HTMLElement | null) => {
+    originCellRef.current = originCell;
+    if (originCell) setClipVars(originCell.getBoundingClientRect());
     viewTransition(() => setSelected(element), ['detail-open']);
   }, []);
 
+  const closeDetail = useCallback(() => {
+    const cell = originCellRef.current;
+    if (cell) setClipVars(cell.getBoundingClientRect());
+    viewTransition(() => setSelected(null), ['detail-close']);
+    // Restore focus to originating cell after transition
+    if (cell) requestAnimationFrame(() => cell.focus());
+  }, []);
+
+  const handleVoiceNavigate = useCallback((element: Element) => {
+    openElement(element, findCellForElement(element));
+  }, [openElement]);
+
+  const handleVoiceGoBack = useCallback(() => {
+    closeDetail();
+  }, [closeDetail]);
+
+  const voice = useElementConversation({
+    onNavigate: handleVoiceNavigate,
+    onGoBack: handleVoiceGoBack,
+  });
+
+  const handleElementClick = useCallback((element: Element, e: React.MouseEvent) => {
+    openElement(element, e.currentTarget as HTMLElement);
+  }, [openElement]);
+
   const handleClose = useCallback(() => {
     voice.notifyElementClosed();
-    viewTransition(() => setSelected(null), ['detail-close']);
-  }, [voice]); // eslint-disable-line react-hooks/exhaustive-deps
+    closeDetail();
+  }, [voice, closeDetail]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (selected) {
@@ -60,7 +91,7 @@ function App() {
 
       {!selected && voice.agentId && (
         <div className="app__voice-float">
-          <VoiceAgent status={voice.status} isSpeaking={voice.isSpeaking} />
+          <VoiceAgent status={voice.status} isSpeaking={voice.isSpeaking} onToggle={voice.toggle} />
         </div>
       )}
 
@@ -70,6 +101,7 @@ function App() {
           onClose={handleClose}
           voiceStatus={voice.status}
           voiceIsSpeaking={voice.isSpeaking}
+          onVoiceToggle={voice.toggle}
         />
       )}
     </div>

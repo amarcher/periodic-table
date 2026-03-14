@@ -1,0 +1,15 @@
+{
+    "name": "go_back_to_table",
+    "description": "Close the current element detail view and return to the periodic table grid. Call this when the user wants to go back or see the full table.",
+    "type": "client",
+    "expects_response": true,
+    "response_timeout_secs": 30,
+    "parameters": {
+        "type": "object",
+        "description": "Parameters for the client tool",
+        "properties": {}
+    },
+    "dynamic_variables": {
+        "dynamic_variable_placeholders": {}
+    }
+}

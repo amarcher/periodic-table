@@ -4,6 +4,7 @@ import './VoiceAgent.css';
 interface VoiceAgentProps {
   status: VoiceStatus;
   isSpeaking: boolean;
+  onToggle: () => void;
   catColor?: string;
 }
 
@@ -21,10 +22,10 @@ function statusText(status: VoiceStatus, isSpeaking: boolean): string {
   if (status === 'connected' && isSpeaking) return 'Talking to you!';
   if (status === 'connected') return 'Listening...';
   if (status === 'error') return 'Tap to try again';
-  return '';
+  return 'Tap to talk';
 }
 
-export function VoiceAgent({ status, isSpeaking, catColor }: VoiceAgentProps) {
+export function VoiceAgent({ status, isSpeaking, onToggle, catColor }: VoiceAgentProps) {
   const orbClass = [
     'voice-agent__orb',
     status === 'connecting' && 'voice-agent__orb--connecting',
@@ -43,9 +44,9 @@ export function VoiceAgent({ status, isSpeaking, catColor }: VoiceAgentProps) {
       style={catColor ? { '--cat-color': catColor } as React.CSSProperties : undefined}
     >
       <div className={containerClass}>
-        <div className={orbClass} aria-label="Voice agent">
+        <button className={orbClass} aria-label="Voice agent" onClick={onToggle} type="button">
           <MicIcon />
-        </div>
+        </button>
         <div className="voice-agent__wave" />
         <div className="voice-agent__wave" />
         <div className="voice-agent__wave" />

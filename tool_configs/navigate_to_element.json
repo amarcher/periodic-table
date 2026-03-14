@@ -1,0 +1,21 @@
+{
+    "name": "navigate_to_element",
+    "description": "Navigate the periodic table app to show details about a specific element. Call this when the user asks about a different element or wants to see one.",
+    "type": "client",
+    "expects_response": true,
+    "response_timeout_secs": 30,
+    "parameters": {
+        "type": "object",
+        "description": "Parameters for the client tool",
+        "properties": {
+            "name": {
+                "type": "string",
+                "description": "The element name (e.g. 'Calcium') or symbol (e.g. 'Ca')"
+            }
+        },
+        "required": ["name"]
+    },
+    "dynamic_variables": {
+        "dynamic_variable_placeholders": {}
+    }
+}
