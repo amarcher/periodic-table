@@ -16,6 +16,11 @@
 }
 
 .voice-agent__orb {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 0;
+  font: inherit;
+  outline: none;
   width: 64px;
   height: 64px;
   border-radius: 50%;

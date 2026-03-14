@@ -26,6 +26,21 @@ Interactive periodic table web app for kids. Vite + React + TypeScript + Framer 
 - `src/utils/colors.ts` — category-to-color mapping (10 categories)
 - `src/components/ElementDetail.tsx` — the detail overlay with staggered animations and orbital ring decorations
 
+## Voice Agent (ElevenLabs)
+
+- **Hook**: `src/hooks/useElementConversation.ts` — manages the ElevenLabs voice session, sends contextual updates on element clicks/closes, and registers client tools
+- **Client tools**: `navigate_to_element` and `go_back_to_table` are registered via `useConversation({ clientTools })` so the voice agent can control the UI
+- **Agent config**: `agent_configs/Chemical-Element-Periodic-Table-Guide.json` — the agent's prompt, voice, and tool settings (managed via `@elevenlabs/cli`)
+- **Tool configs**: `tool_configs/` — JSON schemas for client tools, also managed via CLI
+- **ID mapping**: `agents.json` and `tools.json` are gitignored (contain agent IDs that grant conversation access). After a fresh clone, run `elevenlabs agents pull` and `elevenlabs tools pull` to regenerate them
+- **Skill**: `/11labs-push` pushes config changes to ElevenLabs (dry-run first, then push)
+
+## Accessibility
+
+- `ElementDetail` is a focus-trapped `role="dialog"` modal — close button is auto-focused on mount, Tab cycles within
+- Escape closes the detail view; focus returns to the originating grid cell
+- The close transition uses the originating cell's rect for the clip-path animation in both directions
+
 ## Conventions
 
 - CSS uses `color-mix(in srgb, ...)` for translucent category colors (no `hsl(from ...)` relative color syntax)
