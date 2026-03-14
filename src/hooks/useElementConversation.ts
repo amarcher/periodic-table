@@ -106,16 +106,17 @@ export function useElementConversation({ onNavigate, onGoBack }: ConversationCal
       return;
     }
 
-    // --- Check mic permission before startSession (diagnostic read only) ---
+    // Check mic permission without awaiting — fire-and-forget to avoid
+    // breaking Chrome's user-gesture chain before startSession/getUserMedia.
     try {
       if (navigator.permissions) {
-        const permResult = await navigator.permissions.query({ name: 'microphone' as PermissionName });
-        dbg('microphone permission state:', permResult.state);
-      } else {
-        dbg('navigator.permissions API not available in this browser');
+        navigator.permissions.query({ name: 'microphone' as PermissionName }).then(
+          (r) => dbg('microphone permission state:', r.state),
+          (e) => dbg('permissions.query rejected:', e),
+        );
       }
     } catch (permErr) {
-      dbg('navigator.permissions.query threw (expected on Firefox):', permErr);
+      dbg('permissions.query threw:', permErr);
     }
 
     dbg('setting sessionStarted=true');
