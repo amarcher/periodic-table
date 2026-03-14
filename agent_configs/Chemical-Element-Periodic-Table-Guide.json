@@ -219,29 +219,29 @@
                 "is_enabled": false
             },
             "prompt_injection": {
-                "is_enabled": false
+                "is_enabled": true
             },
             "content": {
                 "execution_mode": "streaming",
                 "config": {
                     "sexual": {
-                        "is_enabled": false,
+                        "is_enabled": true,
                         "threshold": "medium"
                     },
                     "violence": {
-                        "is_enabled": false,
+                        "is_enabled": true,
                         "threshold": "medium"
                     },
                     "harassment": {
-                        "is_enabled": false,
+                        "is_enabled": true,
                         "threshold": "medium"
                     },
                     "self_harm": {
-                        "is_enabled": false,
+                        "is_enabled": true,
                         "threshold": "medium"
                     },
                     "profanity": {
-                        "is_enabled": false,
+                        "is_enabled": true,
                         "threshold": "medium"
                     },
                     "religion_or_politics": {
@@ -313,7 +313,7 @@
         "auth": {
             "enable_auth": false,
             "allowlist": [],
-            "require_origin_header": false
+            "require_origin_header": true
         },
         "call_limits": {
             "agent_concurrency_limit": -1,
@@ -322,8 +322,8 @@
         },
         "ban": null,
         "privacy": {
-            "record_voice": true,
-            "retention_days": -1,
+            "record_voice": false,
+            "retention_days": 1,
             "delete_transcript_and_pii": false,
             "delete_audio": false,
             "apply_to_existing_conversations": false,

@@ -43,13 +43,12 @@ function App() {
     viewTransition(() => setSelected(element), ['detail-open']);
   }, []);
 
-  const closeDetail = useCallback((notify: boolean) => {
+  const closeDetail = useCallback(() => {
     const cell = originCellRef.current;
     if (cell) setClipVars(cell.getBoundingClientRect());
     viewTransition(() => setSelected(null), ['detail-close']);
     // Restore focus to originating cell after transition
     if (cell) requestAnimationFrame(() => cell.focus());
-    if (notify) return true; // flag consumed by handleClose
   }, []);
 
   const handleVoiceNavigate = useCallback((element: Element) => {
@@ -57,7 +56,7 @@ function App() {
   }, [openElement]);
 
   const handleVoiceGoBack = useCallback(() => {
-    closeDetail(false);
+    closeDetail();
   }, [closeDetail]);
 
   const voice = useElementConversation({
@@ -71,7 +70,7 @@ function App() {
 
   const handleClose = useCallback(() => {
     voice.notifyElementClosed();
-    closeDetail(false);
+    closeDetail();
   }, [voice, closeDetail]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {

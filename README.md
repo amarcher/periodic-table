@@ -54,7 +54,7 @@ The app includes an ElevenLabs conversational AI voice agent that acts as a "sci
 1. Copy `.env.example` to `.env` and fill in your ElevenLabs agent ID and API key
 2. Install the ElevenLabs CLI: `npm install -g @elevenlabs/cli`
 3. Pull agent/tool ID mappings: `elevenlabs agents pull && elevenlabs tools pull`
-4. Agent and tool configs are in `agent_configs/` and `tool_configs/`— edit locally, then push with `elevenlabs agents push && elevenlabs tools push`
+4. Agent and tool configs are in `agent_configs/` and `tool_configs/` — edit locally, then push with `elevenlabs agents push && elevenlabs tools push`
 
 ### Architecture
 

@@ -45,6 +45,7 @@ export function useElementConversation({ onNavigate, onGoBack }: ConversationCal
         return `Navigated to ${match.name}`;
       },
       go_back_to_table: () => {
+        currentElementRef.current = null;
         onGoBack();
         return "Returned to periodic table";
       },
