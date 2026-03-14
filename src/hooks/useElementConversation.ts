@@ -26,8 +26,8 @@ if (DEBUG_VOICE) {
   };
 
   const OrigWS = window.WebSocket;
-  // @ts-expect-error -- monkey-patching for debug
-  window.WebSocket = function (url: string | URL, protocols?: string | string[]) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (window as any).WebSocket = function (url: string | URL, protocols?: string | string[]) {
     const urlStr = String(url);
     if (urlStr.includes('elevenlabs')) {
       dbg('WebSocket opening →', urlStr);
