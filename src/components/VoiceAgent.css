@@ -138,3 +138,19 @@
     height: 64px;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .voice-agent__orb {
+    transition: none;
+  }
+
+  .voice-agent__orb--connecting,
+  .voice-agent__orb--listening,
+  .voice-agent__orb--speaking {
+    animation: none;
+  }
+
+  .voice-agent__orb-container--speaking .voice-agent__wave {
+    animation: none;
+  }
+}
