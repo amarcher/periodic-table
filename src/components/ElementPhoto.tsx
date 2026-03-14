@@ -19,17 +19,14 @@ interface WikiSummary {
 
 export function ElementPhoto({ element }: ElementPhotoProps) {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    setLoading(true);
     setError(false);
     setImageUrl(null);
 
     const controller = new AbortController();
 
-    // Fetch element image from Wikipedia REST API
     fetch(
       `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(element.name)}`,
       { signal: controller.signal }
@@ -38,42 +35,42 @@ export function ElementPhoto({ element }: ElementPhotoProps) {
       .then((data: WikiSummary) => {
         const url = data.originalimage?.source || data.thumbnail?.source;
         if (url) {
-          setImageUrl(url);
+          // Pre-load the image so it reveals instantly, no progressive paint
+          const img = new Image();
+          img.onload = () => setImageUrl(url);
+          img.onerror = () => setError(true);
+          img.src = url;
         } else {
           setError(true);
         }
-        setLoading(false);
       })
       .catch((err) => {
         if (err.name !== 'AbortError') {
           setError(true);
-          setLoading(false);
         }
       });
 
     return () => controller.abort();
   }, [element.name]);
 
-  if (error || (!loading && !imageUrl)) {
-    return null;
-  }
+  if (error) return null;
 
   return (
     <div className="element-photo">
-      {loading ? (
-        <div className="element-photo__skeleton" />
+      {imageUrl ? (
+        <>
+          <img
+            className="element-photo__img"
+            src={imageUrl}
+            alt={`${element.name} in its natural form`}
+          />
+          <span className="element-photo__caption">
+            {element.name} — {element.appearance || 'appearance unknown'}
+          </span>
+        </>
       ) : (
-        <img
-          className="element-photo__img"
-          src={imageUrl!}
-          alt={`${element.name} in its natural form`}
-          loading="lazy"
-          onError={() => setError(true)}
-        />
+        <div className="element-photo__skeleton" />
       )}
-      <span className="element-photo__caption">
-        {element.name} — {element.appearance || 'appearance unknown'}
-      </span>
     </div>
   );
 }

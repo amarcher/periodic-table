@@ -52,16 +52,17 @@ body::before {
 .app {
   position: relative;
   z-index: 1;
-  min-height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-bottom: 40px;
+  overflow: hidden;
 }
 
 .app-header {
   text-align: center;
-  padding: 40px 20px 12px;
+  padding: 16px 20px 6px;
+  flex-shrink: 0;
 }
 
 .app-title {

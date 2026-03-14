@@ -73,14 +73,14 @@ html:active-view-transition-type(detail-close) {
 /* ---- Content fade + scale (plays after clip-in on mount) ---- */
 
 .detail__content {
-  animation: content-appear 0.3s cubic-bezier(0.2, 0, 0.2, 1) both;
-  animation-delay: 0.35s;
+  animation: content-appear 0.35s cubic-bezier(0.2, 0, 0.2, 1) both;
+  animation-delay: 0.45s;
 }
 
-.detail__col-right .detail__content:nth-child(1) { animation-delay: 0.38s; }
-.detail__col-right .detail__content:nth-child(2) { animation-delay: 0.44s; }
-.detail__col-right .detail__content:nth-child(3) { animation-delay: 0.50s; }
-.detail__col-right .detail__content:nth-child(4) { animation-delay: 0.56s; }
+.detail__col-right .detail__content:nth-child(1) { animation-delay: 0.48s; }
+.detail__col-right .detail__content:nth-child(2) { animation-delay: 0.56s; }
+.detail__col-right .detail__content:nth-child(3) { animation-delay: 0.64s; }
+.detail__col-right .detail__content:nth-child(4) { animation-delay: 0.72s; }
 
 @keyframes content-appear {
   from {
@@ -213,6 +213,10 @@ html:active-view-transition-type(detail-close) {
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .detail__atom-loading {
@@ -228,8 +232,7 @@ html:active-view-transition-type(detail-close) {
 
 @media (min-width: 900px) {
   .detail__atom-zone {
-    flex: 1 1 auto;
-    max-height: 60vh;
+    flex: 0 1 auto;
   }
 }
 
@@ -241,7 +244,7 @@ html:active-view-transition-type(detail-close) {
   align-items: center;
   gap: 4px;
   padding: 0 24px;
-  margin-top: -8px;
+  margin-top: 16px;
 }
 
 .detail__symbol {
@@ -281,51 +284,10 @@ html:active-view-transition-type(detail-close) {
   padding: 12px 24px 0;
 }
 
-/* ---- Quick stats row ---- */
-
-.detail__stats {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  flex-wrap: wrap;
-  padding: 4px 0 0;
-  width: 100%;
-}
-
-@media (min-width: 900px) {
-  .detail__stats { justify-content: flex-start; }
-}
-
-.detail__stat {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  min-width: 72px;
-  padding: 10px 14px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-}
-
-.detail__stat-value {
-  font-family: 'Space Grotesk', monospace;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--cat-color);
-}
-
-.detail__stat-label {
-  font-size: 0.6rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: rgba(255, 255, 255, 0.4);
-}
-
 /* ---- Photo zone ---- */
 
 .detail__photo-zone {
-  padding: 24px 0 0;
+  padding: 0 0 4px;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -335,13 +297,136 @@ html:active-view-transition-type(detail-close) {
   .detail__photo-zone { justify-content: flex-start; }
 }
 
+/* ---- Visual stat cards ---- */
+
+.detail__viz {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  padding: 16px 0 0;
+}
+
+.viz-card {
+  width: 100%;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.viz-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.viz-card__label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.viz-card__value {
+  font-family: 'Space Grotesk', monospace;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--cat-color);
+}
+
+.viz-card__bar {
+  position: relative;
+  padding-bottom: 20px;
+}
+
+.viz-card__track {
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.viz-card__track--temp {
+  background: linear-gradient(90deg,
+    hsla(210, 70%, 55%, 0.12),
+    hsla(30, 80%, 55%, 0.12),
+    hsla(0, 80%, 45%, 0.12)
+  );
+}
+
+.viz-card__track--density {
+  background: linear-gradient(90deg,
+    hsla(200, 50%, 50%, 0.1),
+    hsla(40, 60%, 50%, 0.1)
+  );
+}
+
+.viz-card__fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+.viz-card__fill--temp {
+  background: linear-gradient(90deg,
+    hsla(210, 70%, 55%, 0.7),
+    hsla(30, 80%, 55%, 0.7),
+    hsla(0, 80%, 50%, 0.7)
+  );
+}
+
+.viz-card__fill--density {
+  background: linear-gradient(90deg,
+    hsla(200, 60%, 55%, 0.6),
+    color-mix(in srgb, var(--cat-color) 60%, hsla(40, 60%, 50%, 0.6))
+  );
+}
+
+.viz-card__refs {
+  position: relative;
+  height: 16px;
+  margin-top: 4px;
+}
+
+.viz-card__ref {
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 0.6rem;
+  color: rgba(255, 255, 255, 0.3);
+  white-space: nowrap;
+}
+
+.viz-card__context {
+  font-size: 0.8rem;
+  color: #c0c0d0;
+  line-height: 1.4;
+}
+
+.viz-card__badge {
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.viz-card__badge--float {
+  color: hsla(160, 70%, 60%, 0.9);
+}
+
+.viz-card__badge--sink {
+  color: #c0c0d0;
+}
+
 /* ---- Fun fact cards ---- */
 
 .detail__facts {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 20px 0 0;
+  padding: 16px 0 0;
   width: 100%;
 }
 
@@ -367,17 +452,18 @@ html:active-view-transition-type(detail-close) {
   color: #c8c8d8;
 }
 
-/* ---- Discoverer ---- */
+/* ---- Meta footer (de-prioritized stats) ---- */
 
-.detail__discoverer {
+.detail__meta {
   padding-top: 20px;
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.28);
   font-style: italic;
+  line-height: 1.6;
 }
 
 @media (min-width: 900px) {
-  .detail__discoverer { text-align: left; }
+  .detail__meta { text-align: left; }
 }
 
 /* ---- Mobile ---- */
@@ -386,8 +472,6 @@ html:active-view-transition-type(detail-close) {
   .detail__close { top: 12px; right: 12px; width: 40px; height: 40px; }
   .detail__symbol { font-size: 3.5rem; }
   .detail__name { font-size: 1.4rem; }
-  .detail__stats { gap: 8px; }
-  .detail__stat { min-width: 60px; padding: 8px 10px; }
 }
 
 /* ---- Reduced motion ---- */

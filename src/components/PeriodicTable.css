@@ -1,17 +1,30 @@
 .periodic-table-wrapper {
   width: 100%;
-  overflow-x: auto;
-  padding: 20px;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 20px;
 }
 
 .periodic-table {
+  /* Compute cell size: fit 18 cols or 9.4 rows, whichever is tighter */
+  --gap: 3px;
+  --col-gaps: calc(17 * var(--gap));
+  --row-gaps: calc(9 * var(--gap));
+  --avail-w: calc(100vw - 48px);
+  --avail-h: calc(100dvh - 110px);
+  --cell-by-w: calc((var(--avail-w) - var(--col-gaps)) / 18);
+  --cell-by-h: calc((var(--avail-h) - var(--row-gaps)) / 9.4);
+  --cell: min(var(--cell-by-w), var(--cell-by-h));
+
   display: grid;
-  grid-template-columns: repeat(18, minmax(52px, 1fr));
-  grid-template-rows: repeat(7, auto) 20px repeat(2, auto);
-  gap: 3px;
-  max-width: 1200px;
+  grid-template-columns: repeat(18, var(--cell));
+  grid-template-rows: repeat(7, var(--cell)) calc(var(--cell) * 0.4) repeat(2, var(--cell));
+  gap: var(--gap);
   margin: 0 auto;
-  font-size: clamp(9px, 0.9vw, 13px);
+  font-size: clamp(9px, calc(var(--cell) * 0.19), 16px);
 }
 
 .table-label {
@@ -25,19 +38,10 @@
   white-space: nowrap;
 }
 
-/* Responsive: tighter on smaller screens */
-@media (max-width: 1100px) {
-  .periodic-table {
-    grid-template-columns: repeat(18, minmax(38px, 1fr));
-    font-size: clamp(7px, 0.8vw, 11px);
-  }
-}
-
+/* Responsive: tighter gap on small screens */
 @media (max-width: 700px) {
   .periodic-table {
-    grid-template-columns: repeat(18, minmax(28px, 1fr));
-    gap: 2px;
-    font-size: clamp(5.5px, 1.4vw, 9px);
+    --gap: 2px;
   }
 
   .table-label {

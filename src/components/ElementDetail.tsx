@@ -10,6 +10,87 @@ const AtomVisualizer = lazy(() =>
   import('./AtomVisualizer').then((m) => ({ default: m.AtomVisualizer }))
 );
 
+// sqrt scale: gives better visual spread across large ranges
+function sqrtScale(value: number, max: number): number {
+  return Math.max(0, Math.min(100, Math.sqrt(Math.max(0, value) / max) * 100));
+}
+
+function getMeltContext(celsius: number): string {
+  if (celsius < -40) return 'Stays liquid in the deep cold!';
+  if (celsius < 0) return 'Liquid below freezing!';
+  if (celsius <= 40) return 'Would melt in your hand!';
+  if (celsius <= 100) return 'Melts below boiling water';
+  if (celsius <= 300) return 'An oven could melt it';
+  if (celsius <= 1000) return 'Needs a furnace to melt';
+  if (celsius <= 2000) return 'Takes extreme heat to melt';
+  return 'One of the toughest to melt!';
+}
+
+function getDensityContext(density: number): { text: string; floats: boolean } {
+  if (density < 1) return { text: 'Floats on water!', floats: true };
+  if (density < 3) return { text: 'A bit heavier than water', floats: false };
+  if (density < 8) return { text: 'About as dense as common metals', floats: false };
+  if (density < 12) return { text: 'Heavier than iron!', floats: false };
+  if (density < 18) return { text: 'Heavier than lead!', floats: false };
+  return { text: 'One of the densest things on Earth!', floats: false };
+}
+
+// Reference positions (sqrt scale)
+const REF_ICE = sqrtScale(273, 3773);       // 0°C in the -273..3500 range
+const REF_IRON = sqrtScale(1811, 3773);     // 1538°C
+const REF_WATER_D = sqrtScale(1, 23);       // water density
+const REF_IRON_D = sqrtScale(7.87, 23);     // iron density
+
+function MeltingPointCard({ kelvin }: { kelvin: number }) {
+  const celsius = Math.round(kelvin - 273);
+  const pct = sqrtScale(celsius + 273, 3773);
+
+  return (
+    <div className="viz-card">
+      <div className="viz-card__header">
+        <span className="viz-card__label">Melting Point</span>
+        <span className="viz-card__value">{celsius}°C</span>
+      </div>
+      <div className="viz-card__bar">
+        <div className="viz-card__track viz-card__track--temp">
+          <div className="viz-card__fill viz-card__fill--temp" style={{ width: `${pct}%` }} />
+        </div>
+        <div className="viz-card__refs">
+          <span className="viz-card__ref" style={{ left: `${REF_ICE}%` }}>Ice 0°</span>
+          <span className="viz-card__ref" style={{ left: `${REF_IRON}%` }}>Iron 1538°</span>
+        </div>
+      </div>
+      <span className="viz-card__context">{getMeltContext(celsius)}</span>
+    </div>
+  );
+}
+
+function DensityCard({ density }: { density: number }) {
+  const pct = sqrtScale(density, 23);
+  const { text, floats } = getDensityContext(density);
+
+  return (
+    <div className="viz-card">
+      <div className="viz-card__header">
+        <span className="viz-card__label">Density</span>
+        <span className="viz-card__value">{density} g/cm³</span>
+      </div>
+      <div className="viz-card__bar">
+        <div className="viz-card__track viz-card__track--density">
+          <div className="viz-card__fill viz-card__fill--density" style={{ width: `${pct}%` }} />
+        </div>
+        <div className="viz-card__refs">
+          <span className="viz-card__ref" style={{ left: `${REF_WATER_D}%` }}>Water</span>
+          <span className="viz-card__ref" style={{ left: `${REF_IRON_D}%` }}>Iron</span>
+        </div>
+      </div>
+      <span className={`viz-card__badge ${floats ? 'viz-card__badge--float' : 'viz-card__badge--sink'}`}>
+        {text}
+      </span>
+    </div>
+  );
+}
+
 interface ElementDetailProps {
   element: Element;
   onClose: () => void;
@@ -116,39 +197,19 @@ export function ElementDetail({ element, onClose, voiceStatus, voiceIsSpeaking, 
           </div>
         </div>
 
-        {/* RIGHT: stats + photo + facts */}
+        {/* RIGHT: photo + visual stats + facts */}
         <div className="detail__col-right">
-          <div className="detail__stats detail__content">
-            <div className="detail__stat">
-              <span className="detail__stat-value">{element.atomicNumber}</span>
-              <span className="detail__stat-label">Atomic #</span>
-            </div>
-            <div className="detail__stat">
-              <span className="detail__stat-value">{element.atomicMass.toFixed(1)}</span>
-              <span className="detail__stat-label">Mass</span>
-            </div>
-            {element.meltingPoint != null && (
-              <div className="detail__stat">
-                <span className="detail__stat-value">{Math.round(element.meltingPoint - 273)}°</span>
-                <span className="detail__stat-label">Melts at</span>
-              </div>
-            )}
-            {element.density != null && (
-              <div className="detail__stat">
-                <span className="detail__stat-value">{element.density}</span>
-                <span className="detail__stat-label">Density</span>
-              </div>
-            )}
-            {element.electronegativity != null && (
-              <div className="detail__stat">
-                <span className="detail__stat-value">{element.electronegativity}</span>
-                <span className="detail__stat-label">Eneg.</span>
-              </div>
-            )}
-          </div>
-
           <div className="detail__photo-zone detail__content">
             <ElementPhoto element={element} />
+          </div>
+
+          <div className="detail__viz detail__content">
+            {element.meltingPoint != null && (
+              <MeltingPointCard kelvin={element.meltingPoint} />
+            )}
+            {element.density != null && (
+              <DensityCard density={element.density} />
+            )}
           </div>
 
           <div className="detail__facts detail__content">
@@ -162,8 +223,10 @@ export function ElementDetail({ element, onClose, voiceStatus, voiceIsSpeaking, 
             ))}
           </div>
 
-          <div className="detail__discoverer detail__content">
-            Discovered by {element.discoveredBy} ({element.yearDiscovered})
+          <div className="detail__meta detail__content">
+            #{element.atomicNumber} · {element.atomicMass.toFixed(1)} u
+            {element.electronegativity != null && ` · Electronegativity ${element.electronegativity}`}
+            {' · '}Discovered by {element.discoveredBy} ({element.yearDiscovered})
           </div>
         </div>
       </div>
