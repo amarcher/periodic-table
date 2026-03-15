@@ -1,0 +1,633 @@
+/* ---- Reactivity Viz: Flame Meter + Water Explosion ---- */
+
+.rxviz {
+  width: 100%;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.rxviz--level-5 {
+  border-color: hsla(15, 80%, 50%, 0.15);
+  box-shadow: 0 0 12px hsla(15, 80%, 50%, 0.06);
+}
+
+.rxviz__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.rxviz__label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.rxviz__value {
+  font-family: 'Space Grotesk', monospace;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--cat-color);
+}
+
+.rxviz__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rxviz__desc {
+  font-size: 0.8rem;
+  color: #c0c0d0;
+  line-height: 1.4;
+}
+
+.rxviz__reacts {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* ---- Scene ---- */
+
+.rxviz__scene {
+  position: relative;
+  height: 140px;
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 12px;
+  gap: 10px;
+  background: linear-gradient(180deg, hsla(220, 30%, 14%, 0.3), hsla(220, 20%, 8%, 0.3));
+}
+
+.rxviz__scene--level-4,
+.rxviz__scene--level-5 {
+  background: linear-gradient(180deg, hsla(15, 35%, 15%, 0.4), hsla(10, 25%, 8%, 0.4));
+}
+
+/* ---- Meter ---- */
+
+.rxviz__meter {
+  display: flex;
+  gap: 4px;
+  width: calc(100% - 40px);
+  z-index: 2;
+}
+
+.rxviz__seg {
+  flex: 1;
+  height: 10px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.rxviz__seg--on {
+  animation: rxviz-seg-in 0.4s cubic-bezier(0.2, 0, 0.2, 1) both;
+}
+
+/* ---- Noble gas sleep ---- */
+
+.rxviz__sleep {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -60%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rxviz__sleep-face {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--cat-color) 25%, rgba(40, 40, 60, 0.6));
+  border: 1.5px solid color-mix(in srgb, var(--cat-color) 40%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: rxviz-sleep-bob 3s ease-in-out infinite;
+}
+
+.rxviz__sleep-sym {
+  font-family: 'Space Grotesk', monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.rxviz__zzz {
+  display: flex;
+  align-items: flex-start;
+  gap: 3px;
+}
+
+.rxviz__z {
+  font-family: 'Space Grotesk', monospace;
+  color: rgba(255, 255, 255, 0.25);
+  font-weight: 700;
+  font-style: italic;
+}
+
+.rxviz__z--1 { font-size: 0.65rem; animation: rxviz-zzz 3s ease-in-out infinite; }
+.rxviz__z--2 { font-size: 0.85rem; animation: rxviz-zzz 3s ease-in-out infinite; animation-delay: 0.5s; }
+.rxviz__z--3 { font-size: 1.1rem; animation: rxviz-zzz 3s ease-in-out infinite; animation-delay: 1s; }
+
+/* ---- Multi-layered flame ---- */
+
+.rxviz__flame-zone {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.rxviz__flame {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.rxviz__flame-core,
+.rxviz__flame-mid,
+.rxviz__flame-outer,
+.rxviz__flame-tip {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+}
+
+/* Level 1: small candle */
+.rxviz__flame--1 .rxviz__flame-outer {
+  width: 16px; height: 26px; margin-left: -8px;
+  background: hsla(40, 90%, 55%, 0.45);
+  animation: rxviz-flick 1.8s ease-in-out infinite;
+}
+.rxviz__flame--1 .rxviz__flame-mid {
+  width: 10px; height: 16px; margin-left: -5px;
+  background: hsla(45, 95%, 65%, 0.65);
+  animation: rxviz-flick 1.5s ease-in-out infinite alternate;
+}
+.rxviz__flame--1 .rxviz__flame-core {
+  width: 5px; height: 8px; margin-left: -2.5px;
+  background: hsla(55, 100%, 85%, 0.8);
+  animation: rxviz-flick 1.2s ease-in-out infinite;
+}
+
+/* Level 2: campfire */
+.rxviz__flame--2 .rxviz__flame-outer {
+  width: 26px; height: 42px; margin-left: -13px;
+  background: hsla(35, 90%, 50%, 0.5);
+  animation: rxviz-flick 1.2s ease-in-out infinite;
+}
+.rxviz__flame--2 .rxviz__flame-mid {
+  width: 18px; height: 28px; margin-left: -9px;
+  background: hsla(45, 95%, 60%, 0.65);
+  animation: rxviz-flick 1s ease-in-out infinite alternate;
+}
+.rxviz__flame--2 .rxviz__flame-core {
+  width: 10px; height: 16px; margin-left: -5px;
+  background: hsla(55, 100%, 80%, 0.8);
+  animation: rxviz-flick 0.8s ease-in-out infinite;
+}
+.rxviz__flame--2 .rxviz__flame-tip {
+  width: 6px; height: 10px; margin-left: -3px; bottom: 26px;
+  background: hsla(40, 90%, 55%, 0.3);
+  animation: rxviz-flick 0.7s ease-in-out infinite alternate;
+}
+
+/* Level 3: furnace */
+.rxviz__flame--3 .rxviz__flame-outer {
+  width: 34px; height: 54px; margin-left: -17px;
+  background: hsla(25, 90%, 48%, 0.55);
+  animation: rxviz-flick 0.8s ease-in-out infinite;
+}
+.rxviz__flame--3 .rxviz__flame-mid {
+  width: 24px; height: 38px; margin-left: -12px;
+  background: hsla(40, 95%, 58%, 0.7);
+  animation: rxviz-flick 0.65s ease-in-out infinite alternate;
+}
+.rxviz__flame--3 .rxviz__flame-core {
+  width: 14px; height: 22px; margin-left: -7px;
+  background: hsla(50, 100%, 75%, 0.85);
+  animation: rxviz-flick 0.5s ease-in-out infinite;
+}
+.rxviz__flame--3 .rxviz__flame-tip {
+  width: 10px; height: 18px; margin-left: -5px; bottom: 36px;
+  background: hsla(30, 85%, 50%, 0.35);
+  animation: rxviz-flick 0.45s ease-in-out infinite alternate;
+}
+
+/* Level 4: inferno */
+.rxviz__flame--4 .rxviz__flame-outer {
+  width: 42px; height: 66px; margin-left: -21px;
+  background: hsla(15, 90%, 48%, 0.6);
+  animation: rxviz-flick 0.55s ease-in-out infinite;
+}
+.rxviz__flame--4 .rxviz__flame-mid {
+  width: 30px; height: 48px; margin-left: -15px;
+  background: hsla(35, 95%, 55%, 0.7);
+  animation: rxviz-flick 0.45s ease-in-out infinite alternate;
+}
+.rxviz__flame--4 .rxviz__flame-core {
+  width: 18px; height: 30px; margin-left: -9px;
+  background: hsla(50, 100%, 72%, 0.85);
+  animation: rxviz-flick 0.35s ease-in-out infinite;
+}
+.rxviz__flame--4 .rxviz__flame-tip {
+  width: 14px; height: 24px; margin-left: -7px; bottom: 44px;
+  background: hsla(20, 85%, 48%, 0.4);
+  animation: rxviz-flick 0.3s ease-in-out infinite alternate;
+}
+
+/* ---- Sparks ---- */
+
+.rxviz__sparks {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 0;
+}
+
+.rxviz__spark {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: hsla(45, 95%, 65%, 0.8);
+}
+
+.rxviz__spark--1 { animation: rxviz-spark-a 2s ease-out infinite; animation-delay: 0.2s; }
+.rxviz__spark--2 { animation: rxviz-spark-b 2.2s ease-out infinite; animation-delay: 0.7s; }
+.rxviz__spark--3 { animation: rxviz-spark-c 1.8s ease-out infinite; animation-delay: 0.4s; }
+.rxviz__spark--4 { animation: rxviz-spark-d 2.1s ease-out infinite; animation-delay: 1s; }
+.rxviz__spark--5 { animation: rxviz-spark-e 1.6s ease-out infinite; animation-delay: 0.3s; }
+.rxviz__spark--6 { animation: rxviz-spark-f 1.9s ease-out infinite; animation-delay: 0.8s; }
+
+/* ---- Heat shimmer ---- */
+
+.rxviz__shimmer {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  width: 50px;
+  height: 30px;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    180deg,
+    hsla(30, 80%, 50%, 0.06),
+    transparent
+  );
+  animation: rxviz-shimmer 1.5s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+/* ===== Level 5: Water Explosion Scene ===== */
+
+.rxviz__explosion {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* Water */
+.rxviz__water {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 45%;
+}
+
+.rxviz__water-body {
+  position: absolute;
+  inset: 0;
+  top: 4px;
+  background: hsla(200, 60%, 40%, 0.2);
+}
+
+.rxviz__water-surface {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: hsla(200, 70%, 55%, 0.3);
+  animation: rxviz-water-wobble 2s ease-in-out infinite;
+}
+
+/* Element block dropping */
+.rxviz__drop-block {
+  position: absolute;
+  top: 8%;
+  left: 50%;
+  width: 28px;
+  height: 28px;
+  margin-left: -14px;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--cat-color) 55%, rgba(40, 40, 60, 0.9));
+  border: 1.5px solid color-mix(in srgb, var(--cat-color) 75%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+  animation: rxviz-drop-in 3.5s ease-in infinite;
+}
+
+.rxviz__drop-sym {
+  font-family: 'Space Grotesk', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* Explosion blast */
+.rxviz__blast {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  width: 60px;
+  height: 60px;
+  margin: -30px 0 0 -30px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    hsla(45, 100%, 75%, 0.5) 0%,
+    hsla(25, 95%, 55%, 0.3) 40%,
+    transparent 70%
+  );
+  z-index: 4;
+  animation: rxviz-blast 3.5s ease-out infinite;
+}
+
+.rxviz__blast-ring {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border-radius: 50%;
+  border: 2px solid hsla(45, 90%, 65%, 0.4);
+  z-index: 4;
+  animation: rxviz-blast-ring 3.5s ease-out infinite;
+}
+
+/* Water splashes */
+.rxviz__splash {
+  position: absolute;
+  top: 50%;
+  width: 4px;
+  height: 20px;
+  border-radius: 2px;
+  background: hsla(200, 70%, 60%, 0.5);
+  z-index: 5;
+}
+
+.rxviz__splash--l {
+  left: 38%;
+  animation: rxviz-splash-l 3.5s ease-out infinite;
+}
+
+.rxviz__splash--r {
+  right: 38%;
+  animation: rxviz-splash-r 3.5s ease-out infinite;
+}
+
+/* Explosion sparks */
+.rxviz__xspark {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: hsla(40, 95%, 65%, 0.9);
+  box-shadow: 0 0 4px hsla(40, 95%, 65%, 0.5);
+  z-index: 5;
+}
+
+.rxviz__xspark--1 { animation: rxviz-xspark-1 3.5s ease-out infinite; }
+.rxviz__xspark--2 { animation: rxviz-xspark-2 3.5s ease-out infinite; }
+.rxviz__xspark--3 { animation: rxviz-xspark-3 3.5s ease-out infinite; }
+.rxviz__xspark--4 { animation: rxviz-xspark-4 3.5s ease-out infinite; }
+.rxviz__xspark--5 { animation: rxviz-xspark-5 3.5s ease-out infinite; }
+.rxviz__xspark--6 { animation: rxviz-xspark-6 3.5s ease-out infinite; }
+.rxviz__xspark--7 { animation: rxviz-xspark-7 3.5s ease-out infinite; }
+.rxviz__xspark--8 { animation: rxviz-xspark-8 3.5s ease-out infinite; }
+
+/* Fireball */
+.rxviz__fireball {
+  position: absolute;
+  top: 42%;
+  left: 50%;
+  width: 40px;
+  height: 50px;
+  margin-left: -20px;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: linear-gradient(
+    to top,
+    hsla(15, 90%, 50%, 0.6),
+    hsla(40, 95%, 55%, 0.5),
+    hsla(55, 100%, 70%, 0.3),
+    transparent
+  );
+  z-index: 4;
+  animation: rxviz-fireball 3.5s ease-out infinite;
+}
+
+/* ---- Animations ---- */
+
+@keyframes rxviz-seg-in {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes rxviz-sleep-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes rxviz-zzz {
+  0%, 100% { transform: translateY(0); opacity: 0.2; }
+  50% { transform: translateY(-8px); opacity: 0.5; }
+}
+
+@keyframes rxviz-flick {
+  0% { transform: scaleY(1) scaleX(1); }
+  33% { transform: scaleY(1.08) scaleX(0.94); }
+  66% { transform: scaleY(0.92) scaleX(1.06); }
+  100% { transform: scaleY(1.04) scaleX(0.97); }
+}
+
+@keyframes rxviz-spark-a {
+  0% { transform: translate(0, 0); opacity: 0.9; }
+  100% { transform: translate(25px, -35px); opacity: 0; }
+}
+@keyframes rxviz-spark-b {
+  0% { transform: translate(0, 0); opacity: 0.9; }
+  100% { transform: translate(-20px, -30px); opacity: 0; }
+}
+@keyframes rxviz-spark-c {
+  0% { transform: translate(0, 0); opacity: 0.9; }
+  100% { transform: translate(18px, -40px); opacity: 0; }
+}
+@keyframes rxviz-spark-d {
+  0% { transform: translate(0, 0); opacity: 0.9; }
+  100% { transform: translate(-28px, -25px); opacity: 0; }
+}
+@keyframes rxviz-spark-e {
+  0% { transform: translate(0, 0); opacity: 0.9; }
+  100% { transform: translate(12px, -45px); opacity: 0; }
+}
+@keyframes rxviz-spark-f {
+  0% { transform: translate(0, 0); opacity: 0.9; }
+  100% { transform: translate(-15px, -38px); opacity: 0; }
+}
+
+@keyframes rxviz-shimmer {
+  0% { opacity: 0.3; transform: translateX(-50%) scaleX(0.9); }
+  100% { opacity: 0.6; transform: translateX(-50%) scaleX(1.1); }
+}
+
+/* Level 5 water explosion timing:
+   0-30%: block drops
+   30-35%: impact
+   35-70%: explosion
+   70-100%: settle + reset */
+
+@keyframes rxviz-drop-in {
+  0% { transform: translateY(0); opacity: 1; }
+  28% { transform: translateY(42px); opacity: 1; }
+  32% { transform: translateY(42px) scale(0.5); opacity: 0; }
+  100% { transform: translateY(42px) scale(0.5); opacity: 0; }
+}
+
+@keyframes rxviz-blast {
+  0%, 30% { transform: scale(0); opacity: 0; }
+  35% { transform: scale(0.3); opacity: 0.9; }
+  55% { transform: scale(1.5); opacity: 0.5; }
+  75% { transform: scale(2); opacity: 0; }
+  100% { opacity: 0; }
+}
+
+@keyframes rxviz-blast-ring {
+  0%, 30% { transform: scale(0); opacity: 0; }
+  35% { transform: scale(1); opacity: 0.7; }
+  65% { transform: scale(4); opacity: 0; }
+  100% { opacity: 0; }
+}
+
+@keyframes rxviz-splash-l {
+  0%, 30% { transform: translate(0, 0) scaleY(0); opacity: 0; }
+  35% { transform: translate(0, 0) scaleY(1); opacity: 0.7; }
+  55% { transform: translate(-15px, -30px) scaleY(1.3); opacity: 0.5; }
+  75% { transform: translate(-20px, -10px) scaleY(0.5); opacity: 0; }
+  100% { opacity: 0; }
+}
+
+@keyframes rxviz-splash-r {
+  0%, 30% { transform: translate(0, 0) scaleY(0); opacity: 0; }
+  35% { transform: translate(0, 0) scaleY(1); opacity: 0.7; }
+  55% { transform: translate(15px, -30px) scaleY(1.3); opacity: 0.5; }
+  75% { transform: translate(20px, -10px) scaleY(0.5); opacity: 0; }
+  100% { opacity: 0; }
+}
+
+@keyframes rxviz-fireball {
+  0%, 30% { transform: scaleY(0) scaleX(0); opacity: 0; }
+  35% { transform: scaleY(0.5) scaleX(0.5); opacity: 0.8; }
+  50% { transform: scaleY(1.3) scaleX(1); opacity: 0.7; }
+  70% { transform: scaleY(0.6) scaleX(0.8); opacity: 0.3; }
+  85% { transform: scaleY(0.2) scaleX(0.5); opacity: 0; }
+  100% { opacity: 0; }
+}
+
+@keyframes rxviz-water-wobble {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(1.3); }
+}
+
+/* Explosion sparks — radiate outward on impact */
+@keyframes rxviz-xspark-1 {
+  0%, 32% { transform: translate(0,0) scale(1); opacity: 0; }
+  35% { opacity: 1; }
+  100% { transform: translate(45px, -35px) scale(0.3); opacity: 0; }
+}
+@keyframes rxviz-xspark-2 {
+  0%, 32% { transform: translate(0,0) scale(1); opacity: 0; }
+  35% { opacity: 1; }
+  100% { transform: translate(-40px, -40px) scale(0.3); opacity: 0; }
+}
+@keyframes rxviz-xspark-3 {
+  0%, 32% { transform: translate(0,0) scale(1); opacity: 0; }
+  35% { opacity: 1; }
+  100% { transform: translate(35px, 20px) scale(0.3); opacity: 0; }
+}
+@keyframes rxviz-xspark-4 {
+  0%, 32% { transform: translate(0,0) scale(1); opacity: 0; }
+  35% { opacity: 1; }
+  100% { transform: translate(-45px, 15px) scale(0.3); opacity: 0; }
+}
+@keyframes rxviz-xspark-5 {
+  0%, 32% { transform: translate(0,0) scale(1); opacity: 0; }
+  35% { opacity: 1; }
+  100% { transform: translate(20px, -50px) scale(0.3); opacity: 0; }
+}
+@keyframes rxviz-xspark-6 {
+  0%, 32% { transform: translate(0,0) scale(1); opacity: 0; }
+  35% { opacity: 1; }
+  100% { transform: translate(-25px, -45px) scale(0.3); opacity: 0; }
+}
+@keyframes rxviz-xspark-7 {
+  0%, 32% { transform: translate(0,0) scale(1); opacity: 0; }
+  35% { opacity: 1; }
+  100% { transform: translate(50px, 5px) scale(0.3); opacity: 0; }
+}
+@keyframes rxviz-xspark-8 {
+  0%, 32% { transform: translate(0,0) scale(1); opacity: 0; }
+  35% { opacity: 1; }
+  100% { transform: translate(-50px, -10px) scale(0.3); opacity: 0; }
+}
+
+/* ---- Reduced motion ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  .rxviz__seg--on,
+  .rxviz__z,
+  .rxviz__sleep-face,
+  .rxviz__flame-core,
+  .rxviz__flame-mid,
+  .rxviz__flame-outer,
+  .rxviz__flame-tip,
+  .rxviz__spark,
+  .rxviz__shimmer,
+  .rxviz__drop-block,
+  .rxviz__blast,
+  .rxviz__blast-ring,
+  .rxviz__splash,
+  .rxviz__xspark,
+  .rxviz__fireball,
+  .rxviz__water-surface {
+    animation: none;
+  }
+  .rxviz__seg--on { transform: scaleX(1); }
+  .rxviz__blast, .rxviz__blast-ring, .rxviz__xspark, .rxviz__fireball, .rxviz__splash { opacity: 0; }
+}

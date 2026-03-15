@@ -1,0 +1,291 @@
+/* ---- Density Viz: Sink or Float ---- */
+
+.dviz {
+  width: 100%;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dviz__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.dviz__label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.dviz__value {
+  font-family: 'Space Grotesk', monospace;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--cat-color);
+}
+
+.dviz__context {
+  font-size: 0.8rem;
+  color: #c0c0d0;
+  line-height: 1.4;
+}
+
+/* ---- Scene container ---- */
+
+.dviz__scene {
+  position: relative;
+  height: 130px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* ---- Gas scene: balloon floating ---- */
+
+.dviz__scene--gas {
+  background: linear-gradient(180deg, hsla(220, 40%, 20%, 0.5) 0%, hsla(220, 30%, 12%, 0.5) 100%);
+}
+
+.dviz__balloon {
+  position: absolute;
+  left: 50%;
+  bottom: 20%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: dviz-float 3s ease-in-out infinite;
+  animation-delay: 0.3s;
+}
+
+.dviz__balloon-body {
+  width: 44px;
+  height: 52px;
+  border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+  background: color-mix(in srgb, var(--cat-color) 60%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--cat-color) 80%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px color-mix(in srgb, var(--cat-color) 25%, transparent);
+}
+
+.dviz__balloon-symbol {
+  font-family: 'Space Grotesk', monospace;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.dviz__balloon-string {
+  width: 1px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.dviz__cloud {
+  position: absolute;
+  width: 40px;
+  height: 16px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.dviz__cloud--1 {
+  top: 18%;
+  left: 15%;
+  animation: dviz-cloud-drift 8s ease-in-out infinite;
+}
+
+.dviz__cloud--2 {
+  top: 35%;
+  right: 12%;
+  width: 32px;
+  height: 12px;
+  animation: dviz-cloud-drift 10s ease-in-out infinite reverse;
+  animation-delay: 2s;
+}
+
+/* ---- Liquid scene: water tank ---- */
+
+.dviz__scene--liquid {
+  background: linear-gradient(180deg, hsla(220, 30%, 15%, 0.3) 0%, hsla(210, 50%, 12%, 0.3) 100%);
+}
+
+.dviz__water {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  bottom: 8%;
+  height: 65%;
+  border-radius: 0 0 8px 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.dviz__water-surface {
+  position: relative;
+  height: 4px;
+  flex-shrink: 0;
+  background: hsla(200, 70%, 60%, 0.3);
+}
+
+.dviz__ripple {
+  position: absolute;
+  top: 0;
+  height: 2px;
+  border-radius: 50%;
+  background: hsla(200, 80%, 70%, 0.4);
+}
+
+.dviz__ripple--1 {
+  left: 35%;
+  width: 30%;
+  animation: dviz-ripple 2.5s ease-out infinite;
+  animation-delay: 0.5s;
+}
+
+.dviz__ripple--2 {
+  left: 40%;
+  width: 20%;
+  animation: dviz-ripple 2.5s ease-out infinite;
+  animation-delay: 1.3s;
+}
+
+.dviz__water-body {
+  flex: 1;
+  background: hsla(200, 60%, 50%, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ---- Bubbles ---- */
+
+.dviz__bubble {
+  position: absolute;
+  border-radius: 50%;
+  background: hsla(200, 80%, 70%, 0.2);
+  border: 1px solid hsla(200, 80%, 80%, 0.15);
+}
+
+.dviz__bubble--1 {
+  width: 6px;
+  height: 6px;
+  left: 45%;
+  bottom: -6px;
+  animation: dviz-bubble-rise 2s ease-out infinite;
+  animation-delay: 0.8s;
+}
+
+.dviz__bubble--2 {
+  width: 4px;
+  height: 4px;
+  left: 55%;
+  bottom: -4px;
+  animation: dviz-bubble-rise 2.4s ease-out infinite;
+  animation-delay: 1.4s;
+}
+
+.dviz__bubble--3 {
+  width: 5px;
+  height: 5px;
+  left: 38%;
+  bottom: -5px;
+  animation: dviz-bubble-rise 1.8s ease-out infinite;
+  animation-delay: 2s;
+}
+
+/* ---- Element block ---- */
+
+.dviz__block {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  left: 50%;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--cat-color) 50%, rgba(40, 40, 60, 0.8));
+  border: 1.5px solid color-mix(in srgb, var(--cat-color) 70%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateX(-50%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dviz__block-symbol {
+  font-family: 'Space Grotesk', monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* Float: block bobs at surface, partially submerged */
+.dviz__block--float {
+  /* Position: top of water area minus (block height * (1 - submersion%)) */
+  bottom: calc(65% + 8% - 36px + 36px * (1 - var(--submersion)) / 100);
+  animation: dviz-bob 3s ease-in-out infinite;
+  animation-delay: 0.3s;
+}
+
+/* Sink: block drops to depth within water */
+.dviz__block--sink {
+  bottom: calc(8% + 4px);
+  animation: dviz-sink 1.2s cubic-bezier(0.4, 0, 0.6, 1) both;
+  animation-delay: 0.3s;
+}
+
+/* ---- Animations ---- */
+
+@keyframes dviz-float {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-8px); }
+}
+
+@keyframes dviz-bob {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-4px); }
+}
+
+@keyframes dviz-sink {
+  0% { transform: translateX(-50%) translateY(-80px); opacity: 0.6; }
+  100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+}
+
+@keyframes dviz-ripple {
+  0% { transform: scaleX(0.3); opacity: 0.6; }
+  100% { transform: scaleX(1.5); opacity: 0; }
+}
+
+@keyframes dviz-bubble-rise {
+  0% { transform: translateY(0); opacity: 0.6; }
+  100% { transform: translateY(-60px); opacity: 0; }
+}
+
+@keyframes dviz-cloud-drift {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(12px); }
+}
+
+/* ---- Reduced motion ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  .dviz__balloon,
+  .dviz__block--float,
+  .dviz__block--sink,
+  .dviz__ripple,
+  .dviz__bubble,
+  .dviz__cloud {
+    animation: none;
+  }
+  .dviz__block--sink {
+    transform: translateX(-50%);
+    opacity: 1;
+  }
+}
