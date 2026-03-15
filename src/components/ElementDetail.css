@@ -297,127 +297,20 @@ html:active-view-transition-type(detail-close) {
   .detail__photo-zone { justify-content: flex-start; }
 }
 
-/* ---- Visual stat cards ---- */
+/* ---- Visual stat cards (2x2 grid) ---- */
 
 .detail__viz {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 12px;
   width: 100%;
   padding: 16px 0 0;
 }
 
-.viz-card {
-  width: 100%;
-  padding: 16px 18px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.viz-card__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-}
-
-.viz-card__label {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: rgba(255, 255, 255, 0.45);
-}
-
-.viz-card__value {
-  font-family: 'Space Grotesk', monospace;
-  font-size: 1.15rem;
-  font-weight: 600;
-  color: var(--cat-color);
-}
-
-.viz-card__bar {
-  position: relative;
-  padding-bottom: 20px;
-}
-
-.viz-card__track {
-  height: 8px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.06);
-  overflow: hidden;
-}
-
-.viz-card__track--temp {
-  background: linear-gradient(90deg,
-    hsla(210, 70%, 55%, 0.12),
-    hsla(30, 80%, 55%, 0.12),
-    hsla(0, 80%, 45%, 0.12)
-  );
-}
-
-.viz-card__track--density {
-  background: linear-gradient(90deg,
-    hsla(200, 50%, 50%, 0.1),
-    hsla(40, 60%, 50%, 0.1)
-  );
-}
-
-.viz-card__fill {
-  height: 100%;
-  border-radius: 4px;
-  transition: width 0.5s cubic-bezier(0.2, 0, 0.2, 1);
-}
-
-.viz-card__fill--temp {
-  background: linear-gradient(90deg,
-    hsla(210, 70%, 55%, 0.7),
-    hsla(30, 80%, 55%, 0.7),
-    hsla(0, 80%, 50%, 0.7)
-  );
-}
-
-.viz-card__fill--density {
-  background: linear-gradient(90deg,
-    hsla(200, 60%, 55%, 0.6),
-    color-mix(in srgb, var(--cat-color) 60%, hsla(40, 60%, 50%, 0.6))
-  );
-}
-
-.viz-card__refs {
-  position: relative;
-  height: 16px;
-  margin-top: 4px;
-}
-
-.viz-card__ref {
-  position: absolute;
-  transform: translateX(-50%);
-  font-size: 0.6rem;
-  color: rgba(255, 255, 255, 0.3);
-  white-space: nowrap;
-}
-
-.viz-card__context {
-  font-size: 0.8rem;
-  color: #c0c0d0;
-  line-height: 1.4;
-}
-
-.viz-card__badge {
-  font-size: 0.8rem;
-  font-weight: 500;
-  line-height: 1.4;
-}
-
-.viz-card__badge--float {
-  color: hsla(160, 70%, 60%, 0.9);
-}
-
-.viz-card__badge--sink {
-  color: #c0c0d0;
+@media (min-width: 900px) {
+  .detail__viz {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 /* ---- Fun fact cards ---- */
