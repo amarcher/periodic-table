@@ -1,6 +1,6 @@
 import { useEffect, useRef, lazy, Suspense } from 'react';
 import type { Element } from '../types/element';
-import type { VoiceStatus } from '../hooks/useElementConversation';
+import type { MicError, VoiceStatus } from '../hooks/useElementConversation';
 import { categoryColors, categoryLabels } from '../utils/colors';
 import { VoiceAgent } from './VoiceAgent';
 import { ElementPhoto } from './ElementPhoto';
@@ -16,9 +16,11 @@ interface ElementDetailProps {
   voiceStatus: VoiceStatus;
   voiceIsSpeaking: boolean;
   onVoiceToggle: () => void;
+  micError: MicError;
+  onDismissVoiceError: () => void;
 }
 
-export function ElementDetail({ element, onClose, voiceStatus, voiceIsSpeaking, onVoiceToggle }: ElementDetailProps) {
+export function ElementDetail({ element, onClose, voiceStatus, voiceIsSpeaking, onVoiceToggle, micError, onDismissVoiceError }: ElementDetailProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
 
@@ -112,6 +114,8 @@ export function ElementDetail({ element, onClose, voiceStatus, voiceIsSpeaking, 
               isSpeaking={voiceIsSpeaking}
               onToggle={onVoiceToggle}
               catColor={catColor}
+              micError={micError}
+              onDismissError={onDismissVoiceError}
             />
           </div>
         </div>

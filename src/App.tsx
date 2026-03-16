@@ -91,7 +91,13 @@ function App() {
 
       {!selected && voice.agentId && (
         <div className="app__voice-float">
-          <VoiceAgent status={voice.status} isSpeaking={voice.isSpeaking} onToggle={voice.toggle} />
+          <VoiceAgent
+            status={voice.status}
+            isSpeaking={voice.isSpeaking}
+            onToggle={voice.toggle}
+            micError={voice.micError}
+            onDismissError={voice.clearMicError}
+          />
         </div>
       )}
 
@@ -102,6 +108,8 @@ function App() {
           voiceStatus={voice.status}
           voiceIsSpeaking={voice.isSpeaking}
           onVoiceToggle={voice.toggle}
+          micError={voice.micError}
+          onDismissVoiceError={voice.clearMicError}
         />
       )}
     </div>

@@ -4,68 +4,13 @@ import type { Element } from '../types/element';
 import { categoryLabels } from '../utils/colors';
 import { elements } from '../data/elements';
 
-const DEBUG_VOICE = true;
-
-function dbg(...args: unknown[]) {
-  if (DEBUG_VOICE) console.log('[VoiceDebug]', ...args);
-}
-
-// Patch getUserMedia, fetch, and WebSocket to trace the full connection lifecycle
-if (DEBUG_VOICE) {
-  const origGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
-  navigator.mediaDevices.getUserMedia = function (constraints?: MediaStreamConstraints) {
-    dbg('getUserMedia called with constraints:', JSON.stringify(constraints));
-    const t0 = performance.now();
-    return origGetUserMedia(constraints).then(
-      (stream) => {
-        dbg('getUserMedia resolved in', Math.round(performance.now() - t0), 'ms — tracks:', stream.getTracks().map(t => t.kind));
-        return stream;
-      },
-      (err) => {
-        console.error('[VoiceDebug] getUserMedia REJECTED in', Math.round(performance.now() - t0), 'ms —', err.name, err.message);
-        throw err;
-      },
-    );
-  };
-
-  const origFetch = window.fetch;
-  window.fetch = function (...args: Parameters<typeof fetch>) {
-    const url = typeof args[0] === 'string' ? args[0] : args[0] instanceof Request ? args[0].url : String(args[0]);
-    if (url.includes('elevenlabs')) {
-      dbg('fetch →', url, args[1]?.method || 'GET');
-      return origFetch.apply(this, args).then(
-        (res) => { dbg('fetch ←', url, res.status); return res; },
-        (err) => { console.error('[VoiceDebug] fetch FAILED →', url, err); throw err; },
-      );
-    }
-    return origFetch.apply(this, args);
-  };
-
-  const OrigWS = window.WebSocket;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (window as any).WebSocket = function (url: string | URL, protocols?: string | string[]) {
-    const urlStr = String(url);
-    if (urlStr.includes('elevenlabs')) {
-      dbg('WebSocket opening →', urlStr);
-    }
-    const ws = new OrigWS(url, protocols);
-    if (urlStr.includes('elevenlabs')) {
-      ws.addEventListener('open', () => dbg('WebSocket OPEN →', urlStr));
-      ws.addEventListener('error', (e) => console.error('[VoiceDebug] WebSocket ERROR →', urlStr, e));
-      ws.addEventListener('close', (e) => dbg('WebSocket CLOSE →', urlStr, 'code:', e.code, 'reason:', e.reason));
-    }
-    return ws;
-  } as unknown as typeof WebSocket;
-  Object.assign(window.WebSocket, OrigWS);
-  window.WebSocket.prototype = OrigWS.prototype;
-}
-
 interface ConversationCallbacks {
   onNavigate: (element: Element) => void;
   onGoBack: () => void;
 }
 
 export type VoiceStatus = 'off' | 'connecting' | 'connected' | 'error';
+export type MicError = 'timeout' | 'not-allowed' | 'device' | 'no-input' | null;
 
 function buildElementContext(element: Element): string {
   return [
@@ -86,8 +31,10 @@ function buildElementContext(element: Element): string {
 export function useElementConversation({ onNavigate, onGoBack }: ConversationCallbacks) {
   const agentId = import.meta.env.VITE_ELEVENLABS_AGENT_ID as string | undefined;
   const [sessionStarted, setSessionStarted] = useState(false);
+  const [micError, setMicError] = useState<MicError>(null);
   const pendingElementRef = useRef<Element | null>(null);
   const currentElementRef = useRef<number | null>(null);
+  const inputVolumeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const conversation = useConversation({
     clientTools: {
@@ -107,52 +54,63 @@ export function useElementConversation({ onNavigate, onGoBack }: ConversationCal
       },
     },
     onConnect: () => {
-      dbg('onConnect fired — SDK reports connection established');
-      dbg('onConnect: pendingElement =', pendingElementRef.current?.name ?? 'none');
       // If an element was clicked before connection completed, send it now
       if (pendingElementRef.current) {
         const ctx = buildElementContext(pendingElementRef.current);
-        dbg('onConnect: flushing pending element context');
         conversation.sendContextualUpdate(ctx);
         currentElementRef.current = pendingElementRef.current.atomicNumber;
         pendingElementRef.current = null;
       }
     },
-    onDisconnect: () => {
-      dbg('onDisconnect fired — SDK reports session ended');
-    },
-    onMessage: (message: unknown) => {
-      dbg('onMessage received:', message);
-    },
     onError: (error: unknown) => {
-      console.error('[VoiceDebug] onError fired:', error);
-      if (error && typeof error === 'object') {
-        console.error('[VoiceDebug] onError details:', JSON.stringify(error, null, 2));
-      }
+      console.error('[VoiceAgent] session error:', error);
     },
   });
 
-  /** Toggle session on/off — must be called from a user gesture (click) */
-  const toggle = useCallback(async () => {
-    console.group('[VoiceDebug] toggle()');
-    dbg('entered toggle — agentId:', agentId ? `${agentId.slice(0, 8)}…` : 'MISSING');
-    dbg('current state — sessionStarted:', sessionStarted, '| conversation.status:', conversation.status);
-
-    if (!agentId) {
-      dbg('aborting: no agentId configured');
-      console.groupEnd();
+  // Poll input volume after connecting to detect silent/wrong input device
+  useEffect(() => {
+    if (conversation.status !== 'connected') {
+      if (inputVolumeIntervalRef.current !== null) {
+        clearInterval(inputVolumeIntervalRef.current);
+        inputVolumeIntervalRef.current = null;
+      }
       return;
     }
 
+    const startedAt = Date.now();
+    const POLL_DURATION_MS = 10_000;
+    const POLL_INTERVAL_MS = 500;
+
+    inputVolumeIntervalRef.current = setInterval(() => {
+      const volume = conversation.getInputVolume();
+      if (volume > 0) {
+        clearInterval(inputVolumeIntervalRef.current!);
+        inputVolumeIntervalRef.current = null;
+        return;
+      }
+      if (Date.now() - startedAt >= POLL_DURATION_MS) {
+        clearInterval(inputVolumeIntervalRef.current!);
+        inputVolumeIntervalRef.current = null;
+        setMicError('no-input');
+      }
+    }, POLL_INTERVAL_MS);
+
+    return () => {
+      if (inputVolumeIntervalRef.current !== null) {
+        clearInterval(inputVolumeIntervalRef.current);
+        inputVolumeIntervalRef.current = null;
+      }
+    };
+  }, [conversation.status]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /** Toggle session on/off — must be called from a user gesture (click) */
+  const toggle = useCallback(async () => {
+    if (!agentId) return;
+
     // If connected, disconnect
     if (sessionStarted) {
-      dbg('sessionStarted=true → calling endSession()');
-      await conversation.endSession().catch((err) => {
-        dbg('endSession() threw:', err);
-      });
-      dbg('endSession() settled — setting sessionStarted=false');
+      await conversation.endSession().catch(() => {});
       setSessionStarted(false);
-      console.groupEnd();
       return;
     }
 
@@ -163,59 +121,40 @@ export function useElementConversation({ onNavigate, onGoBack }: ConversationCal
     // mic here, the permission state becomes 'granted' so the SDK's own
     // getUserMedia call resolves immediately without needing a gesture.
     try {
-      dbg('pre-acquiring mic to lock in user gesture…');
-      const tempStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const micPromise = navigator.mediaDevices.getUserMedia({ audio: true });
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new DOMException('getUserMedia timed out', 'TimeoutError')), 5_000)
+      );
+      const tempStream = await Promise.race([micPromise, timeoutPromise]);
       tempStream.getTracks().forEach(t => t.stop());
-      dbg('mic pre-acquired and released — permission is now granted');
-    } catch (micErr) {
-      console.error('[VoiceDebug] mic pre-acquire failed:', micErr);
-      setSessionStarted(false);
-      console.groupEnd();
+    } catch (err) {
+      const error = err as DOMException;
+      if (error.name === 'TimeoutError') {
+        setMicError('timeout');
+      } else if (error.name === 'NotAllowedError') {
+        setMicError('not-allowed');
+      } else {
+        setMicError('device');
+      }
       return;
     }
 
-    dbg('setting sessionStarted=true');
     setSessionStarted(true);
 
-    // Quick sanity check that timers work at all
-    window.setTimeout(() => dbg('3s heartbeat — timers are working'), 3_000);
-
-    // Timeout sentinel — logs a warning if startSession hasn't resolved in 10 s
-    const timeoutId = window.setTimeout(() => {
-      console.warn('[VoiceDebug] TIMEOUT: startSession() has not resolved after 10 s — the call appears to be hanging');
-    }, 10_000);
-
     try {
-      dbg('calling conversation.startSession() with connectionType=websocket');
-      const sessionResult = await conversation.startSession({
+      await conversation.startSession({
         agentId,
         connectionType: 'websocket',
       });
-      clearTimeout(timeoutId);
-      dbg('startSession() resolved successfully — result:', sessionResult);
     } catch (err) {
-      clearTimeout(timeoutId);
-      console.error('[VoiceDebug] startSession() rejected with error:', err);
-      if (err && typeof err === 'object') {
-        console.error('[VoiceDebug] startSession error details:', JSON.stringify(err, null, 2));
-      }
+      console.error('[VoiceAgent] startSession failed:', err);
       setSessionStarted(false);
     }
-
-    console.groupEnd();
   }, [agentId, sessionStarted, conversation]);
 
-  // Watch conversation.status for every transition
-  useEffect(() => {
-    if (!DEBUG_VOICE) return;
-    dbg('conversation.status changed →', conversation.status);
-  }, [conversation.status]);
-
-  // Watch sessionStarted state
-  useEffect(() => {
-    if (!DEBUG_VOICE) return;
-    dbg('sessionStarted state changed →', sessionStarted);
-  }, [sessionStarted]);
+  const clearMicError = useCallback(() => {
+    setMicError(null);
+  }, []);
 
   const notifyElementChange = useCallback((element: Element) => {
     if (!agentId) return;
@@ -263,6 +202,8 @@ export function useElementConversation({ onNavigate, onGoBack }: ConversationCal
   return {
     status,
     isSpeaking: conversation.isSpeaking,
+    micError,
+    clearMicError,
     notifyElementChange,
     notifyElementClosed,
     toggle,

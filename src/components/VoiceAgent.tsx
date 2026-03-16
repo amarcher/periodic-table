@@ -1,13 +1,12 @@
-import { useEffect } from 'react';
-import type { VoiceStatus } from '../hooks/useElementConversation';
+import type { MicError, VoiceStatus } from '../hooks/useElementConversation';
 import './VoiceAgent.css';
-
-const DEBUG_VOICE = true;
 
 interface VoiceAgentProps {
   status: VoiceStatus;
   isSpeaking: boolean;
   onToggle: () => void;
+  micError: MicError;
+  onDismissError: () => void;
   catColor?: string;
 }
 
@@ -20,7 +19,19 @@ function MicIcon() {
   );
 }
 
-function statusText(status: VoiceStatus, isSpeaking: boolean): string {
+const MIC_ERROR_MESSAGES: Record<NonNullable<MicError>, string> = {
+  timeout:
+    'Microphone not responding. Try quitting audio apps like Wispr Flow or superwhisper, then restart your browser.',
+  'not-allowed':
+    'Microphone access denied. Please allow microphone access in your browser settings and try again.',
+  device:
+    "Couldn't access your microphone. Please check that a microphone is connected.",
+  'no-input':
+    'No audio input detected. Your microphone may be muted or the wrong device is selected. Check your input device in System Settings → Sound → Input.',
+};
+
+function statusText(status: VoiceStatus, isSpeaking: boolean, micError: MicError): string {
+  if (micError) return 'Tap to try again';
   if (status === 'connecting') return 'Getting ready...';
   if (status === 'connected' && isSpeaking) return 'Talking to you!';
   if (status === 'connected') return 'Listening...';
@@ -28,12 +39,7 @@ function statusText(status: VoiceStatus, isSpeaking: boolean): string {
   return 'Tap to talk';
 }
 
-export function VoiceAgent({ status, isSpeaking, onToggle, catColor }: VoiceAgentProps) {
-  useEffect(() => {
-    if (!DEBUG_VOICE) return;
-    console.log('[VoiceDebug] VoiceAgent props changed — status:', status, '| isSpeaking:', isSpeaking);
-  }, [status, isSpeaking]);
-
+export function VoiceAgent({ status, isSpeaking, onToggle, micError, onDismissError, catColor }: VoiceAgentProps) {
   const orbClass = [
     'voice-agent__orb',
     status === 'connecting' && 'voice-agent__orb--connecting',
@@ -60,8 +66,18 @@ export function VoiceAgent({ status, isSpeaking, onToggle, catColor }: VoiceAgen
         <div className="voice-agent__wave" />
       </div>
       <span className="voice-agent__status">
-        {statusText(status, isSpeaking)}
+        {statusText(status, isSpeaking, micError)}
       </span>
+      {micError && (
+        <button
+          className="voice-agent__error"
+          onClick={onDismissError}
+          type="button"
+          aria-label="Dismiss microphone error"
+        >
+          {MIC_ERROR_MESSAGES[micError]}
+        </button>
+      )}
     </div>
   );
 }
