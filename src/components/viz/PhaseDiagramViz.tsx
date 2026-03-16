@@ -180,7 +180,7 @@ export function PhaseDiagramViz({ element, catColor }: Props) {
             onClick={() => setTempUnit(u => u === 'C' ? 'F' : 'C')}
             aria-label={`Switch to degrees ${tempUnit === 'C' ? 'Fahrenheit' : 'Celsius'}`}
           >
-            °{tempUnit === 'C' ? 'F' : 'C'}
+            °{tempUnit}
           </button>
           <span className="pdviz__readout">
             {tempDisplay} · {formatPressure(pressure)}

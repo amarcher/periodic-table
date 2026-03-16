@@ -112,6 +112,33 @@
   }
 }
 
+/* Landscape phones: atomic number + lowercase symbol only */
+@media (max-height: 500px) {
+  .element-cell {
+    padding: 2px 1px;
+    border-radius: 4px;
+    gap: 0;
+  }
+
+  .element-cell__number {
+    font-size: 0.45em;
+    top: 1px;
+    left: 2px;
+  }
+
+  .element-cell__symbol {
+    font-size: 1em;
+  }
+
+  .element-cell__name {
+    display: none;
+  }
+
+  .element-cell__mass {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .element-cell {
     transition: none;
