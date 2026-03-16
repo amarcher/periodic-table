@@ -156,17 +156,22 @@ export function useElementConversation({ onNavigate, onGoBack }: ConversationCal
       return;
     }
 
-    // Check mic permission without awaiting — fire-and-forget to avoid
-    // breaking Chrome's user-gesture chain before startSession/getUserMedia.
+    // Acquire mic permission NOW while the user gesture is still valid.
+    // The ElevenLabs SDK calls getUserMedia internally, but by the time it
+    // gets there Chrome's gesture allowance has expired and the prompt is
+    // suppressed (getUserMedia hangs forever). By acquiring+releasing the
+    // mic here, the permission state becomes 'granted' so the SDK's own
+    // getUserMedia call resolves immediately without needing a gesture.
     try {
-      if (navigator.permissions) {
-        navigator.permissions.query({ name: 'microphone' as PermissionName }).then(
-          (r) => dbg('microphone permission state:', r.state),
-          (e) => dbg('permissions.query rejected:', e),
-        );
-      }
-    } catch (permErr) {
-      dbg('permissions.query threw:', permErr);
+      dbg('pre-acquiring mic to lock in user gesture…');
+      const tempStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      tempStream.getTracks().forEach(t => t.stop());
+      dbg('mic pre-acquired and released — permission is now granted');
+    } catch (micErr) {
+      console.error('[VoiceDebug] mic pre-acquire failed:', micErr);
+      setSessionStarted(false);
+      console.groupEnd();
+      return;
     }
 
     dbg('setting sessionStarted=true');
