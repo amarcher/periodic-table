@@ -3,6 +3,9 @@ import { useConversation } from '@elevenlabs/react';
 import type { Element } from '../types/element';
 import { categoryLabels } from '../utils/colors';
 import { elements } from '../data/elements';
+import { getVideoEntry } from '../data/videoManifest';
+import { getRadioactivity } from '../utils/elementDerived';
+import { getReactivity } from '../utils/elementDerived';
 
 interface ConversationCallbacks {
   onNavigate: (element: Element) => void;
@@ -12,15 +15,88 @@ interface ConversationCallbacks {
 export type VoiceStatus = 'off' | 'connecting' | 'connected' | 'error';
 export type MicError = 'timeout' | 'not-allowed' | 'device' | 'no-input' | null;
 
+function getDensityContext(density: number): string {
+  if (density < 0.01) return 'So light it floats in air';
+  if (density < 1) return 'Floats on water';
+  if (density < 3) return 'A bit heavier than water';
+  if (density < 8) return 'About as dense as common metals';
+  if (density < 12) return 'Heavier than iron';
+  if (density < 18) return 'Heavier than lead';
+  return 'One of the densest things on Earth';
+}
+
 function buildElementContext(element: Element): string {
-  return [
+  const video = getVideoEntry(element.atomicNumber);
+  const { level: radioLevel } = getRadioactivity(element);
+  const { label: reactLabel, description: reactDesc } = getReactivity(element);
+  const mpC = element.meltingPoint != null ? Math.round(element.meltingPoint - 273) : null;
+  const bpC = element.boilingPoint != null ? Math.round(element.boilingPoint - 273) : null;
+  const roomPhase = element.meltingPoint != null && element.meltingPoint > 293 ? 'solid'
+    : element.boilingPoint != null && element.boilingPoint > 293 ? 'liquid' : 'gas';
+
+  const parts = [
     `[ELEMENT CLICK] The child just clicked on ${element.name} (symbol: ${element.symbol}, atomic number: ${element.atomicNumber}).`,
-    `It is a ${categoryLabels[element.category]}.`,
+    `It is a ${categoryLabels[element.category]}. Atomic mass: ${element.atomicMass.toFixed(2)} u.`,
+    `Electron configuration: ${element.electronConfiguration}.`,
     `Appearance: ${element.appearance || 'unknown'}.`,
-    `Summary: ${element.summary}`,
-    `Fun facts: ${element.funFacts.join('. ')}`,
-    `Get excited about ${element.name} and start telling the child about it!`,
-  ].join(' ');
+    '',
+    `[WHAT THE CHILD SEES ON SCREEN]`,
+    `LEFT SIDE:`,
+    `- A spinning 3D atom model showing ${element.symbol}'s electron orbitals`,
+    `- Element identity: #${element.atomicNumber} ${element.symbol} ${element.name} (${categoryLabels[element.category]})`,
+  ];
+
+  // Phase diagram
+  if (element.meltingPoint != null) {
+    parts.push(
+      `- An interactive phase diagram showing when ${element.name} is solid, liquid, or gas at different temperatures and pressures.`,
+      `  At room temperature (20°C, 1 atm), ${element.name} is a ${roomPhase}.`,
+      mpC != null ? `  Melting point: ${mpC}°C.` : '',
+      bpC != null ? `  Boiling point: ${bpC}°C.` : '',
+      `  The child can drag sliders to change temperature and pressure and see the phase change.`,
+    );
+  }
+
+  parts.push('', `RIGHT SIDE:`);
+
+  // Video or photo
+  if (video) {
+    parts.push(`- A looping video showing: "${video.description}". The child can see this dramatic footage playing right now.`);
+  } else {
+    parts.push(`- A photograph of ${element.name} from Wikipedia showing what it looks like.`);
+  }
+
+  // Density
+  if (element.density != null) {
+    parts.push(`- Density card: ${element.density} g/cm³ — ${getDensityContext(element.density)}.`);
+  }
+
+  // Stability
+  const radioLabels: Record<string, string> = {
+    stable: 'Stable — atoms stay together',
+    mildly: 'Radioactive — some atoms slowly break apart over time',
+    highly: 'Highly Radioactive — atoms are very unstable and break apart quickly',
+  };
+  parts.push(`- Stability card: ${radioLabels[radioLevel]}.`);
+
+  // Reactivity
+  parts.push(`- Reactivity card: ${reactLabel} — ${reactDesc}.`);
+
+  // Electronegativity
+  if (element.electronegativity != null) {
+    parts.push(`- Electronegativity: ${element.electronegativity}.`);
+  }
+
+  // Fun facts
+  parts.push('', `[FUN FACTS shown on screen]`);
+  element.funFacts.forEach((fact, i) => parts.push(`${i + 1}. ${fact}`));
+
+  // Discovery
+  parts.push('', `Discovered by ${element.discoveredBy} (${element.yearDiscovered}).`);
+
+  parts.push('', `Get excited about ${element.name} and tell the child about what they're seeing! Reference the visuals — the video, the phase diagram, the atomic model.`);
+
+  return parts.filter(Boolean).join('\n');
 }
 
 /**
