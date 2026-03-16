@@ -128,7 +128,6 @@
 
   .element-cell__symbol {
     font-size: 1em;
-    text-transform: lowercase;
   }
 
   .element-cell__name {
