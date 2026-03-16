@@ -1,12 +1,11 @@
 import { useEffect, useRef, lazy, Suspense } from 'react';
 import type { Element } from '../types/element';
-import type { VoiceStatus } from '../hooks/useElementConversation';
 import { categoryColors, categoryLabels } from '../utils/colors';
-import { VoiceAgent } from './VoiceAgent';
+import { getVideoEntry } from '../data/videoManifest';
 import { ElementVideo } from './ElementVideo';
 import { ElementPhoto } from './ElementPhoto';
 import { DensityViz } from './viz/DensityViz';
-import { MeltingPointViz } from './viz/MeltingPointViz';
+import { PhaseDiagramViz } from './viz/PhaseDiagramViz';
 import { RadioactivityViz } from './viz/RadioactivityViz';
 import { ReactivityViz } from './viz/ReactivityViz';
 import './ElementDetail.css';
@@ -18,12 +17,9 @@ const AtomVisualizer = lazy(() =>
 interface ElementDetailProps {
   element: Element;
   onClose: () => void;
-  voiceStatus: VoiceStatus;
-  voiceIsSpeaking: boolean;
-  onVoiceToggle: () => void;
 }
 
-export function ElementDetail({ element, onClose, voiceStatus, voiceIsSpeaking, onVoiceToggle }: ElementDetailProps) {
+export function ElementDetail({ element, onClose }: ElementDetailProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
 
@@ -76,6 +72,7 @@ export function ElementDetail({ element, onClose, voiceStatus, voiceIsSpeaking, 
   }, []);
 
   const catColor = categoryColors[element.category];
+  const hasVideo = !!getVideoEntry(element.atomicNumber);
 
   return (
     <div
@@ -95,42 +92,45 @@ export function ElementDetail({ element, onClose, voiceStatus, voiceIsSpeaking, 
       </button>
 
       <div className="detail__layout">
-        {/* LEFT: 3D atom + identity + voice */}
+        {/* LEFT: atom + identity + phase diagram */}
         <div className="detail__col-left">
-          <div className="detail__atom-zone detail__content">
-            <Suspense fallback={<div className="detail__atom-loading">Loading...</div>}>
-              <AtomVisualizer element={element} />
-            </Suspense>
+          <div className="detail__top-row detail__content">
+            <div className="detail__atom-zone">
+              <Suspense fallback={<div className="detail__atom-loading">Loading...</div>}>
+                <AtomVisualizer element={element} />
+              </Suspense>
+            </div>
+
+            <div className="detail__identity">
+              <span className="detail__number">#{element.atomicNumber}</span>
+              <span className="detail__symbol">{element.symbol}</span>
+              <span className="detail__name">{element.name}</span>
+              <span className="detail__category">
+                {categoryLabels[element.category]}
+              </span>
+              <span className="detail__mass">{element.atomicMass.toFixed(2)} u</span>
+            </div>
           </div>
 
-          <div className="detail__identity detail__content">
-            <span className="detail__symbol">{element.symbol}</span>
-            <span className="detail__name">{element.name}</span>
-            <span className="detail__category">
-              {categoryLabels[element.category]}
-            </span>
-          </div>
-
-          <div className="detail__voice-zone detail__content">
-            <VoiceAgent
-              status={voiceStatus}
-              isSpeaking={voiceIsSpeaking}
-              onToggle={onVoiceToggle}
-              catColor={catColor}
-            />
-          </div>
+          {element.meltingPoint != null && (
+            <div className="detail__phase-zone detail__content">
+              <PhaseDiagramViz element={element} catColor={catColor} />
+            </div>
+          )}
         </div>
 
-        {/* RIGHT: photo + visual stats + facts */}
+        {/* RIGHT: photo/video + viz cards + fun facts */}
         <div className="detail__col-right">
-          <div className="detail__photo-zone detail__content">
-            <ElementVideo element={element} />
-            <ElementPhoto element={element} />
+          <div className="detail__media-zone detail__content">
+            {hasVideo ? (
+              <ElementVideo element={element} />
+            ) : (
+              <ElementPhoto element={element} />
+            )}
           </div>
 
-          <div className="detail__viz detail__content">
+          <div className="detail__viz-row detail__content">
             {element.density != null && <DensityViz element={element} catColor={catColor} />}
-            {element.meltingPoint != null && <MeltingPointViz element={element} catColor={catColor} />}
             <RadioactivityViz element={element} catColor={catColor} />
             <ReactivityViz element={element} catColor={catColor} />
           </div>
@@ -147,9 +147,8 @@ export function ElementDetail({ element, onClose, voiceStatus, voiceIsSpeaking, 
           </div>
 
           <div className="detail__meta detail__content">
-            #{element.atomicNumber} · {element.atomicMass.toFixed(1)} u
-            {element.electronegativity != null && ` · Electronegativity ${element.electronegativity}`}
-            {' · '}Discovered by {element.discoveredBy} ({element.yearDiscovered})
+            {element.electronegativity != null && `Electronegativity ${element.electronegativity} · `}
+            Discovered by {element.discoveredBy} ({element.yearDiscovered})
           </div>
         </div>
       </div>

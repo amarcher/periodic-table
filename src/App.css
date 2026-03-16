@@ -82,12 +82,12 @@ body::before {
   margin-top: 6px;
 }
 
-/* Floating voice agent orb on main table */
+/* Floating voice agent orb — always visible, even over detail overlay */
 .app__voice-float {
   position: fixed;
   bottom: 28px;
   right: 28px;
-  z-index: 50;
+  z-index: 120;
 }
 
 @media (max-width: 560px) {

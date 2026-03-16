@@ -89,7 +89,7 @@ function App() {
       <PeriodicTable onElementClick={handleElementClick} />
       <CategoryLegend />
 
-      {!selected && voice.agentId && (
+      {voice.agentId && (
         <div className="app__voice-float">
           <VoiceAgent status={voice.status} isSpeaking={voice.isSpeaking} onToggle={voice.toggle} />
         </div>
@@ -99,9 +99,6 @@ function App() {
         <ElementDetail
           element={selected}
           onClose={handleClose}
-          voiceStatus={voice.status}
-          voiceIsSpeaking={voice.isSpeaking}
-          onVoiceToggle={voice.toggle}
         />
       )}
     </div>
