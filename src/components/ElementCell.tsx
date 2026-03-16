@@ -1,6 +1,7 @@
-import { memo } from 'react';
+import { memo, useRef, useCallback } from 'react';
 import type { Element } from '../types/element';
 import { categoryColors } from '../utils/colors';
+import { getVideoEntry } from '../data/videoManifest';
 import './ElementCell.css';
 
 interface ElementCellProps {
@@ -11,11 +12,36 @@ interface ElementCellProps {
 
 export const ElementCell = memo(function ElementCell({ element, onClick, tabIndex = -1 }: ElementCellProps) {
   const color = categoryColors[element.category];
+  const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const preloadLinkRef = useRef<HTMLLinkElement | null>(null);
+
+  const handleMouseEnter = useCallback(() => {
+    hoverTimerRef.current = setTimeout(() => {
+      const entry = getVideoEntry(element.atomicNumber);
+      if (entry && !preloadLinkRef.current) {
+        const link = document.createElement('link');
+        link.rel = 'preload';
+        link.as = 'video';
+        link.href = entry.url;
+        document.head.appendChild(link);
+        preloadLinkRef.current = link;
+      }
+    }, 300);
+  }, [element.atomicNumber]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (hoverTimerRef.current) {
+      clearTimeout(hoverTimerRef.current);
+      hoverTimerRef.current = null;
+    }
+  }, []);
 
   return (
     <button
       className="element-cell"
       onClick={(e) => onClick(element, e)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       tabIndex={tabIndex}
       data-row={element.gridRow}
       data-col={element.gridColumn}

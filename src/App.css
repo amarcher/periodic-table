@@ -91,9 +91,32 @@ body::before {
 }
 
 @media (max-width: 560px) {
+  .app-header {
+    padding: 8px 12px 2px;
+  }
+
+  .app-subtitle {
+    display: none;
+  }
+
   .app__voice-float {
     bottom: 16px;
     right: 16px;
+  }
+}
+
+/* Landscape phones: minimal header to maximize table height */
+@media (max-height: 500px) {
+  .app-header {
+    padding: 4px 12px 2px;
+  }
+
+  .app-title {
+    font-size: 1rem;
+  }
+
+  .app-subtitle {
+    display: none;
   }
 }
 

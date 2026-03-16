@@ -48,3 +48,38 @@
     font-size: 0.55em;
   }
 }
+
+/* Small phones: minimal spacing, less overhead for header/legend */
+@media (max-width: 560px) {
+  .periodic-table-wrapper {
+    padding: 4px 6px;
+  }
+
+  .periodic-table {
+    --gap: 1px;
+    --avail-w: calc(100vw - 16px);
+    --avail-h: calc(100dvh - 70px);
+  }
+
+  .table-label {
+    font-size: 0.45em;
+    padding-right: 2px;
+  }
+}
+
+/* Landscape phones: reclaim vertical space */
+@media (max-height: 500px) {
+  .periodic-table-wrapper {
+    padding: 2px 8px;
+  }
+
+  .periodic-table {
+    --gap: 1px;
+    --avail-h: calc(100dvh - 50px);
+  }
+
+  .table-label {
+    font-size: 0.45em;
+    padding-right: 2px;
+  }
+}
