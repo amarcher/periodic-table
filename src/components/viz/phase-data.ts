@@ -85,9 +85,10 @@ export function getPhaseData(element: Element): PhaseDiagramData | null {
   // Sublimation curve: from near-zero to triple point
   const solidGasCurve = generateSublimationCurve(tpT, tpP);
 
-  // Axis ranges — always start from absolute zero
+  // Axis ranges — always start from absolute zero, always include STP (293K)
+  const STP_T = 293; // 20°C in Kelvin
   const tMin = 0;
-  const tMax = cpT * 1.3;
+  const tMax = Math.max(cpT * 1.3, STP_T * 1.15);
   const pMin = 0.001;
   const pMax = cpP * 3;
 
@@ -127,7 +128,7 @@ function getHeliumData(overrides: Partial<{ criticalPointT: number; criticalPoin
     solidLiquidCurve: [], // He doesn't have normal solid-liquid at low P
     liquidGasCurve,
     solidGasCurve: [],
-    tRange: [0, cpT * 1.5],
+    tRange: [0, Math.max(cpT * 1.5, 293 * 1.15)],
     pRange: [0.01, cpP * 3],
     isHelium: true,
     hasEstimatedBp: false,
