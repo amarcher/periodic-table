@@ -3,6 +3,7 @@ import type { Element } from '../types/element';
 import type { MicError, VoiceStatus } from '../hooks/useElementConversation';
 import { categoryColors, categoryLabels } from '../utils/colors';
 import { VoiceAgent } from './VoiceAgent';
+import { ElementVideo } from './ElementVideo';
 import { ElementPhoto } from './ElementPhoto';
 import { DensityViz } from './viz/DensityViz';
 import { MeltingPointViz } from './viz/MeltingPointViz';
@@ -127,6 +128,7 @@ export function ElementDetail({ element, onClose, voiceStatus, voiceIsSpeaking, 
         {/* RIGHT: photo + visual stats + facts */}
         <div className="detail__col-right">
           <div className="detail__photo-zone detail__content">
+            <ElementVideo element={element} />
             <ElementPhoto element={element} />
           </div>
 

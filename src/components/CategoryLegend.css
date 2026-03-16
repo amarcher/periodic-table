@@ -25,3 +25,45 @@
   color: #8888a0;
   white-space: nowrap;
 }
+
+/* Small phones: compact legend */
+@media (max-width: 560px) {
+  .category-legend {
+    gap: 4px 10px;
+    padding: 4px 12px;
+  }
+
+  .legend-dot {
+    width: 7px;
+    height: 7px;
+  }
+
+  .legend-label {
+    font-size: 0.6rem;
+  }
+
+  .legend-item {
+    gap: 4px;
+  }
+}
+
+/* Landscape phones: single-line legend */
+@media (max-height: 500px) {
+  .category-legend {
+    gap: 2px 8px;
+    padding: 2px 12px;
+  }
+
+  .legend-dot {
+    width: 6px;
+    height: 6px;
+  }
+
+  .legend-label {
+    font-size: 0.55rem;
+  }
+
+  .legend-item {
+    gap: 3px;
+  }
+}
