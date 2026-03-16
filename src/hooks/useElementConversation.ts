@@ -10,6 +10,7 @@ interface ConversationCallbacks {
 }
 
 export type VoiceStatus = 'off' | 'connecting' | 'connected' | 'error';
+export type MicError = 'timeout' | 'not-allowed' | 'device' | 'no-input' | null;
 
 function buildElementContext(element: Element): string {
   return [
@@ -30,8 +31,10 @@ function buildElementContext(element: Element): string {
 export function useElementConversation({ onNavigate, onGoBack }: ConversationCallbacks) {
   const agentId = import.meta.env.VITE_ELEVENLABS_AGENT_ID as string | undefined;
   const [sessionStarted, setSessionStarted] = useState(false);
+  const [micError, setMicError] = useState<MicError>(null);
   const pendingElementRef = useRef<Element | null>(null);
   const currentElementRef = useRef<number | null>(null);
+  const inputVolumeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const conversation = useConversation({
     clientTools: {
@@ -59,10 +62,46 @@ export function useElementConversation({ onNavigate, onGoBack }: ConversationCal
         pendingElementRef.current = null;
       }
     },
-    onError: (error) => {
-      console.error('ElevenLabs conversation error:', error);
+    onError: (error: unknown) => {
+      console.error('[VoiceAgent] session error:', error);
     },
   });
+
+  // Poll input volume after connecting to detect silent/wrong input device
+  useEffect(() => {
+    if (conversation.status !== 'connected') {
+      if (inputVolumeIntervalRef.current !== null) {
+        clearInterval(inputVolumeIntervalRef.current);
+        inputVolumeIntervalRef.current = null;
+      }
+      return;
+    }
+
+    const startedAt = Date.now();
+    const POLL_DURATION_MS = 10_000;
+    const POLL_INTERVAL_MS = 500;
+
+    inputVolumeIntervalRef.current = setInterval(() => {
+      const volume = conversation.getInputVolume();
+      if (volume > 0) {
+        clearInterval(inputVolumeIntervalRef.current!);
+        inputVolumeIntervalRef.current = null;
+        return;
+      }
+      if (Date.now() - startedAt >= POLL_DURATION_MS) {
+        clearInterval(inputVolumeIntervalRef.current!);
+        inputVolumeIntervalRef.current = null;
+        setMicError('no-input');
+      }
+    }, POLL_INTERVAL_MS);
+
+    return () => {
+      if (inputVolumeIntervalRef.current !== null) {
+        clearInterval(inputVolumeIntervalRef.current);
+        inputVolumeIntervalRef.current = null;
+      }
+    };
+  }, [conversation.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /** Toggle session on/off — must be called from a user gesture (click) */
   const toggle = useCallback(async () => {
@@ -75,21 +114,47 @@ export function useElementConversation({ onNavigate, onGoBack }: ConversationCal
       return;
     }
 
+    // Acquire mic permission NOW while the user gesture is still valid.
+    // The ElevenLabs SDK calls getUserMedia internally, but by the time it
+    // gets there Chrome's gesture allowance has expired and the prompt is
+    // suppressed (getUserMedia hangs forever). By acquiring+releasing the
+    // mic here, the permission state becomes 'granted' so the SDK's own
+    // getUserMedia call resolves immediately without needing a gesture.
+    try {
+      const micPromise = navigator.mediaDevices.getUserMedia({ audio: true });
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new DOMException('getUserMedia timed out', 'TimeoutError')), 5_000)
+      );
+      const tempStream = await Promise.race([micPromise, timeoutPromise]);
+      tempStream.getTracks().forEach(t => t.stop());
+    } catch (err) {
+      const error = err as DOMException;
+      if (error.name === 'TimeoutError') {
+        setMicError('timeout');
+      } else if (error.name === 'NotAllowedError') {
+        setMicError('not-allowed');
+      } else {
+        setMicError('device');
+      }
+      return;
+    }
+
     setSessionStarted(true);
 
     try {
-      // Let the SDK handle getUserMedia internally — calling it ourselves
-      // first can exhaust Chrome's user-gesture context, causing the SDK's
-      // own mic request to fail silently.
       await conversation.startSession({
         agentId,
         connectionType: 'websocket',
       });
     } catch (err) {
-      console.error('Failed to start conversation:', err);
+      console.error('[VoiceAgent] startSession failed:', err);
       setSessionStarted(false);
     }
   }, [agentId, sessionStarted, conversation]);
+
+  const clearMicError = useCallback(() => {
+    setMicError(null);
+  }, []);
 
   const notifyElementChange = useCallback((element: Element) => {
     if (!agentId) return;
@@ -137,6 +202,8 @@ export function useElementConversation({ onNavigate, onGoBack }: ConversationCal
   return {
     status,
     isSpeaking: conversation.isSpeaking,
+    micError,
+    clearMicError,
     notifyElementChange,
     notifyElementClosed,
     toggle,

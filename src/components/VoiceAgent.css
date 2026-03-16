@@ -99,6 +99,26 @@
   fill: rgba(255, 255, 255, 0.9);
 }
 
+/* Mic error message — tappable to dismiss */
+.voice-agent__error {
+  appearance: none;
+  -webkit-appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  max-width: 300px;
+  font-size: 0.75rem;
+  color: #f5a623;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.voice-agent__error:hover {
+  color: #ffc059;
+}
+
 /* No agent configured message */
 .voice-agent__unavailable {
   font-size: 0.7rem;

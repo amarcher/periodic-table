@@ -117,6 +117,7 @@ export function ElementDetail({ element, onClose }: ElementDetailProps) {
               <PhaseDiagramViz element={element} catColor={catColor} />
             </div>
           )}
+
         </div>
 
         {/* RIGHT: photo/video + viz cards + fun facts */}
