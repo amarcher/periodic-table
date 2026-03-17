@@ -81,6 +81,36 @@ export const videoManifest: Partial<Record<number, VideoEntry>> = {
     poster: '',
     description: 'A pure silicon crystal being pulled from glowing molten silicon in the Czochralski process',
   },
+  15: {
+    url: `${BASE_URL}/015-P-veo31fast.mp4`,
+    poster: '',
+    description: 'White phosphorus glowing with an eerie green-blue light before self-igniting into fierce white flames',
+  },
+  16: {
+    url: `${BASE_URL}/016-S-veo31fast.mp4`,
+    poster: '',
+    description: 'Sulfur crystals melting from golden liquid to blood-red syrup, then igniting with an electric blue flame',
+  },
+  17: {
+    url: `${BASE_URL}/017-Cl-veo31fast.mp4`,
+    poster: '',
+    description: 'Pale yellow-green chlorine gas swirling in a glass flask, reacting with metals',
+  },
+  18: {
+    url: `${BASE_URL}/018-Ar-veo31fast.mp4`,
+    poster: '',
+    description: 'Argon gas discharge tube glowing with a soft lavender-purple light',
+  },
+  19: {
+    url: `${BASE_URL}/019-K-veo31fast.mp4`,
+    poster: '',
+    description: 'Potassium metal dropped into water, exploding with a bright violet-pink flame',
+  },
+  20: {
+    url: `${BASE_URL}/020-Ca-veo31fast.mp4`,
+    poster: '',
+    description: 'Calcium metal reacting with water, producing bubbles and a vivid orange-red flame',
+  },
   35: {
     url: `${BASE_URL}/035-Br-veo31fast.mp4`,
     poster: '',

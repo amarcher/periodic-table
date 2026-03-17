@@ -61,7 +61,10 @@ function buildElementContext(element: Element): string {
 
   // Video or photo
   if (video) {
-    parts.push(`- A looping video showing: "${video.description}". The child can see this dramatic footage playing right now.`);
+    parts.push(
+      `- VIDEO (playing right now): "${video.description}"`,
+      `  IMPORTANT: Describe THIS specific video to the child, not what you think the element generally looks like. The video shows exactly what is described above.`,
+    );
   } else {
     parts.push(`- A photograph of ${element.name} from Wikipedia showing what it looks like.`);
   }
@@ -88,6 +91,9 @@ function buildElementContext(element: Element): string {
   }
 
   // Fun facts
+  // Summary
+  parts.push('', `[ABOUT THIS ELEMENT]`, element.summary);
+
   parts.push('', `[FUN FACTS shown on screen]`);
   element.funFacts.forEach((fact, i) => parts.push(`${i + 1}. ${fact}`));
 
