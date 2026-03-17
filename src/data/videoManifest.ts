@@ -111,6 +111,56 @@ export const videoManifest: Partial<Record<number, VideoEntry>> = {
     poster: '',
     description: 'Calcium metal reacting with water, producing hydrogen bubbles and milky white calcium hydroxide clouds',
   },
+  21: {
+    url: `${BASE_URL}/021-Sc-veo31fast.mp4`,
+    poster: '',
+    description: 'Silvery-white scandium metal surface gleaming under soft light',
+  },
+  22: {
+    url: `${BASE_URL}/022-Ti-veo31fast.mp4`,
+    poster: '',
+    description: 'Titanium rod pressed against a spinning grinding wheel, throwing bright white sparks',
+  },
+  23: {
+    url: `${BASE_URL}/023-V-veo31fast.mp4`,
+    poster: '',
+    description: 'Four flasks of vanadium solutions in different brilliant colors showing its oxidation states',
+  },
+  24: {
+    url: `${BASE_URL}/024-Cr-veo31fast.mp4`,
+    poster: '',
+    description: 'A perfectly polished block of chromium with a flawless mirror finish',
+  },
+  25: {
+    url: `${BASE_URL}/025-Mn-veo31fast.mp4`,
+    poster: '',
+    description: 'Purple potassium permanganate crystals dissolving into water, creating swirling violet clouds',
+  },
+  26: {
+    url: `${BASE_URL}/026-Fe-veo31fast.mp4`,
+    poster: '',
+    description: 'Steel wool burning brilliantly in a jar of pure oxygen, showering orange-white sparks',
+  },
+  27: {
+    url: `${BASE_URL}/027-Co-veo31fast.mp4`,
+    poster: '',
+    description: 'Molten cobalt-blue glass on a glassblowing rod, glowing with intense deep blue color',
+  },
+  28: {
+    url: `${BASE_URL}/028-Ni-veo31fast.mp4`,
+    poster: '',
+    description: 'A highly polished nickel sphere with a warm silvery-gold luster',
+  },
+  29: {
+    url: `${BASE_URL}/029-Cu-veo31fast.mp4`,
+    poster: '',
+    description: 'Copper wire held in a Bunsen burner flame, producing a vivid green-blue flame',
+  },
+  30: {
+    url: `${BASE_URL}/030-Zn-veo31fast.mp4`,
+    poster: '',
+    description: 'Zinc metal reacting with hydrochloric acid, releasing rapid streams of hydrogen bubbles',
+  },
   35: {
     url: `${BASE_URL}/035-Br-veo31fast.mp4`,
     poster: '',
