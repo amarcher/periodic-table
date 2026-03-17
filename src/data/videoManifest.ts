@@ -109,7 +109,7 @@ export const videoManifest: Partial<Record<number, VideoEntry>> = {
   20: {
     url: `${BASE_URL}/020-Ca-veo31fast.mp4`,
     poster: '',
-    description: 'Calcium metal reacting with water, producing bubbles and a vivid orange-red flame',
+    description: 'Calcium metal reacting with water, producing hydrogen bubbles and milky white calcium hydroxide clouds',
   },
   35: {
     url: `${BASE_URL}/035-Br-veo31fast.mp4`,
