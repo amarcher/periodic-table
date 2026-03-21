@@ -171,6 +171,11 @@ export const videoManifest: Partial<Record<number, VideoEntry>> = {
     poster: '',
     description: 'A polished germanium crystal with a dark mirror-like metallic luster',
   },
+  33: {
+    url: `${BASE_URL}/033-As-veo31fast.mp4`,
+    poster: '',
+    description: 'Crystalline arsenic sublimating into yellowish vapor and re-depositing inside a sealed glass tube',
+  },
   34: {
     url: `${BASE_URL}/034-Se-veo31fast.mp4`,
     poster: '',
@@ -201,10 +206,60 @@ export const videoManifest: Partial<Record<number, VideoEntry>> = {
     poster: '',
     description: 'Yttrium metal turnings igniting into a blinding white-hot fire',
   },
+  40: {
+    url: `${BASE_URL}/040-Zr-veo31fast.mp4`,
+    poster: '',
+    description: 'Zirconium powder igniting into a dazzling white-hot spark fountain',
+  },
   41: {
     url: `${BASE_URL}/041-Nb-veo31fast.mp4`,
     poster: '',
     description: 'Niobium disc anodizing through a rainbow of colors as voltage is applied',
+  },
+  42: {
+    url: `${BASE_URL}/042-Mo-veo31fast.mp4`,
+    poster: '',
+    description: 'Molybdenum rod glowing white-hot in a vacuum chamber, remaining solid at extreme temperature',
+  },
+  43: {
+    url: `${BASE_URL}/043-Tc-veo31fast.mp4`,
+    poster: '',
+    description: 'Technetium metal tarnishing in time-lapse inside a sealed ampoule with a faint Cherenkov-blue shimmer',
+  },
+  44: {
+    url: `${BASE_URL}/044-Ru-veo31fast.mp4`,
+    poster: '',
+    description: 'Polished ruthenium metal oxidizing from mirror-bright silver to deep matte black at high temperature',
+  },
+  45: {
+    url: `${BASE_URL}/045-Rh-veo31fast.mp4`,
+    poster: '',
+    description: 'Molten rhodium cooling from white-hot liquid to a flawless mirror-finish solid',
+  },
+  46: {
+    url: `${BASE_URL}/046-Pd-veo31fast.mp4`,
+    poster: '',
+    description: 'Palladium foil absorbing and releasing hydrogen gas, visibly swelling and contracting',
+  },
+  47: {
+    url: `${BASE_URL}/047-Ag-veo31fast.mp4`,
+    poster: '',
+    description: 'Molten silver poured in a glowing stream, cooling to a brilliant mirror finish',
+  },
+  48: {
+    url: `${BASE_URL}/048-Cd-veo31fast.mp4`,
+    poster: '',
+    description: 'Cadmium metal melting and releasing thick, vivid yellow vapor',
+  },
+  49: {
+    url: `${BASE_URL}/049-In-veo31fast.mp4`,
+    poster: '',
+    description: 'Soft indium metal bending like putty, then melting into a shimmering liquid pool',
+  },
+  50: {
+    url: `${BASE_URL}/050-Sn-veo31fast.mp4`,
+    poster: '',
+    description: 'Polished tin disintegrating into grey powder as tin pest spreads across its surface',
   },
   79: {
     url: `${BASE_URL}/079-Au-veo31fast.mp4`,
