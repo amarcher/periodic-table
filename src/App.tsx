@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import type { Element } from './types/element';
 import { PeriodicTable } from './components/PeriodicTable';
 import { ElementDetail } from './components/ElementDetail';
@@ -107,6 +108,7 @@ function App() {
           onClose={handleClose}
         />
       )}
+      <Analytics />
     </div>
   );
 }
