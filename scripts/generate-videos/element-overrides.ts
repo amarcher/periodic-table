@@ -165,7 +165,7 @@ export const elementOverrides: Record<number, ElementOverride> = {
   33: {
     // Arsenic
     videoPrompt:
-      'Extreme close-up of crystalline gray metallic arsenic inside a sealed glass tube being gently heated from below. The hard, brittle, silver-gray crystals begin to transform directly into a swirling yellowish vapor without ever becoming liquid — sublimating straight from solid to gas. The pale yellow-white fumes rise and swirl inside the glass tube in ghostly, ethereal tendrils. As the vapor contacts the cooler upper portion of the tube, it re-deposits as a thin film of shiny gray crystalline arsenic on the glass walls, creating a dark metallic mirror coating. The cycle of sublimation and deposition creates a dramatic visual of matter shifting between states inside the sealed vessel. Dark background, cinematic lighting, extreme close-up, no text, no watermarks, no logos.',
+      'Extreme close-up of crystalline gray metallic arsenic inside a sealed, airtight glass tube being gently heated from below. The hard, brittle, silver-gray crystals begin to transform directly into a swirling yellowish vapor without ever becoming liquid — sublimating straight from solid to gas. The pale yellow-white fumes rise and swirl entirely within the sealed tube in ghostly, ethereal tendrils, never escaping. As the vapor contacts the cooler upper portion of the tube, it re-deposits as a thin film of shiny gray crystalline arsenic on the inner glass walls, creating a dark metallic mirror coating inside the tube. All vapor and material remains completely contained within the sealed glass tube throughout. Dark background, cinematic lighting, extreme close-up, no text, no watermarks, no logos.',
   },
   34: {
     // Selenium
