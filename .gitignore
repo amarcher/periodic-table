@@ -54,3 +54,4 @@ agent_configs/Kaia.json
 agent_configs/Milo.json
 agent_configs/New-agent.json
 test_configs/
+.env*.local

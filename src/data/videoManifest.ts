@@ -161,10 +161,50 @@ export const videoManifest: Partial<Record<number, VideoEntry>> = {
     poster: '',
     description: 'Zinc metal reacting with hydrochloric acid, releasing rapid streams of hydrogen bubbles',
   },
+  31: {
+    url: `${BASE_URL}/031-Ga-veo31fast.mp4`,
+    poster: '',
+    description: 'Solid gallium melting into a mirror-like liquid puddle from body heat alone',
+  },
+  32: {
+    url: `${BASE_URL}/032-Ge-veo31fast.mp4`,
+    poster: '',
+    description: 'A polished germanium crystal with a dark mirror-like metallic luster',
+  },
+  34: {
+    url: `${BASE_URL}/034-Se-veo31fast.mp4`,
+    poster: '',
+    description: 'Vivid red selenium powder heated through dramatic color changes to metallic gray',
+  },
   35: {
     url: `${BASE_URL}/035-Br-veo31fast.mp4`,
     poster: '',
     description: 'Bromine liquid releasing dense reddish-brown vapor',
+  },
+  36: {
+    url: `${BASE_URL}/036-Kr-veo31fast.mp4`,
+    poster: '',
+    description: 'Krypton gas discharge tube glowing with a haunting greenish-white light',
+  },
+  37: {
+    url: `${BASE_URL}/037-Rb-veo31fast.mp4`,
+    poster: '',
+    description: 'Rubidium metal exploding violently in water with reddish-purple flames',
+  },
+  38: {
+    url: `${BASE_URL}/038-Sr-veo31fast.mp4`,
+    poster: '',
+    description: 'Strontium metal burning with an intensely brilliant crimson-red flame',
+  },
+  39: {
+    url: `${BASE_URL}/039-Y-veo31fast.mp4`,
+    poster: '',
+    description: 'Yttrium metal turnings igniting into a blinding white-hot fire',
+  },
+  41: {
+    url: `${BASE_URL}/041-Nb-veo31fast.mp4`,
+    poster: '',
+    description: 'Niobium disc anodizing through a rainbow of colors as voltage is applied',
   },
   79: {
     url: `${BASE_URL}/079-Au-veo31fast.mp4`,

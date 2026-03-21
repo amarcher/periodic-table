@@ -42,6 +42,7 @@ export const STYLE_ANCHOR =
   'Photorealistic cinematic video, shallow depth of field, dramatic and vivid scientific visualization, ' +
   'professional laboratory aesthetic, dark background with soft volumetric lighting, smooth slow-motion, ' +
   'seamless looping video that returns to its starting state, ' +
+  'all substances remain fully contained within their vessels — nothing escapes, leaks, or spills unless an explosion is depicted, ' +
   'absolutely no text, no watermarks, no logos, no letters, no symbols overlaid on the video, no human faces.';
 
 export const NEGATIVE_PROMPT =
@@ -49,4 +50,6 @@ export const NEGATIVE_PROMPT =
   'letters, numbers overlaid, title card, captions, subtitles, credits, ' +
   'human face, hands, person, cartoon, anime, illustration, 2D, flat, ' +
   'low quality, blurry, pixelated, oversaturated, cheesy, stock footage look, CGI plastic, ' +
-  'artificial looking, cheap effects, static image, still frame.';
+  'artificial looking, cheap effects, static image, still frame, ' +
+  'gas or liquid escaping or leaking from containers, substances spilling outside their vessel, ' +
+  'vapor condensing on the outside of a sealed container.';
