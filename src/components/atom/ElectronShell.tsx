@@ -12,6 +12,14 @@ interface ElectronShellProps {
   detailLevel: DetailLevel;
 }
 
+function smoothRadial(value: number, exponent = 0.7, minFraction = 0.12): number {
+  const smoothed = Math.sign(value) * Math.pow(Math.abs(value), exponent);
+  if (Math.abs(smoothed) < minFraction) {
+    return Math.sign(smoothed || 1) * minFraction;
+  }
+  return smoothed;
+}
+
 function generateOrbitalPath(type: string, radius: number, segments: number): THREE.Vector3[] {
   const points: THREE.Vector3[] = [];
   switch (type) {
@@ -24,21 +32,21 @@ function generateOrbitalPath(type: string, radius: number, segments: number): TH
     case 'p':
       for (let i = 0; i <= segments; i++) {
         const t = (i / segments) * Math.PI * 2;
-        const r = radius * Math.cos(t);
+        const r = radius * smoothRadial(Math.cos(t), 0.45, 0.20);
         points.push(new THREE.Vector3(r * Math.cos(t), 0, r * Math.sin(t)));
       }
       break;
     case 'd':
       for (let i = 0; i <= segments; i++) {
         const t = (i / segments) * Math.PI * 2;
-        const r = radius * Math.abs(Math.cos(2 * t));
+        const r = radius * smoothRadial(Math.abs(Math.cos(2 * t)), 0.4, 0.22);
         points.push(new THREE.Vector3(r * Math.cos(t), 0, r * Math.sin(t)));
       }
       break;
     case 'f':
       for (let i = 0; i <= segments; i++) {
         const t = (i / segments) * Math.PI * 2;
-        const r = radius * Math.abs(Math.cos(3 * t));
+        const r = radius * smoothRadial(Math.abs(Math.cos(3 * t)), 0.35, 0.25);
         points.push(new THREE.Vector3(r * Math.cos(t), 0, r * Math.sin(t)));
       }
       break;
@@ -66,9 +74,9 @@ function getOrientations(type: string): [number, number, number][] {
 function getPointOnOrbital(type: string, radius: number, t: number): THREE.Vector3 {
   switch (type) {
     case 's': return new THREE.Vector3(Math.cos(t) * radius, 0, Math.sin(t) * radius);
-    case 'p': { const r = radius * Math.cos(t); return new THREE.Vector3(r * Math.cos(t), 0, r * Math.sin(t)); }
-    case 'd': { const r = radius * Math.abs(Math.cos(2 * t)); return new THREE.Vector3(r * Math.cos(t), 0, r * Math.sin(t)); }
-    case 'f': { const r = radius * Math.abs(Math.cos(3 * t)); return new THREE.Vector3(r * Math.cos(t), 0, r * Math.sin(t)); }
+    case 'p': { const r = radius * smoothRadial(Math.cos(t), 0.45, 0.20); return new THREE.Vector3(r * Math.cos(t), 0, r * Math.sin(t)); }
+    case 'd': { const r = radius * smoothRadial(Math.abs(Math.cos(2 * t)), 0.4, 0.22); return new THREE.Vector3(r * Math.cos(t), 0, r * Math.sin(t)); }
+    case 'f': { const r = radius * smoothRadial(Math.abs(Math.cos(3 * t)), 0.35, 0.25); return new THREE.Vector3(r * Math.cos(t), 0, r * Math.sin(t)); }
     default: return new THREE.Vector3(0, 0, 0);
   }
 }
