@@ -261,6 +261,61 @@ export const videoManifest: Partial<Record<number, VideoEntry>> = {
     poster: '',
     description: 'Polished tin disintegrating into grey powder as tin pest spreads across its surface',
   },
+  51: {
+    url: `${BASE_URL}/051-Sb-veo31fast.mp4`,
+    poster: '',
+    description: 'Antimony metal shattering like glass under a hammer, revealing crystalline layers',
+  },
+  52: {
+    url: `${BASE_URL}/052-Te-veo31fast.mp4`,
+    poster: '',
+    description: 'Crystalline tellurium burning with a vivid blue-green flame and billowing white smoke',
+  },
+  53: {
+    url: `${BASE_URL}/053-I-veo31fast.mp4`,
+    poster: '',
+    description: 'Iodine crystals sublimating into rich purple-violet vapor that fills a glass flask',
+  },
+  54: {
+    url: `${BASE_URL}/054-Xe-veo31fast.mp4`,
+    poster: '',
+    description: 'Xenon gas discharge tube erupting with an intense blue-lavender plasma glow',
+  },
+  55: {
+    url: `${BASE_URL}/055-Cs-veo31fast.mp4`,
+    poster: '',
+    description: 'Cesium metal exploding violently on contact with water in a brilliant white-hot flash',
+  },
+  56: {
+    url: `${BASE_URL}/056-Ba-veo31fast.mp4`,
+    poster: '',
+    description: 'Barium chloride producing a vivid emerald green flame in a Bunsen burner',
+  },
+  57: {
+    url: `${BASE_URL}/057-La-veo31fast.mp4`,
+    poster: '',
+    description: 'Pyrophoric lanthanum filings self-igniting into a shower of white-hot sparks mid-air',
+  },
+  58: {
+    url: `${BASE_URL}/058-Ce-veo31fast.mp4`,
+    poster: '',
+    description: 'Ferrocerium rod struck by steel, erupting in a cascade of brilliant white-hot sparks',
+  },
+  59: {
+    url: `${BASE_URL}/059-Pr-veo31fast.mp4`,
+    poster: '',
+    description: 'Freshly cut praseodymium rapidly developing a vivid green oxide layer in time-lapse',
+  },
+  60: {
+    url: `${BASE_URL}/060-Nd-veo31fast.mp4`,
+    poster: '',
+    description: 'Two powerful neodymium magnets crushing an apple between them with explosive force',
+  },
+  61: {
+    url: `${BASE_URL}/061-Pm-veo31fast.mp4`,
+    poster: '',
+    description: 'Promethium salt crystals glowing with an eerie pale blue-green radioactive luminescence',
+  },
   79: {
     url: `${BASE_URL}/079-Au-veo31fast.mp4`,
     poster: '',
