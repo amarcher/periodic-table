@@ -316,6 +316,56 @@ export const videoManifest: Partial<Record<number, VideoEntry>> = {
     poster: '',
     description: 'Promethium salt crystals glowing with an eerie pale blue-green radioactive luminescence',
   },
+  62: {
+    url: `${BASE_URL}/062-Sm-veo31fast.mp4`,
+    poster: '',
+    description: 'Red-hot samarium-cobalt magnet still attracting iron filings at extreme temperature',
+  },
+  63: {
+    url: `${BASE_URL}/063-Eu-veo31fast.mp4`,
+    poster: '',
+    description: 'Europium oxide erupting with brilliant red phosphorescence under UV light',
+  },
+  64: {
+    url: `${BASE_URL}/064-Gd-veo31fast.mp4`,
+    poster: '',
+    description: 'Gadolinium releasing from a magnet as gentle warmth switches off its ferromagnetism',
+  },
+  65: {
+    url: `${BASE_URL}/065-Tb-veo31fast.mp4`,
+    poster: '',
+    description: 'Terbium-doped material erupting with intense electric green fluorescence under UV light',
+  },
+  66: {
+    url: `${BASE_URL}/066-Dy-veo31fast.mp4`,
+    poster: '',
+    description: 'Dysprosium alloy rod visibly stretching and contracting with magnetic pulses',
+  },
+  67: {
+    url: `${BASE_URL}/067-Ho-veo31fast.mp4`,
+    poster: '',
+    description: 'Rich brownish-pink holmium chloride solution poured between beakers',
+  },
+  68: {
+    url: `${BASE_URL}/068-Er-veo31fast.mp4`,
+    poster: '',
+    description: 'Rose-pink erbium-doped glass erupting with pink fluorescence from a green laser beam',
+  },
+  69: {
+    url: `${BASE_URL}/069-Tm-veo31fast.mp4`,
+    poster: '',
+    description: 'Thulium-doped material glowing ice-blue under UV alongside red europium and green terbium',
+  },
+  72: {
+    url: `${BASE_URL}/072-Hf-veo31fast.mp4`,
+    poster: '',
+    description: 'Pyrophoric hafnium powder igniting spontaneously into white-hot sparks and flames',
+  },
+  73: {
+    url: `${BASE_URL}/073-Ta-veo31fast.mp4`,
+    poster: '',
+    description: 'Polished tantalum bar sitting untouched in fuming concentrated hydrochloric acid',
+  },
   79: {
     url: `${BASE_URL}/079-Au-veo31fast.mp4`,
     poster: '',
