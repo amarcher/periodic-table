@@ -155,6 +155,40 @@ function loadGenerationDescriptions(): Map<number, string> {
   return map;
 }
 
+/**
+ * Reads the existing videoManifest.ts to preserve descriptions that were
+ * hand-edited or set in a previous run, preventing --update-manifest from
+ * clobbering them with generic placeholders.
+ */
+function loadExistingDescriptions(): Map<number, string> {
+  const map = new Map<number, string>();
+  if (!fs.existsSync(OUTPUT_FILE)) return map;
+
+  try {
+    const raw = fs.readFileSync(OUTPUT_FILE, 'utf-8');
+    // Match entries like:  42: { ... description: "some text", ... }
+    const entryPattern = /^\s+(\d+):\s*\{[^}]*description:\s*"([^"]+)"/gm;
+    // Also handle single-quoted descriptions
+    const entryPatternSQ = /^\s+(\d+):\s*\{[^}]*description:\s*'([^']+)'/gm;
+
+    for (const match of raw.matchAll(entryPattern)) {
+      const num = parseInt(match[1], 10);
+      const desc = match[2];
+      if (!Number.isNaN(num) && desc) map.set(num, desc);
+    }
+    for (const match of raw.matchAll(entryPatternSQ)) {
+      const num = parseInt(match[1], 10);
+      const desc = match[2];
+      if (!Number.isNaN(num) && desc) map.set(num, desc);
+    }
+  } catch {
+    // Non-fatal
+  }
+  return map;
+}
+
+const GENERIC_PLACEHOLDER_RE = /^[A-Z][a-z]?$|element visualization$/;
+
 // ---------------------------------------------------------------------------
 // Core generator
 // ---------------------------------------------------------------------------
@@ -169,6 +203,7 @@ export interface ManifestEntry {
 
 function collectEntries(publicUrl: string): ManifestEntry[] {
   const generationDescriptions = loadGenerationDescriptions();
+  const existingDescriptions = loadExistingDescriptions();
 
   const files = fs
     .readdirSync(VIDEOS_DIR)
@@ -176,6 +211,7 @@ function collectEntries(publicUrl: string): ManifestEntry[] {
     .sort();
 
   const entries: ManifestEntry[] = [];
+  const missingDescriptions: string[] = [];
 
   for (const filename of files) {
     const atomicNumber = parseAtomicNumber(filename);
@@ -186,10 +222,21 @@ function collectEntries(publicUrl: string): ManifestEntry[] {
       continue;
     }
 
+    // Priority: DESCRIPTIONS map > existing videoManifest.ts > generation manifest > placeholder
+    const existingDesc = existingDescriptions.get(atomicNumber);
+    const nonGenericExisting = existingDesc && !GENERIC_PLACEHOLDER_RE.test(existingDesc)
+      ? existingDesc
+      : undefined;
+
     const description =
       DESCRIPTIONS[atomicNumber] ??
+      nonGenericExisting ??
       generationDescriptions.get(atomicNumber) ??
       `${symbol} element visualization`;
+
+    if (GENERIC_PLACEHOLDER_RE.test(description)) {
+      missingDescriptions.push(`  ⚠ ${atomicNumber} (${symbol}) — needs a real description`);
+    }
 
     entries.push({
       atomicNumber,
@@ -198,6 +245,12 @@ function collectEntries(publicUrl: string): ManifestEntry[] {
       url: `${publicUrl}/${filename}`,
       description,
     });
+  }
+
+  if (missingDescriptions.length > 0) {
+    console.warn(`\n⚠ ${missingDescriptions.length} element(s) have placeholder descriptions:`);
+    for (const msg of missingDescriptions) console.warn(msg);
+    console.warn('  Add descriptions to DESCRIPTIONS in scripts/r2-upload/generate-manifest.ts\n');
   }
 
   return entries;
