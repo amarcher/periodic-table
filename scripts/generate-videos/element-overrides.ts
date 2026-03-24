@@ -307,7 +307,11 @@ export const elementOverrides: Record<number, ElementOverride> = {
     videoPrompt:
       'Extreme close-up of a small sealed glass vial containing promethium salt crystals sitting on a dark surface. The room is pitch black, but the crystals emit an eerie, ghostly pale blue-green glow entirely from their own radioactive decay — no external light source needed. The soft luminescence pulses gently, casting faint blue-green light onto the glass walls of the vial. The glow is ethereal and otherworldly, like a tiny captured piece of radioactive starlight. A self-luminous element that has been glowing since the moment it was created, powered by atomic decay. Dark background, cinematic lighting, extreme close-up, no text, no watermarks, no logos.',
   },
-  62: { skipVideo: true }, // Samarium
+  62: {
+    // Samarium
+    videoPrompt:
+      'Extreme close-up of a small silvery samarium-cobalt magnet sitting on a heat-resistant ceramic surface in a dark laboratory. A blowtorch flame engulfs the magnet, heating it until it glows a deep, dull red. Iron filings are sprinkled from above — and they still leap toward the red-hot magnet, clinging to its glowing surface in spiky clusters. The magnet is white-hot now, yet its invisible magnetic grip refuses to let go. Other magnets would have lost their power hundreds of degrees ago, but this one holds firm at temperatures that would destroy ordinary magnets. Dark background, cinematic lighting, extreme close-up, no text, no watermarks, no logos.',
+  },
   63: {
     // Europium
     videoPrompt:
@@ -323,16 +327,36 @@ export const elementOverrides: Record<number, ElementOverride> = {
     videoPrompt:
       'Extreme close-up of a glass dish containing terbium-doped material in a dark room. A UV lamp clicks on and the sample instantly erupts with an intense, electric green fluorescence — a vivid, saturated green glow so bright it illuminates the entire surrounding area with an otherworldly emerald light. The green fluorescence is strikingly pure and intense, far brighter than typical glow-in-the-dark materials. A euro banknote is brought under the same UV light, and terbium security features blaze green against the dark purple of the UV. The brilliant green phosphorescence makes terbium the undisputed king of green light among all elements. Dark background, cinematic lighting, extreme close-up, no text, no watermarks, no logos.',
   },
-  66: { skipVideo: true }, // Dysprosium
-  67: { skipVideo: true }, // Holmium
+  66: {
+    // Dysprosium
+    videoPrompt:
+      'Extreme close-up of a small metallic rod of Terfenol-D (a dysprosium-iron alloy) clamped vertically in a laboratory fixture, with a dial indicator touching its tip. An electromagnet surrounding the rod pulses on — the rod visibly stretches, the dial indicator needle jumping. The magnet pulses off — the rod contracts back. On, stretch. Off, contract. The rod breathes rhythmically like a metallic heartbeat, expanding and shrinking with each magnetic pulse. A metal that physically changes shape in response to magnetic fields, converting invisible magnetism into visible mechanical motion. Dark background, cinematic lighting, extreme close-up, no text, no watermarks, no logos.',
+  },
+  67: {
+    // Holmium
+    videoPrompt:
+      'Extreme close-up of a glass beaker filled with holmium chloride solution — a rich, distinctive brownish-pink liquid unlike any other element. The solution is slowly poured into a second beaker, the thick pink-amber liquid catching the light as it flows in a smooth stream. Nearby, a polished holmium-doped cubic zirconia gemstone sparkles with a warm champagne-pink brilliance. A holmium oxide powder sample displays a vivid yellow color. The element with the strongest magnetic field of any atom, revealed through its uniquely beautiful colored compounds. Dark background, cinematic lighting, extreme close-up, no text, no watermarks, no logos.',
+  },
   68: {
     // Erbium
     videoPrompt:
       'Extreme close-up of a collection of erbium-doped glass pieces in a dark room — rods, lenses, and discs all tinted a beautiful, distinctive rose-pink color. A beam of light passes through the erbium glass, emerging tinted with a warm rosy glow. An erbium oxide powder sample nearby displays a vivid pink color. When a green laser beam strikes the erbium-doped glass, the glass erupts with bright pink fluorescence along the beam path, the erbium ions converting green light into their signature pink emission. Glowing pink traces of light streak through the glass like veins of luminous rose quartz. The element that powers the entire internet, revealed in its true color. Dark background, cinematic lighting, extreme close-up, no text, no watermarks, no logos.',
   },
-  69: { skipVideo: true }, // Thulium
-  70: { skipVideo: true }, // Ytterbium
-  71: { skipVideo: true }, // Lutetium
+  69: {
+    // Thulium
+    videoPrompt:
+      'Extreme close-up of a glass dish containing thulium-doped material in a pitch-black room. A UV lamp clicks on and the sample begins to glow with a soft, pure ice-blue luminescence — a cool, ethereal blue unlike the red of europium or the green of terbium. The blue light is delicate but unmistakable, casting a frosty azure glow across the dish and surrounding surface. A second dish with europium glows vivid red, a third with terbium blazes emerald green — together the three lanthanides create a stunning RGB trio of red, green, and blue, the three primary colors of light from three neighboring elements. Dark background, cinematic lighting, extreme close-up, no text, no watermarks, no logos.',
+  },
+  70: {
+    // Ytterbium
+    videoPrompt:
+      'Extreme close-up of a polished silvery ytterbium metal disc connected to a voltmeter by thin wires, sitting in a laboratory hydraulic press. The press slowly compresses the disc — the voltmeter needle swings dramatically as the electrical resistance changes under pressure. Released, the needle swings back. Compressed again, harder this time — the needle jumps even further. The metal can feel every squeeze and report it through electricity, its atomic structure shifting measurably under stress. A living pressure sensor made of pure metal. Dark background, cinematic lighting, extreme close-up, no text, no watermarks, no logos.',
+  },
+  71: {
+    // Lutetium
+    videoPrompt:
+      'Extreme close-up of a small polished lutetium metal sample with a brilliant, mirror-like silvery sheen — the densest and hardest of all the rare earth elements. A Vickers diamond hardness tester descends, pressing its sharp diamond point into the surface. The resulting indent is remarkably tiny compared to other lanthanide samples lined up beside it. The camera pushes in on lutetium\'s flawless metallic surface, catching light with a cold, steely brilliance. The last element in the lanthanide series, and by far the toughest — a fitting end to the rare earth family. Dark background, cinematic lighting, extreme close-up, no text, no watermarks, no logos.',
+  },
   72: {
     // Hafnium
     videoPrompt:
