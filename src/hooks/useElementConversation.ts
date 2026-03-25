@@ -6,10 +6,12 @@ import { elements } from '../data/elements';
 import { getVideoEntry } from '../data/videoManifest';
 import { getRadioactivity } from '../utils/elementDerived';
 import { getReactivity } from '../utils/elementDerived';
+import { DEFAULT_VIEW_MODE, getAtomConfig, getValenceIndices, type AtomViewMode, type OrbitalFilter } from '../components/atom/atomConfig';
 
 interface ConversationCallbacks {
   onNavigate: (element: Element) => void;
   onGoBack: () => void;
+  onSetAtomViewMode: (mode: AtomViewMode) => void;
 }
 
 export type VoiceStatus = 'off' | 'connecting' | 'connected' | 'error';
@@ -42,7 +44,13 @@ function buildElementContext(element: Element): string {
     '',
     `[WHAT THE CHILD SEES ON SCREEN]`,
     `LEFT SIDE:`,
-    `- A spinning 3D atom model showing ${element.symbol}'s electron orbitals`,
+    `- A spinning 3D atom model showing ${element.symbol}'s electron orbitals.`,
+    `  You can control the atom view with these tools:`,
+    `  - show_valence_electrons: highlights just the outermost electrons, dims inner shells`,
+    `  - show_orbital_type: shows only s, p, d, or f orbitals to reveal their shapes`,
+    `  - show_unfilled_orbitals: shows ghost electrons in empty valence slots (explains reactivity!)`,
+    `  - reset_atom_view: returns to normal view`,
+    `  Proactively use these when explaining reactivity, bonding, or orbital shapes!`,
     `- Element identity: #${element.atomicNumber} ${element.symbol} ${element.name} (${categoryLabels[element.category]})`,
   ];
 
@@ -110,7 +118,7 @@ function buildElementContext(element: Element): string {
  * Starts immediately on page load — greets the kid on the periodic table.
  * Element clicks are sent as contextual updates.
  */
-export function useElementConversation({ onNavigate, onGoBack }: ConversationCallbacks) {
+export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode }: ConversationCallbacks) {
   const agentId = import.meta.env.VITE_ELEVENLABS_AGENT_ID as string | undefined;
   const [sessionStarted, setSessionStarted] = useState(false);
   const [micError, setMicError] = useState<MicError>(null);
@@ -133,6 +141,51 @@ export function useElementConversation({ onNavigate, onGoBack }: ConversationCal
         currentElementRef.current = null;
         onGoBack();
         return "Returned to periodic table";
+      },
+      show_valence_electrons: () => {
+        if (!currentElementRef.current) return "No element is open right now — ask them to click one first!";
+        onSetAtomViewMode({ valenceOnly: true, orbitalFilter: null, showUnfilled: false });
+        const el = elements.find(e => e.atomicNumber === currentElementRef.current);
+        if (!el) return "Showing valence electrons";
+        const config = getAtomConfig(el.atomicNumber);
+        const valence = getValenceIndices(config.subshells);
+        const parts = [...valence].map(i => {
+          const s = config.subshells[i];
+          return `${s.n}${s.type}${s.electronCount}`;
+        });
+        return `Now showing valence electrons for ${el.name}: ${parts.join(', ')}. Inner shells are dimmed.`;
+      },
+      show_orbital_type: (params: { type: string }) => {
+        if (!currentElementRef.current) return "No element is open right now — ask them to click one first!";
+        const t = params.type as OrbitalFilter;
+        if (!['s', 'p', 'd', 'f'].includes(t!)) return `Invalid orbital type "${params.type}". Use s, p, d, or f.`;
+        onSetAtomViewMode({ valenceOnly: false, orbitalFilter: t, showUnfilled: false });
+        const el = elements.find(e => e.atomicNumber === currentElementRef.current);
+        const shapes: Record<string, string> = {
+          s: 'spherical (circular)',
+          p: 'dumbbell (figure-8) with 3 orientations',
+          d: 'cloverleaf with 5 orientations',
+          f: 'complex multi-lobed with 7 orientations',
+        };
+        return `Now showing only ${t} orbitals for ${el?.name ?? 'this element'}. ${t} orbitals are ${shapes[t!] ?? ''} shaped.`;
+      },
+      show_unfilled_orbitals: () => {
+        if (!currentElementRef.current) return "No element is open right now — ask them to click one first!";
+        onSetAtomViewMode({ valenceOnly: true, orbitalFilter: null, showUnfilled: true });
+        const el = elements.find(e => e.atomicNumber === currentElementRef.current);
+        if (!el) return "Showing unfilled orbitals";
+        const config = getAtomConfig(el.atomicNumber);
+        const valence = getValenceIndices(config.subshells);
+        const unfilled = [...valence]
+          .map(i => config.subshells[i])
+          .filter(s => s.electronCount < s.maxElectrons)
+          .map(s => `${s.n}${s.type}: ${s.electronCount}/${s.maxElectrons}`);
+        if (unfilled.length === 0) return `${el.name} has all valence shells full — it's very stable (noble gas configuration)!`;
+        return `Now showing unfilled orbitals for ${el.name}. Ghost electrons show empty slots: ${unfilled.join(', ')}. These empty spots explain its chemical reactivity!`;
+      },
+      reset_atom_view: () => {
+        onSetAtomViewMode(DEFAULT_VIEW_MODE);
+        return "Reset atom view to show all electrons normally.";
       },
     },
     onConnect: () => {

@@ -1,5 +1,6 @@
 import { useEffect, useRef, lazy, Suspense } from 'react';
 import type { Element } from '../types/element';
+import type { AtomViewMode } from './atom/atomConfig';
 import { categoryColors, categoryLabels } from '../utils/colors';
 import { getVideoEntry } from '../data/videoManifest';
 import { ElementVideo } from './ElementVideo';
@@ -17,9 +18,11 @@ const AtomVisualizer = lazy(() =>
 interface ElementDetailProps {
   element: Element;
   onClose: () => void;
+  atomViewMode: AtomViewMode;
+  onAtomViewModeChange: (mode: AtomViewMode) => void;
 }
 
-export function ElementDetail({ element, onClose }: ElementDetailProps) {
+export function ElementDetail({ element, onClose, atomViewMode, onAtomViewModeChange }: ElementDetailProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
 
@@ -97,7 +100,7 @@ export function ElementDetail({ element, onClose }: ElementDetailProps) {
           <div className="detail__top-row detail__content">
             <div className="detail__atom-zone">
               <Suspense fallback={<div className="detail__atom-loading">Loading...</div>}>
-                <AtomVisualizer element={element} />
+                <AtomVisualizer element={element} viewMode={atomViewMode} onViewModeChange={onAtomViewModeChange} />
               </Suspense>
             </div>
 

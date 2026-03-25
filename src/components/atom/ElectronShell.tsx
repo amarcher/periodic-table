@@ -10,6 +10,9 @@ interface ElectronShellProps {
   color: string;
   totalSubshells: number;
   detailLevel: DetailLevel;
+  dimmed?: boolean;
+  hidden?: boolean;
+  showUnfilled?: boolean;
 }
 
 function smoothRadial(value: number, exponent = 0.7, minFraction = 0.12): number {
@@ -82,8 +85,8 @@ function getPointOnOrbital(type: string, radius: number, t: number): THREE.Vecto
 }
 
 /** Glowing electron orb — forwardRef so parent can animate position */
-const ElectronOrb = forwardRef<THREE.Group, { color: string }>(
-  function ElectronOrb({ color }, ref) {
+const ElectronOrb = forwardRef<THREE.Group, { color: string; opacity?: number }>(
+  function ElectronOrb({ color, opacity = 1 }, ref) {
     return (
       <group ref={ref}>
         <mesh>
@@ -91,13 +94,44 @@ const ElectronOrb = forwardRef<THREE.Group, { color: string }>(
           <meshStandardMaterial
             color="white"
             emissive="white"
-            emissiveIntensity={3}
+            emissiveIntensity={3 * opacity}
+            transparent={opacity < 1}
+            opacity={opacity}
             toneMapped={false}
           />
         </mesh>
         <mesh>
           <sphereGeometry args={[0.18, 10, 10]} />
-          <meshBasicMaterial color={color} transparent opacity={0.25} toneMapped={false} />
+          <meshBasicMaterial color={color} transparent opacity={0.25 * opacity} toneMapped={false} />
+        </mesh>
+      </group>
+    );
+  }
+);
+
+/** Ghost electron — wireframe hollow orb for unfilled slots */
+const GhostElectronOrb = forwardRef<THREE.Group, { color: string }>(
+  function GhostElectronOrb({ color }, ref) {
+    const matRef = useRef<THREE.MeshBasicMaterial>(null);
+
+    useFrame((state) => {
+      if (matRef.current) {
+        matRef.current.opacity = 0.15 + Math.sin(state.clock.elapsedTime * 2) * 0.1;
+      }
+    });
+
+    return (
+      <group ref={ref}>
+        <mesh>
+          <sphereGeometry args={[0.12, 8, 8]} />
+          <meshBasicMaterial
+            ref={matRef}
+            color={color}
+            wireframe
+            transparent
+            opacity={0.25}
+            toneMapped={false}
+          />
         </mesh>
       </group>
     );
@@ -105,23 +139,30 @@ const ElectronOrb = forwardRef<THREE.Group, { color: string }>(
 );
 
 /** Electron with trail wrapper */
-function TrackedElectron({ color, onRef, idx }: { color: string; onRef: (idx: number, el: THREE.Group | null) => void; idx: number }) {
+function TrackedElectron({ color, onRef, idx, opacity }: { color: string; onRef: (idx: number, el: THREE.Group | null) => void; idx: number; opacity?: number }) {
   const ref = useCallback((el: THREE.Group | null) => { onRef(idx, el); }, [onRef, idx]);
   return (
     <Trail width={0.4} length={6} decay={1.2} color={color} attenuation={(w: number) => w * w}>
-      <ElectronOrb ref={ref} color={color} />
+      <ElectronOrb ref={ref} color={color} opacity={opacity} />
     </Trail>
   );
 }
 
 /** Electron without trail */
-function PlainElectron({ color, onRef, idx }: { color: string; onRef: (idx: number, el: THREE.Group | null) => void; idx: number }) {
+function PlainElectron({ color, onRef, idx, opacity }: { color: string; onRef: (idx: number, el: THREE.Group | null) => void; idx: number; opacity?: number }) {
   const ref = useCallback((el: THREE.Group | null) => { onRef(idx, el); }, [onRef, idx]);
-  return <ElectronOrb ref={ref} color={color} />;
+  return <ElectronOrb ref={ref} color={color} opacity={opacity} />;
 }
 
-export function ElectronShell({ subshell, index, color, totalSubshells, detailLevel }: ElectronShellProps) {
+/** Ghost electron (no trail) */
+function GhostElectron({ color, onRef, idx }: { color: string; onRef: (idx: number, el: THREE.Group | null) => void; idx: number }) {
+  const ref = useCallback((el: THREE.Group | null) => { onRef(idx, el); }, [onRef, idx]);
+  return <GhostElectronOrb ref={ref} color={color} />;
+}
+
+export function ElectronShell({ subshell, index, color, totalSubshells, detailLevel, dimmed = false, hidden = false, showUnfilled = false }: ElectronShellProps) {
   const electronRefs = useRef<(THREE.Group | null)[]>([]);
+  const ghostRefs = useRef<(THREE.Group | null)[]>([]);
 
   const orientations = useMemo(() => getOrientations(subshell.type), [subshell.type]);
 
@@ -133,6 +174,22 @@ export function ElectronShell({ subshell, index, color, totalSubshells, detailLe
     return result;
   }, [subshell.electronCount, orientations.length]);
 
+  const unfilledCount = showUnfilled ? subshell.maxElectrons - subshell.electronCount : 0;
+
+  const ghostsPerOrientation = useMemo(() => {
+    if (unfilledCount === 0) return [];
+    const result: number[] = new Array(orientations.length).fill(0);
+    for (let i = 0; i < unfilledCount; i++) {
+      result[i % orientations.length]++;
+    }
+    return result;
+  }, [unfilledCount, orientations.length]);
+
+  // Visual parameters based on dimmed state
+  const tubeOpacity = dimmed ? 0.08 : 0.35;
+  const tubeEmissive = dimmed ? 0.2 : 0.8;
+  const electronOpacity = dimmed ? 0.15 : 1;
+
   const tubeSegments = detailLevel === 'high' ? 64 : detailLevel === 'medium' ? 48 : 32;
 
   const orbitalTubes = useMemo(() => {
@@ -143,9 +200,9 @@ export function ElectronShell({ subshell, index, color, totalSubshells, detailLe
       const tubeMat = new THREE.MeshStandardMaterial({
         color,
         emissive: new THREE.Color(color),
-        emissiveIntensity: 0.8,
+        emissiveIntensity: tubeEmissive,
         transparent: true,
-        opacity: 0.35,
+        opacity: tubeOpacity,
         toneMapped: false,
         roughness: 0.5,
       });
@@ -153,13 +210,14 @@ export function ElectronShell({ subshell, index, color, totalSubshells, detailLe
       mesh.rotation.set(rotation[0], rotation[1], rotation[2]);
       return mesh;
     });
-  }, [subshell.type, subshell.radius, color, orientations, tubeSegments]);
+  }, [subshell.type, subshell.radius, color, orientations, tubeSegments, tubeOpacity, tubeEmissive]);
 
   const shouldUseTrail = useMemo(() => {
+    if (dimmed) return false;
     if (detailLevel === 'high') return true;
     if (detailLevel === 'medium') return index >= totalSubshells - 2;
     return index >= totalSubshells - 1;
-  }, [detailLevel, index, totalSubshells]);
+  }, [detailLevel, index, totalSubshells, dimmed]);
 
   const speed = Math.max(0.6 - index * 0.03, 0.15);
 
@@ -172,6 +230,8 @@ export function ElectronShell({ subshell, index, color, totalSubshells, detailLe
 
   useFrame((state) => {
     const t = state.clock.elapsedTime * speed;
+
+    // Animate real electrons
     let childIdx = 0;
     for (let o = 0; o < orientations.length; o++) {
       const count = electronsPerOrientation[o];
@@ -187,6 +247,28 @@ export function ElectronShell({ subshell, index, color, totalSubshells, detailLe
         childIdx++;
       }
     }
+
+    // Animate ghost electrons
+    if (unfilledCount > 0 && ghostsPerOrientation.length > 0) {
+      let ghostIdx = 0;
+      for (let o = 0; o < orientations.length; o++) {
+        const realCount = electronsPerOrientation[o];
+        const ghostCount = ghostsPerOrientation[o];
+        const quat = quaternions[o];
+        const totalInOrientation = realCount + ghostCount;
+        for (let e = 0; e < ghostCount; e++) {
+          const ref = ghostRefs.current[ghostIdx];
+          if (ref) {
+            // Offset ghosts to interleave with real electrons
+            const phase = t + ((realCount + e) / totalInOrientation) * Math.PI * 2 + o * 1.3;
+            const pathPos = getPointOnOrbital(subshell.type, subshell.radius, phase);
+            pathPos.applyQuaternion(quat);
+            ref.position.copy(pathPos);
+          }
+          ghostIdx++;
+        }
+      }
+    }
   });
 
   const displayCount = Math.min(
@@ -198,7 +280,13 @@ export function ElectronShell({ subshell, index, color, totalSubshells, detailLe
     electronRefs.current[idx] = el;
   }, []);
 
+  const handleGhostRef = useCallback((idx: number, el: THREE.Group | null) => {
+    ghostRefs.current[idx] = el;
+  }, []);
+
   const ElectronComponent = shouldUseTrail ? TrackedElectron : PlainElectron;
+
+  if (hidden) return null;
 
   return (
     <group>
@@ -206,7 +294,10 @@ export function ElectronShell({ subshell, index, color, totalSubshells, detailLe
         <primitive key={i} object={tube} />
       ))}
       {Array.from({ length: displayCount }).map((_, i) => (
-        <ElectronComponent key={i} idx={i} color={color} onRef={handleRef} />
+        <ElectronComponent key={i} idx={i} color={color} onRef={handleRef} opacity={electronOpacity} />
+      ))}
+      {unfilledCount > 0 && Array.from({ length: unfilledCount }).map((_, i) => (
+        <GhostElectron key={`ghost-${i}`} idx={i} color={color} onRef={handleGhostRef} />
       ))}
     </group>
   );

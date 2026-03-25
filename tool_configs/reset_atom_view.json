@@ -1,0 +1,16 @@
+{
+    "name": "reset_atom_view",
+    "description": "Reset the 3D atom model to its default view showing all electron shells normally. Use after demonstrating valence electrons or orbital types to return to the full view.",
+    "type": "client",
+    "expects_response": true,
+    "response_timeout_secs": 30,
+    "parameters": {
+        "type": "object",
+        "description": "No parameters needed",
+        "properties": {},
+        "required": []
+    },
+    "dynamic_variables": {
+        "dynamic_variable_placeholders": {}
+    }
+}
