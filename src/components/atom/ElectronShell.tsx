@@ -164,8 +164,6 @@ export function ElectronShell({ subshell, index, color, totalSubshells, detailLe
   const electronRefs = useRef<(THREE.Group | null)[]>([]);
   const ghostRefs = useRef<(THREE.Group | null)[]>([]);
 
-  if (hidden) return null;
-
   const orientations = useMemo(() => getOrientations(subshell.type), [subshell.type]);
 
   const electronsPerOrientation = useMemo(() => {
@@ -287,6 +285,8 @@ export function ElectronShell({ subshell, index, color, totalSubshells, detailLe
   }, []);
 
   const ElectronComponent = shouldUseTrail ? TrackedElectron : PlainElectron;
+
+  if (hidden) return null;
 
   return (
     <group>
