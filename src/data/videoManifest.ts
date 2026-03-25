@@ -376,6 +376,11 @@ export const videoManifest: Partial<Record<number, VideoEntry>> = {
     poster: '',
     description: "A polished tantalum bar sitting completely untouched in fuming hydrochloric acid",
   },
+  74: {
+    url: `${BASE_URL}/074-W-veo31fast.mp4`,
+    poster: '',
+    description: "A tungsten filament glowing white-hot inside a glass bulb, refusing to melt at extreme temperature",
+  },
   75: {
     url: `${BASE_URL}/075-Re-veo31fast.mp4`,
     poster: '',
@@ -425,6 +430,21 @@ export const videoManifest: Partial<Record<number, VideoEntry>> = {
     url: `${BASE_URL}/084-Po-veo31fast.mp4`,
     poster: '',
     description: "A speck of polonium-210 emitting an ethereal blue glow from ionizing the surrounding air",
+  },
+  86: {
+    url: `${BASE_URL}/086-Rn-veo31fast.mp4`,
+    poster: '',
+    description: "Radon gas condensing on cold glass walls, revealing a radioluminescent orange-red glow",
+  },
+  89: {
+    url: `${BASE_URL}/089-Ac-veo31fast.mp4`,
+    poster: '',
+    description: "A tiny actinium pellet emitting an ethereal pale blue glow from ionizing the surrounding air",
+  },
+  90: {
+    url: `${BASE_URL}/090-Th-veo31fast.mp4`,
+    poster: '',
+    description: "Thorium metal turnings igniting into a blazing, brilliant white incandescence",
   },
   92: {
     url: `${BASE_URL}/092-U-veo31fast.mp4`,

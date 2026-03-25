@@ -124,6 +124,7 @@ const DESCRIPTIONS: Record<number, string> = {
   71: 'Polished lutetium with a brilliant mirror-like sheen, tested for hardness with a Vickers diamond indenter',
   72: 'Pyrophoric hafnium powder self-igniting in mid-air, producing brilliant white-hot sparks',
   73: 'A polished tantalum bar sitting completely untouched in fuming hydrochloric acid',
+  74: 'A tungsten filament glowing white-hot inside a glass bulb, refusing to melt at extreme temperature',
   75: 'A dense silvery-white rhenium pellet gleaming under dramatic laboratory lighting',
   76: 'A tiny osmium bead outweighing steel ball bearings three times its size on a precision balance',
   77: 'A polished iridium pellet sitting completely untouched in fuming aqua regia',
@@ -134,6 +135,9 @@ const DESCRIPTIONS: Record<number, string> = {
   82: 'Fresh-cut lead revealing bright silvery-blue metal as dark oxide creeps across the surface',
   83: 'Molten bismuth cooling into iridescent rainbow hopper crystals with vivid oxide layers',
   84: 'A speck of polonium-210 emitting an ethereal blue glow from ionizing the surrounding air',
+  86: 'Radon gas condensing on cold glass walls, revealing a radioluminescent orange-red glow',
+  89: 'A tiny actinium pellet emitting an ethereal pale blue glow from ionizing the surrounding air',
+  90: 'Thorium metal turnings igniting into a blazing, brilliant white incandescence',
   92: 'Uranium glass glowing with intense green fluorescence under UV light',
 };
 
