@@ -15,8 +15,68 @@
   touch-action: none;
 }
 
+/* Overlay controls */
+.atom-controls {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.atom-controls__pill {
+  pointer-events: auto;
+  height: 24px;
+  padding: 0 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 11px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  white-space: nowrap;
+  line-height: 22px;
+}
+
+.atom-controls__pill:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.atom-controls__pill--active {
+  background: color-mix(in srgb, var(--pill-color, #888) 30%, transparent);
+  border-color: color-mix(in srgb, var(--pill-color, #888) 50%, transparent);
+  color: #fff;
+}
+
+.atom-controls__pill--orbital {
+  padding: 0 8px;
+  font-style: italic;
+  text-transform: lowercase;
+}
+
+.atom-controls__segment {
+  display: flex;
+  gap: 2px;
+}
+
 @media (max-width: 560px) {
   .atom-visualizer {
     max-height: 240px;
+  }
+
+  .atom-controls__pill {
+    height: 20px;
+    padding: 0 7px;
+    font-size: 10px;
+    line-height: 18px;
   }
 }

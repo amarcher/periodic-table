@@ -5,7 +5,11 @@ import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import type { Element } from '../types/element';
 import { categoryColors } from '../utils/colors';
-import { getAtomConfig, getCategoryEffect, getDetailLevel } from './atom/atomConfig';
+import {
+  getAtomConfig, getCategoryEffect, getDetailLevel, getValenceIndices, hasUnfilledValence,
+  DEFAULT_VIEW_MODE,
+  type AtomViewMode, type OrbitalType,
+} from './atom/atomConfig';
 import { Nucleus } from './atom/Nucleus';
 import { ElectronShell } from './atom/ElectronShell';
 import { CategoryEffects } from './atom/CategoryEffects';
@@ -13,13 +17,16 @@ import './AtomVisualizer.css';
 
 interface AtomVisualizerProps {
   element: Element;
+  viewMode?: AtomViewMode;
+  onViewModeChange?: (mode: AtomViewMode) => void;
 }
 
-function AtomScene({ element }: { element: Element }) {
+function AtomScene({ element, viewMode }: { element: Element; viewMode: AtomViewMode }) {
   const config = useMemo(() => getAtomConfig(element.atomicNumber), [element.atomicNumber]);
   const effect = useMemo(() => getCategoryEffect(element.category), [element.category]);
   const detailLevel = useMemo(() => getDetailLevel(element.atomicNumber), [element.atomicNumber]);
   const color = categoryColors[element.category];
+  const valenceIndices = useMemo(() => getValenceIndices(config.subshells), [config.subshells]);
 
   const cameraZ = useMemo(() => {
     const maxRadius = config.subshells.length > 0
@@ -27,6 +34,8 @@ function AtomScene({ element }: { element: Element }) {
       : 2;
     return maxRadius * 2.2 + 3;
   }, [config.subshells]);
+
+  const isAnyModeActive = viewMode.valenceOnly || viewMode.orbitalFilter !== null || viewMode.showUnfilled;
 
   return (
     <Canvas
@@ -51,16 +60,28 @@ function AtomScene({ element }: { element: Element }) {
         color={color}
       />
 
-      {config.subshells.map((subshell, i) => (
-        <ElectronShell
-          key={`${subshell.n}-${subshell.type}`}
-          subshell={subshell}
-          index={i}
-          color={color}
-          totalSubshells={config.subshells.length}
-          detailLevel={detailLevel}
-        />
-      ))}
+      {config.subshells.map((subshell, i) => {
+        const isValence = valenceIndices.has(i);
+        const matchesFilter = viewMode.orbitalFilter === null || subshell.type === viewMode.orbitalFilter;
+        const highlighted = (!viewMode.valenceOnly || isValence) && matchesFilter;
+        const shellHidden = viewMode.orbitalFilter !== null && !matchesFilter;
+        const shellDimmed = isAnyModeActive && !highlighted && !shellHidden;
+        const shellShowUnfilled = viewMode.showUnfilled && highlighted && subshell.electronCount < subshell.maxElectrons;
+
+        return (
+          <ElectronShell
+            key={`${subshell.n}-${subshell.type}`}
+            subshell={subshell}
+            index={i}
+            color={color}
+            totalSubshells={config.subshells.length}
+            detailLevel={detailLevel}
+            dimmed={shellDimmed}
+            hidden={shellHidden}
+            showUnfilled={shellShowUnfilled}
+          />
+        );
+      })}
 
       <CategoryEffects
         effect={effect}
@@ -89,10 +110,67 @@ function AtomScene({ element }: { element: Element }) {
   );
 }
 
-export function AtomVisualizer({ element }: AtomVisualizerProps) {
+const ORBITAL_TYPES: OrbitalType[] = ['s', 'p', 'd', 'f'];
+
+function AtomControls({ element, viewMode, onViewModeChange }: {
+  element: Element;
+  viewMode: AtomViewMode;
+  onViewModeChange: (mode: AtomViewMode) => void;
+}) {
+  const config = useMemo(() => getAtomConfig(element.atomicNumber), [element.atomicNumber]);
+  const showUnfilledButton = hasUnfilledValence(config.subshells);
+  const presentOrbitalTypes = useMemo(() => {
+    const types = new Set(config.subshells.map(s => s.type));
+    return ORBITAL_TYPES.filter(t => types.has(t));
+  }, [config.subshells]);
+  const catColor = categoryColors[element.category];
+
+  return (
+    <div className="atom-controls">
+      <button
+        className={`atom-controls__pill ${viewMode.valenceOnly ? 'atom-controls__pill--active' : ''}`}
+        style={viewMode.valenceOnly ? { '--pill-color': catColor } as React.CSSProperties : undefined}
+        onClick={() => onViewModeChange({ ...viewMode, valenceOnly: !viewMode.valenceOnly })}
+      >
+        Valence
+      </button>
+
+      <div className="atom-controls__segment">
+        {presentOrbitalTypes.map(t => (
+          <button
+            key={t}
+            className={`atom-controls__pill atom-controls__pill--orbital ${viewMode.orbitalFilter === t ? 'atom-controls__pill--active' : ''}`}
+            style={viewMode.orbitalFilter === t ? { '--pill-color': catColor } as React.CSSProperties : undefined}
+            onClick={() => onViewModeChange({
+              ...viewMode,
+              orbitalFilter: viewMode.orbitalFilter === t ? null : t,
+            })}
+          >
+            {t}
+          </button>
+        ))}
+      </div>
+
+      {showUnfilledButton && (
+        <button
+          className={`atom-controls__pill ${viewMode.showUnfilled ? 'atom-controls__pill--active' : ''}`}
+          style={viewMode.showUnfilled ? { '--pill-color': catColor } as React.CSSProperties : undefined}
+          onClick={() => onViewModeChange({ ...viewMode, showUnfilled: !viewMode.showUnfilled })}
+        >
+          Unfilled
+        </button>
+      )}
+    </div>
+  );
+}
+
+export function AtomVisualizer({ element, viewMode = DEFAULT_VIEW_MODE, onViewModeChange }: AtomVisualizerProps) {
   return (
     <div className="atom-visualizer">
-      <AtomScene element={element} />
+      <AtomScene element={element} viewMode={viewMode} />
+      {onViewModeChange && (
+        <AtomControls element={element} viewMode={viewMode} onViewModeChange={onViewModeChange} />
+      )}
     </div>
   );
 }

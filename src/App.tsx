@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Analytics } from '@vercel/analytics/react';
 import type { Element } from './types/element';
+import { DEFAULT_VIEW_MODE, type AtomViewMode } from './components/atom/atomConfig';
 import { PeriodicTable } from './components/PeriodicTable';
 import { ElementDetail } from './components/ElementDetail';
 import { CategoryLegend } from './components/CategoryLegend';
@@ -36,10 +37,12 @@ function findCellForElement(element: Element): HTMLElement | null {
 
 function App() {
   const [selected, setSelected] = useState<Element | null>(null);
+  const [atomViewMode, setAtomViewMode] = useState<AtomViewMode>(DEFAULT_VIEW_MODE);
   const originCellRef = useRef<HTMLElement | null>(null);
 
   const openElement = useCallback((element: Element, originCell: HTMLElement | null) => {
     originCellRef.current = originCell;
+    setAtomViewMode(DEFAULT_VIEW_MODE);
     if (originCell) setClipVars(originCell.getBoundingClientRect());
     viewTransition(() => setSelected(element), ['detail-open']);
   }, []);
@@ -63,6 +66,7 @@ function App() {
   const voice = useElementConversation({
     onNavigate: handleVoiceNavigate,
     onGoBack: handleVoiceGoBack,
+    onSetAtomViewMode: setAtomViewMode,
   });
 
   const handleElementClick = useCallback((element: Element, e: React.MouseEvent) => {
@@ -106,6 +110,8 @@ function App() {
         <ElementDetail
           element={selected}
           onClose={handleClose}
+          atomViewMode={atomViewMode}
+          onAtomViewModeChange={setAtomViewMode}
         />
       )}
       <Analytics />

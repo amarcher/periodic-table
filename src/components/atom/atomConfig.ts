@@ -87,6 +87,48 @@ export function getCategoryEffect(category: ElementCategory): CategoryEffect {
   }
 }
 
+export type OrbitalFilter = 's' | 'p' | 'd' | 'f' | null;
+
+export interface AtomViewMode {
+  valenceOnly: boolean;
+  orbitalFilter: OrbitalFilter;
+  showUnfilled: boolean;
+}
+
+export const DEFAULT_VIEW_MODE: AtomViewMode = {
+  valenceOnly: false,
+  orbitalFilter: null,
+  showUnfilled: false,
+};
+
+/**
+ * Returns indices of valence subshells:
+ * - All subshells at the highest principal quantum number n
+ * - Any subshell that is not fully filled (incomplete d/f in transition metals)
+ */
+export function getValenceIndices(subshells: SubshellConfig[]): Set<number> {
+  if (subshells.length === 0) return new Set();
+  const maxN = Math.max(...subshells.map(s => s.n));
+  const indices = new Set<number>();
+  subshells.forEach((s, i) => {
+    if (s.n === maxN || s.electronCount < s.maxElectrons) {
+      indices.add(i);
+    }
+  });
+  return indices;
+}
+
+/**
+ * Check whether any valence subshell has unfilled slots.
+ */
+export function hasUnfilledValence(subshells: SubshellConfig[]): boolean {
+  const valence = getValenceIndices(subshells);
+  for (const i of valence) {
+    if (subshells[i].electronCount < subshells[i].maxElectrons) return true;
+  }
+  return false;
+}
+
 export type DetailLevel = 'high' | 'medium' | 'low';
 
 export function getDetailLevel(atomicNumber: number): DetailLevel {
