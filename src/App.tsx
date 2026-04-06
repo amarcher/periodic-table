@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import type { Element } from './types/element';
 import { DEFAULT_VIEW_MODE, type AtomViewMode } from './components/atom/atomConfig';
 import { PeriodicTable } from './components/PeriodicTable';
@@ -115,6 +116,7 @@ function App() {
         />
       )}
       <Analytics />
+      <SpeedInsights />
     </div>
   );
 }
