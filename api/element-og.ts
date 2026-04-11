@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getElementBySymbol } from '../src/data/elements';
-import { VIDEO_DATA } from '../src/data/videoData';
+import { getElementBySymbol } from '../src/data/elements.js';
+import { VIDEO_DATA } from '../src/data/videoData.js';
 
 const SITE_ORIGIN = 'https://www.periodictable.tech';
 const DEFAULT_VIDEO_CDN = 'https://pub-31265833619c4b07a0d5cae75480e369.r2.dev';

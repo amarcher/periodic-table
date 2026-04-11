@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import handler from './element-og';
+import handler from './element-og.js';
 
 type FakeReq = { url?: string; query?: Record<string, string | string[]> };
 type FakeRes = {
