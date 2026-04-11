@@ -1,7 +1,10 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import type { Element } from './types/element';
+import { getElementBySymbol } from './data/elements';
 import { DEFAULT_VIEW_MODE, type AtomViewMode } from './components/atom/atomConfig';
 import { PeriodicTable } from './components/PeriodicTable';
 import { ElementDetail } from './components/ElementDetail';
@@ -37,28 +40,49 @@ function findCellForElement(element: Element): HTMLElement | null {
 }
 
 function App() {
-  const [selected, setSelected] = useState<Element | null>(null);
+  const navigate = useNavigate();
+  const { symbol } = useParams<{ symbol: string }>();
+  const selected = symbol ? getElementBySymbol(symbol) ?? null : null;
   const [atomViewMode, setAtomViewMode] = useState<AtomViewMode>(DEFAULT_VIEW_MODE);
   const originCellRef = useRef<HTMLElement | null>(null);
 
-  const openElement = useCallback((element: Element, originCell: HTMLElement | null) => {
-    originCellRef.current = originCell;
-    setAtomViewMode(DEFAULT_VIEW_MODE);
-    if (originCell) setClipVars(originCell.getBoundingClientRect());
-    viewTransition(() => setSelected(element), ['detail-open']);
-  }, []);
+  // If the URL has a bogus symbol, bounce back to the root.
+  useEffect(() => {
+    if (symbol && !selected) navigate('/', { replace: true });
+  }, [symbol, selected, navigate]);
+
+  const openElement = useCallback(
+    (element: Element, originCell: HTMLElement | null) => {
+      originCellRef.current = originCell;
+      setAtomViewMode(DEFAULT_VIEW_MODE);
+      if (originCell) setClipVars(originCell.getBoundingClientRect());
+      viewTransition(() => {
+        flushSync(() => {
+          navigate(`/element/${element.symbol}`);
+        });
+      }, ['detail-open']);
+    },
+    [navigate]
+  );
 
   const closeDetail = useCallback(() => {
     const cell = originCellRef.current;
     if (cell) setClipVars(cell.getBoundingClientRect());
-    viewTransition(() => setSelected(null), ['detail-close']);
+    viewTransition(() => {
+      flushSync(() => {
+        navigate('/');
+      });
+    }, ['detail-close']);
     // Restore focus to originating cell after transition
     if (cell) requestAnimationFrame(() => cell.focus());
-  }, []);
+  }, [navigate]);
 
-  const handleVoiceNavigate = useCallback((element: Element) => {
-    openElement(element, findCellForElement(element));
-  }, [openElement]);
+  const handleVoiceNavigate = useCallback(
+    (element: Element) => {
+      openElement(element, findCellForElement(element));
+    },
+    [openElement]
+  );
 
   const handleVoiceGoBack = useCallback(() => {
     closeDetail();
@@ -70,20 +94,25 @@ function App() {
     onSetAtomViewMode: setAtomViewMode,
   });
 
-  const handleElementClick = useCallback((element: Element, e: React.MouseEvent) => {
-    openElement(element, e.currentTarget as HTMLElement);
-  }, [openElement]);
+  const handleElementClick = useCallback(
+    (element: Element, e: React.MouseEvent) => {
+      openElement(element, e.currentTarget as HTMLElement);
+    },
+    [openElement]
+  );
 
   const handleClose = useCallback(() => {
     voice.notifyElementClosed();
     closeDetail();
   }, [voice, closeDetail]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Keep the voice agent's context in sync with the URL regardless of how
+  // the user navigated (click, voice, paste, back button).
   useEffect(() => {
     if (selected) {
       voice.notifyElementChange(selected);
     }
-  }, [selected]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [selected?.atomicNumber]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="app">
