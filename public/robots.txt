@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://periodictable.tech/sitemap.xml
+Sitemap: https://www.periodictable.tech/sitemap.xml
