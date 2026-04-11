@@ -1,6 +1,17 @@
 {
   "framework": "vite",
   "rewrites": [
+    {
+      "source": "/element/(.*)",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i).*(facebookexternalhit|Twitterbot|WhatsApp|Slackbot|LinkedInBot|Discordbot|TelegramBot|Applebot|AppleNewsBot|Pinterest|redditbot|SkypeUriPreview).*"
+        }
+      ],
+      "destination": "/api/element-og"
+    },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
   "headers": [

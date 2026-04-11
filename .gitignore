@@ -38,8 +38,9 @@ scripts/generate-videos/output/cost-summary.json
 scripts/generate-videos/output/manifest.json
 scripts/generate-videos/output/review.html
 
-# Public element videos (served locally in dev, hosted on R2 in prod)
+# Public element videos + thumbnails (served locally in dev, hosted on R2 in prod)
 public/element-videos/*.mp4
+public/element-videos/*.jpg
 
 # Claude worktrees
 .claude/worktrees/

@@ -1,4 +1,4 @@
-import type { Element } from '../types/element';
+import type { Element } from '../types/element.js';
 
 export const elements: Element[] = [
   {
@@ -2834,3 +2834,8 @@ export const elements: Element[] = [
     ]
   },
 ];
+
+export function getElementBySymbol(symbol: string): Element | undefined {
+  const target = symbol.trim().toUpperCase();
+  return elements.find((el) => el.symbol.toUpperCase() === target);
+}
