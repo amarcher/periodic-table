@@ -1,7 +1,8 @@
-import { useCallback, useId, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import type { Element } from '../../types/element';
 import { getPhaseData, getPhaseAtPoint } from './phase-data';
 import type { PhaseDiagramData, PhasePoint } from './phase-data';
+import { trackPhaseDiagramUsed } from '../../utils/analytics';
 import './PhaseDiagramViz.css';
 
 interface Props {
@@ -46,6 +47,17 @@ export function PhaseDiagramViz({ element, catColor }: Props) {
   const [tempUnit, setTempUnit] = useState<TempUnit>('C');
   const svgRef = useRef<SVGSVGElement>(null);
   const dragging = useRef(false);
+  const hasInteracted = useRef(false);
+
+  // Track phase diagram interaction on unmount
+  useEffect(() => {
+    const el = element;
+    return () => {
+      if (hasInteracted.current) {
+        trackPhaseDiagramUsed(el.symbol, el.atomicNumber);
+      }
+    };
+  }, [element]);
 
   const tToX = useCallback((t: number) => {
     if (!data) return 0;
@@ -93,6 +105,7 @@ export function PhaseDiagramViz({ element, catColor }: Props) {
 
   const handlePointerDown = useCallback((e: React.PointerEvent<SVGSVGElement>) => {
     dragging.current = true;
+    hasInteracted.current = true;
     (e.target as SVGElement).setPointerCapture(e.pointerId);
     const tp = pointerToTP(e);
     if (tp) { setTemp(tp.t); setPressure(tp.p); }
@@ -115,6 +128,7 @@ export function PhaseDiagramViz({ element, catColor }: Props) {
     const tStep = (tMax - tMin) / 40;
     const pFactor = 1.15;
     let handled = true;
+    hasInteracted.current = true;
     switch (e.key) {
       case 'ArrowRight': setTemp(t => Math.min(t + tStep, tMax)); break;
       case 'ArrowLeft': setTemp(t => Math.max(t - tStep, tMin)); break;
@@ -196,7 +210,7 @@ export function PhaseDiagramViz({ element, catColor }: Props) {
           max={Math.log10(data.pRange[1])}
           step={0.01}
           value={Math.log10(pressure)}
-          onChange={e => setPressure(Math.pow(10, parseFloat(e.target.value)))}
+          onChange={e => { hasInteracted.current = true; setPressure(Math.pow(10, parseFloat(e.target.value))); }}
           aria-label="Pressure"
         />
 
@@ -319,7 +333,7 @@ export function PhaseDiagramViz({ element, catColor }: Props) {
         max={data.tRange[1]}
         step={(data.tRange[1] - data.tRange[0]) / 200}
         value={temp}
-        onChange={e => setTemp(parseFloat(e.target.value))}
+        onChange={e => { hasInteracted.current = true; setTemp(parseFloat(e.target.value)); }}
         aria-label="Temperature"
       />
 

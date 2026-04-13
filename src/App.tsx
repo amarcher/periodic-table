@@ -11,6 +11,7 @@ import { ElementDetail } from './components/ElementDetail';
 import { CategoryLegend } from './components/CategoryLegend';
 import { VoiceAgent } from './components/VoiceAgent';
 import { useElementConversation } from './hooks/useElementConversation';
+import { trackElementOpened, trackElementClosed } from './utils/analytics';
 import './App.css';
 
 function setClipVars(rect: DOMRect) {
@@ -45,6 +46,7 @@ function App() {
   const selected = symbol ? getElementBySymbol(symbol) ?? null : null;
   const [atomViewMode, setAtomViewMode] = useState<AtomViewMode>(DEFAULT_VIEW_MODE);
   const originCellRef = useRef<HTMLElement | null>(null);
+  const openTimeRef = useRef<number>(0);
 
   // If the URL has a bogus symbol, bounce back to the root.
   useEffect(() => {
@@ -54,7 +56,9 @@ function App() {
   const openElement = useCallback(
     (element: Element, originCell: HTMLElement | null) => {
       originCellRef.current = originCell;
+      openTimeRef.current = Date.now();
       setAtomViewMode(DEFAULT_VIEW_MODE);
+      trackElementOpened(element.symbol, element.atomicNumber);
       if (originCell) setClipVars(originCell.getBoundingClientRect());
       viewTransition(() => {
         flushSync(() => {
@@ -102,9 +106,12 @@ function App() {
   );
 
   const handleClose = useCallback(() => {
+    if (selected) {
+      trackElementClosed(selected.symbol, selected.atomicNumber, Date.now() - openTimeRef.current);
+    }
     voice.notifyElementClosed();
     closeDetail();
-  }, [voice, closeDetail]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [voice, closeDetail, selected]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Keep the voice agent's context in sync with the URL regardless of how
   // the user navigated (click, voice, paste, back button).

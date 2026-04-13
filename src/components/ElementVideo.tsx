@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { Element } from '../types/element';
 import { getVideoEntry } from '../data/videoManifest';
+import { trackVideoPlayToggle, trackVideoLoop } from '../utils/analytics';
 import './ElementVideo.css';
 
 interface ElementVideoProps {
@@ -12,6 +13,7 @@ export function ElementVideo({ element }: ElementVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(true);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const loopCountRef = useRef(0);
 
   // Detect prefers-reduced-motion
   useEffect(() => {
@@ -21,6 +23,22 @@ export function ElementVideo({ element }: ElementVideoProps) {
     mq.addEventListener('change', handler);
     return () => mq.removeEventListener('change', handler);
   }, []);
+
+  // Count video loops and fire analytics on unmount
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    loopCountRef.current = 0;
+    const handleEnded = () => { loopCountRef.current += 1; };
+    video.addEventListener('ended', handleEnded);
+    const el = element;
+    return () => {
+      video.removeEventListener('ended', handleEnded);
+      if (loopCountRef.current > 0) {
+        trackVideoLoop(el.symbol, el.atomicNumber, loopCountRef.current);
+      }
+    };
+  }, [element]);
 
   // Sync play/pause state with video element
   useEffect(() => {
@@ -34,8 +52,12 @@ export function ElementVideo({ element }: ElementVideoProps) {
   }, [isPlaying]);
 
   const handleToggle = useCallback(() => {
-    setIsPlaying((prev) => !prev);
-  }, []);
+    setIsPlaying((prev) => {
+      const next = !prev;
+      trackVideoPlayToggle(element.symbol, element.atomicNumber, next);
+      return next;
+    });
+  }, [element]);
 
   if (!entry) {
     return null;
