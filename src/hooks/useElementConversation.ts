@@ -7,6 +7,7 @@ import { getVideoEntry } from '../data/videoManifest';
 import { getRadioactivity } from '../utils/elementDerived';
 import { getReactivity } from '../utils/elementDerived';
 import { DEFAULT_VIEW_MODE, getAtomConfig, getValenceIndices, type AtomViewMode, type OrbitalFilter } from '../components/atom/atomConfig';
+import { trackVoiceAgentActivated } from '../utils/analytics';
 
 interface ConversationCallbacks {
   onNavigate: (element: Element) => void;
@@ -275,6 +276,7 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
     }
 
     setSessionStarted(true);
+    trackVoiceAgentActivated();
 
     try {
       await conversation.startSession({

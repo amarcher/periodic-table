@@ -13,6 +13,7 @@ import {
 import { Nucleus } from './atom/Nucleus';
 import { ElectronShell } from './atom/ElectronShell';
 import { CategoryEffects } from './atom/CategoryEffects';
+import { trackValenceToggle, trackOrbitalFilter, trackUnfilledToggle } from '../utils/analytics';
 import './AtomVisualizer.css';
 
 interface AtomVisualizerProps {
@@ -130,7 +131,11 @@ function AtomControls({ element, viewMode, onViewModeChange }: {
       <button
         className={`atom-controls__pill ${viewMode.valenceOnly ? 'atom-controls__pill--active' : ''}`}
         style={viewMode.valenceOnly ? { '--pill-color': catColor } as React.CSSProperties : undefined}
-        onClick={() => onViewModeChange({ ...viewMode, valenceOnly: !viewMode.valenceOnly })}
+        onClick={() => {
+          const next = !viewMode.valenceOnly;
+          trackValenceToggle(element.symbol, element.atomicNumber, next);
+          onViewModeChange({ ...viewMode, valenceOnly: next });
+        }}
       >
         Valence
       </button>
@@ -141,10 +146,11 @@ function AtomControls({ element, viewMode, onViewModeChange }: {
             key={t}
             className={`atom-controls__pill atom-controls__pill--orbital ${viewMode.orbitalFilter === t ? 'atom-controls__pill--active' : ''}`}
             style={viewMode.orbitalFilter === t ? { '--pill-color': catColor } as React.CSSProperties : undefined}
-            onClick={() => onViewModeChange({
-              ...viewMode,
-              orbitalFilter: viewMode.orbitalFilter === t ? null : t,
-            })}
+            onClick={() => {
+              const next = viewMode.orbitalFilter === t ? null : t;
+              trackOrbitalFilter(element.symbol, element.atomicNumber, next);
+              onViewModeChange({ ...viewMode, orbitalFilter: next });
+            }}
           >
             {t}
           </button>
@@ -155,7 +161,11 @@ function AtomControls({ element, viewMode, onViewModeChange }: {
         <button
           className={`atom-controls__pill ${viewMode.showUnfilled ? 'atom-controls__pill--active' : ''}`}
           style={viewMode.showUnfilled ? { '--pill-color': catColor } as React.CSSProperties : undefined}
-          onClick={() => onViewModeChange({ ...viewMode, showUnfilled: !viewMode.showUnfilled })}
+          onClick={() => {
+            const next = !viewMode.showUnfilled;
+            trackUnfilledToggle(element.symbol, element.atomicNumber, next);
+            onViewModeChange({ ...viewMode, showUnfilled: next });
+          }}
         >
           Unfilled
         </button>
