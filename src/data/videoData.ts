@@ -344,6 +344,10 @@ export const VIDEO_DATA: Partial<Record<number, VideoRawEntry>> = {
     filename: '086-Rn-veo31fast.mp4',
     description: "Radon gas condensing on cold glass walls, revealing a radioluminescent orange-red glow",
   },
+  88: {
+    filename: '088-Ra-veo31fast.mp4',
+    description: "A sealed vial of radium compound glowing with a haunting, steady emerald-green radioluminescence in total darkness",
+  },
   89: {
     filename: '089-Ac-veo31fast.mp4',
     description: "A tiny actinium pellet emitting an ethereal pale blue glow from ionizing the surrounding air",
@@ -355,5 +359,9 @@ export const VIDEO_DATA: Partial<Record<number, VideoRawEntry>> = {
   92: {
     filename: '092-U-veo31fast.mp4',
     description: "Uranium glass glowing with intense green fluorescence under UV light",
+  },
+  93: {
+    filename: '093-Np-veo31fast.mp4',
+    description: "Freshly prepared silvery neptunium blooming with a vivid green oxide patina in real time",
   },
 };

@@ -2,13 +2,15 @@ import { elements } from '../../src/data/elements.ts';
 import type { Element } from '../../src/types/element.ts';
 import { VIDEO_CATEGORIES } from './video-categories.ts';
 import { elementOverrides } from './element-overrides.ts';
-import { STYLE_ANCHOR, NEGATIVE_PROMPT } from './config.ts';
+import { STYLE_ANCHOR, IMAGE_STYLE_ANCHOR, NEGATIVE_PROMPT } from './config.ts';
 
 export interface BuiltPrompt {
   atomicNumber: number;
   symbol: string;
   name: string;
   prompt: string;
+  startFramePrompt: string;
+  endFramePrompt: string;
   negativePrompt: string;
   skipVideo: boolean;
 }
@@ -73,6 +75,22 @@ export function buildPrompt(element: Element): string {
   return `${filledTemplate} ${STYLE_ANCHOR}`;
 }
 
+export function buildStartFramePrompt(element: Element): string {
+  const override = elementOverrides[element.atomicNumber] ?? {};
+  if (override.startFramePrompt) {
+    return `${override.startFramePrompt} ${IMAGE_STYLE_ANCHOR}`;
+  }
+  return '';
+}
+
+export function buildEndFramePrompt(element: Element): string {
+  const override = elementOverrides[element.atomicNumber] ?? {};
+  if (override.endFramePrompt) {
+    return `${override.endFramePrompt} ${IMAGE_STYLE_ANCHOR}`;
+  }
+  return '';
+}
+
 export function buildNegativePrompt(): string {
   return NEGATIVE_PROMPT;
 }
@@ -85,6 +103,8 @@ export function buildAllPrompts(): BuiltPrompt[] {
       symbol: element.symbol,
       name: element.name,
       prompt: buildPrompt(element),
+      startFramePrompt: buildStartFramePrompt(element),
+      endFramePrompt: buildEndFramePrompt(element),
       negativePrompt: buildNegativePrompt(),
       skipVideo: override.skipVideo === true,
     };
