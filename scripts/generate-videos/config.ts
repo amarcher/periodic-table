@@ -45,6 +45,11 @@ export const STYLE_ANCHOR =
   'all substances remain fully contained within their vessels — nothing escapes, leaks, or spills unless an explosion is depicted, ' +
   'absolutely no text, no watermarks, no logos, no letters, no symbols overlaid on the video, no human faces.';
 
+export const IMAGE_STYLE_ANCHOR =
+  'Photorealistic photograph, shallow depth of field, dramatic and vivid scientific visualization, ' +
+  'professional laboratory aesthetic, dark background with soft volumetric lighting, extremely detailed, ' +
+  'absolutely no text, no watermarks, no logos, no letters, no symbols overlaid on the image, no human faces.';
+
 export const NEGATIVE_PROMPT =
   'text, watermark, logo, Chinese characters, Japanese characters, Korean characters, any written language, ' +
   'letters, numbers overlaid, title card, captions, subtitles, credits, ' +
