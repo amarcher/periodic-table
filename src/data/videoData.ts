@@ -340,9 +340,17 @@ export const VIDEO_DATA: Partial<Record<number, VideoRawEntry>> = {
     filename: '084-Po-veo31fast.mp4',
     description: "A speck of polonium-210 emitting an ethereal blue glow from ionizing the surrounding air",
   },
+  85: {
+    filename: '085-At-veo31fast.mp4',
+    description: "A sealed quartz capsule revealing a faint violet-blue glow from astatine's intense radioactivity ionizing trace gas",
+  },
   86: {
     filename: '086-Rn-veo31fast.mp4',
     description: "Radon gas condensing on cold glass walls, revealing a radioluminescent orange-red glow",
+  },
+  87: {
+    filename: '087-Fr-veo31fast.mp4',
+    description: "Francium atoms fluorescing with golden luminescence in a magneto-optical laser trap",
   },
   88: {
     filename: '088-Ra-veo31fast.mp4',
@@ -363,5 +371,9 @@ export const VIDEO_DATA: Partial<Record<number, VideoRawEntry>> = {
   93: {
     filename: '093-Np-veo31fast.mp4',
     description: "Freshly prepared silvery neptunium blooming with a vivid green oxide patina in real time",
+  },
+  94: {
+    filename: '094-Pu-veo31fast.mp4',
+    description: "A plutonium oxide pellet radiating a deep red-orange glow from its own radioactive decay heat",
   },
 };
