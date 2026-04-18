@@ -145,7 +145,7 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
       },
       show_valence_electrons: () => {
         if (!currentElementRef.current) return "No element is open right now — ask them to click one first!";
-        onSetAtomViewMode({ valenceOnly: true, orbitalFilter: null, showUnfilled: false });
+        onSetAtomViewMode({ valenceOnly: true, orbitalFilter: null, showUnfilled: false, hybridization: null });
         const el = elements.find(e => e.atomicNumber === currentElementRef.current);
         if (!el) return "Showing valence electrons";
         const config = getAtomConfig(el.atomicNumber);
@@ -160,7 +160,7 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
         if (!currentElementRef.current) return "No element is open right now — ask them to click one first!";
         const t = params.type as OrbitalFilter;
         if (!['s', 'p', 'd', 'f'].includes(t!)) return `Invalid orbital type "${params.type}". Use s, p, d, or f.`;
-        onSetAtomViewMode({ valenceOnly: false, orbitalFilter: t, showUnfilled: false });
+        onSetAtomViewMode({ valenceOnly: false, orbitalFilter: t, showUnfilled: false, hybridization: null });
         const el = elements.find(e => e.atomicNumber === currentElementRef.current);
         const shapes: Record<string, string> = {
           s: 'spherical (circular)',
@@ -172,7 +172,7 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
       },
       show_unfilled_orbitals: () => {
         if (!currentElementRef.current) return "No element is open right now — ask them to click one first!";
-        onSetAtomViewMode({ valenceOnly: true, orbitalFilter: null, showUnfilled: true });
+        onSetAtomViewMode({ valenceOnly: true, orbitalFilter: null, showUnfilled: true, hybridization: null });
         const el = elements.find(e => e.atomicNumber === currentElementRef.current);
         if (!el) return "Showing unfilled orbitals";
         const config = getAtomConfig(el.atomicNumber);
