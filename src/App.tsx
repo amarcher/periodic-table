@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { flushSync } from 'react-dom';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
@@ -25,10 +24,13 @@ function setClipVars(rect: DOMRect) {
   s.setProperty('--clip-radius', `${Math.max(rect.width, rect.height) * 0.12}px`);
 }
 
-function viewTransition(update: () => void, types: string[], onFinish?: () => void) {
+function viewTransition(
+  update: () => void | Promise<void>,
+  types: string[],
+  onFinish?: () => void,
+) {
   if (!document.startViewTransition) {
-    update();
-    onFinish?.();
+    Promise.resolve(update()).finally(() => onFinish?.());
     return;
   }
   // Chrome 125+ supports { update, types }
@@ -80,10 +82,13 @@ function App() {
         originCell.classList.add('vt-active');
       }
       viewTransition(
-        () => {
-          flushSync(() => {
-            navigate(`/element/${element.symbol}`);
-          });
+        async () => {
+          // React Router v7 wraps navigate state updates in
+          // React.startTransition by default, which `flushSync` from
+          // react-dom cannot pierce. Passing `{ flushSync: true }` makes
+          // RR use ReactDOM.flushSync directly so the mount/unmount
+          // commits before the browser captures the NEW snapshot.
+          await navigate(`/element/${element.symbol}`, { flushSync: true });
           // Detail is now in the DOM with hero-<sym> on the media-zone.
           // Strip the name from the live cell so NEW capture only sees
           // hero-<sym> on the media-zone (not both).
@@ -99,17 +104,12 @@ function App() {
     const cell = originCellRef.current;
     if (cell) setClipVars(cell.getBoundingClientRect());
     viewTransition(
-      () => {
-        flushSync(() => {
-          navigate('/');
-        });
-        // React Router v7's useSyncExternalStore doesn't always commit the
-        // unmount synchronously inside flushSync, so `.detail__media-zone`
-        // may briefly linger with its hero-<sym> name. Clear any lingering
-        // name before handing hero-<sym> to the cell for NEW capture.
-        document.querySelectorAll<HTMLElement>('.detail__media-zone').forEach((el) => {
-          el.style.viewTransitionName = 'none';
-        });
+      async () => {
+        // `{ flushSync: true }` opts out of RR's default startTransition
+        // wrapper so the detail actually unmounts before the browser
+        // captures the NEW snapshot — without this the close-morph
+        // animates detail→detail and no transition is visible.
+        await navigate('/', { flushSync: true });
         cell?.classList.add('vt-active');
       },
       ['detail-close'],
