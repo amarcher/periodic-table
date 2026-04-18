@@ -562,7 +562,7 @@ html:active-view-transition-type(detail-close) {
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55);
-    flex-wrap: initial;
+    flex-wrap: nowrap;
   }
 
   .detail__identity .detail__symbol {
@@ -623,20 +623,15 @@ html:active-view-transition-type(detail-close) {
     margin: 16px 16px 0;
   }
 
-  /* Viz components render cleanest at ~200–280px. Keep the 2-col layout
-     even when a 3rd card orphans — the empty cell is quieter than a
-     stretched card. */
-}
-
-@media (max-width: 420px) {
-  /* Very narrow: stack viz cards full-width so their internal vizzes
-     aren't forced into a half-width box that crops their labels. */
-  .detail__viz-row {
-    grid-template-columns: 1fr;
+  /* Phones (≤560px): stack viz cards full-width. Their internal
+     visualizations render cleanest at ≥200px, and a 3-card orphan in a
+     2-col grid leaves an awkward empty cell. Tablets (561–899px) keep
+     the 2-col grid. */
+  @media (max-width: 560px) {
+    .detail__viz-row {
+      grid-template-columns: 1fr;
+    }
   }
-}
-
-@media (max-width: 899px) {
 
   .detail__facts {
     order: 5;
