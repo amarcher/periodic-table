@@ -89,17 +89,100 @@ export function getCategoryEffect(category: ElementCategory): CategoryEffect {
 
 export type OrbitalFilter = 's' | 'p' | 'd' | 'f' | null;
 
+export type Hybridization = 'sp' | 'sp2' | 'sp3' | null;
+
 export interface AtomViewMode {
   valenceOnly: boolean;
   orbitalFilter: OrbitalFilter;
   showUnfilled: boolean;
+  hybridization: Hybridization;
 }
 
 export const DEFAULT_VIEW_MODE: AtomViewMode = {
   valenceOnly: false,
   orbitalFilter: null,
   showUnfilled: false,
+  hybridization: null,
 };
+
+/**
+ * Elements that get the sp/sp²/sp³ hybridization control. Limited to p-block
+ * elements that meaningfully hybridize in covalent bonding: 2nd period B–F and
+ * 3rd period Si–S. Deliberately excludes H/He, alkali/alkaline earth metals,
+ * noble gases, transition metals, and post-transition metals where the concept
+ * either doesn't apply or is pedagogically muddier.
+ */
+export const HYBRIDIZABLE = new Set<number>([5, 6, 7, 8, 9, 14, 15, 16]);
+
+export interface HybridAxes {
+  /** unit vectors along each hybrid lobe direction */
+  hybrid: [number, number, number][];
+  /** pairs of opposite unit vectors for each unhybridized p orbital (2 lobes) */
+  pPairs: [[number, number, number], [number, number, number]][];
+}
+
+export function getHybridAxes(mode: Hybridization): HybridAxes {
+  const SQRT3 = Math.sqrt(3);
+  const INV_SQRT3 = 1 / SQRT3;
+  switch (mode) {
+    case 'sp3':
+      return {
+        hybrid: [
+          [INV_SQRT3, INV_SQRT3, INV_SQRT3],
+          [INV_SQRT3, -INV_SQRT3, -INV_SQRT3],
+          [-INV_SQRT3, INV_SQRT3, -INV_SQRT3],
+          [-INV_SQRT3, -INV_SQRT3, INV_SQRT3],
+        ],
+        pPairs: [],
+      };
+    case 'sp2':
+      return {
+        hybrid: [
+          [1, 0, 0],
+          [-0.5, 0, SQRT3 / 2],
+          [-0.5, 0, -SQRT3 / 2],
+        ],
+        pPairs: [[[0, 1, 0], [0, -1, 0]]],
+      };
+    case 'sp':
+      return {
+        hybrid: [
+          [1, 0, 0],
+          [-1, 0, 0],
+        ],
+        pPairs: [
+          [[0, 1, 0], [0, -1, 0]],
+          [[0, 0, 1], [0, 0, -1]],
+        ],
+      };
+    default:
+      return { hybrid: [], pPairs: [] };
+  }
+}
+
+/**
+ * Distribute electrons across orbitals by Hund's rule — one electron per orbital
+ * first, then pair up. Used for hybridization electron assignment.
+ */
+export function distributeHybridElectrons(totalElectrons: number, nOrbitals: number): number[] {
+  const result = new Array(nOrbitals).fill(0);
+  let rem = totalElectrons;
+  for (let i = 0; i < nOrbitals && rem > 0; i++) { result[i] = 1; rem--; }
+  for (let i = 0; i < nOrbitals && rem > 0; i++) { result[i] = 2; rem--; }
+  return result;
+}
+
+/**
+ * Number of electrons in the outermost (highest-n) shell — the count that gets
+ * distributed into hybrid + unhybridized-p orbitals.
+ */
+export function getValenceElectronCount(subshells: SubshellConfig[]): number {
+  if (subshells.length === 0) return 0;
+  const maxN = Math.max(...subshells.map(s => s.n));
+  return subshells
+    .filter(s => s.n === maxN)
+    .reduce((sum, s) => sum + s.electronCount, 0);
+}
 
 /**
  * Returns indices of valence subshells:
@@ -116,6 +199,22 @@ export function getValenceIndices(subshells: SubshellConfig[]): Set<number> {
     }
   });
   return indices;
+}
+
+/**
+ * Radius of the sphere that tightly wraps every valence subshell. Used by the
+ * camera to fly in when "Valence" is toggled. Pads lobe tips (p/d/f extend past
+ * the nominal radius due to the petal floor).
+ */
+export function getValenceBoundingRadius(subshells: SubshellConfig[]): number {
+  const valence = getValenceIndices(subshells);
+  if (valence.size === 0) return 2;
+  let maxR = 0;
+  valence.forEach(i => {
+    const r = subshells[i].radius;
+    if (r > maxR) maxR = r;
+  });
+  return maxR * 1.15;
 }
 
 /**

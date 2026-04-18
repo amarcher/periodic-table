@@ -59,6 +59,12 @@ export function trackUnfilledToggle(symbol: string, atomicNumber: number, showUn
   gtag('event', 'unfilled_toggle', { symbol, atomic_number: atomicNumber, show_unfilled: showUnfilled });
 }
 
+export function trackHybridization(symbol: string, atomicNumber: number, mode: string | null) {
+  if (!initialized) return;
+  posthog.capture('hybridization_toggle', { symbol, atomic_number: atomicNumber, mode });
+  gtag('event', 'hybridization_toggle', { symbol, atomic_number: atomicNumber, mode });
+}
+
 // ---------- Video Events ----------
 
 export function trackVideoPlayToggle(symbol: string, atomicNumber: number, isPlaying: boolean) {
