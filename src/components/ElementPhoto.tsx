@@ -59,11 +59,13 @@ export function ElementPhoto({ element }: ElementPhotoProps) {
     <div className="element-photo">
       {imageUrl ? (
         <>
-          <img
-            className="element-photo__img"
-            src={imageUrl}
-            alt={`${element.name} in its natural form`}
-          />
+          <div className="element-photo__img-wrap">
+            <img
+              className="element-photo__img"
+              src={imageUrl}
+              alt={`${element.name} in its natural form`}
+            />
+          </div>
           <span className="element-photo__caption">
             {element.name} — {element.appearance || 'appearance unknown'}
           </span>
