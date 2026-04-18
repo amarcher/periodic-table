@@ -536,6 +536,14 @@ html:active-view-transition-type(detail-close) {
     border-radius: 0;
   }
 
+  /* Identity card overlaps the media-zone's bottom via margin-bottom:
+     -2.25rem, which would cover any caption sitting inside the hero.
+     Hide captions on mobile — the video speaks for itself at that size. */
+  .element-video__caption,
+  .element-photo__caption {
+    display: none;
+  }
+
   /* 2. Identity glass card, overlapping the hero bottom. Uses the
         existing top-row as its container (atom is now below it). */
   .detail__top-row {
