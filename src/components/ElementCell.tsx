@@ -1,4 +1,4 @@
-import { memo, useRef, useCallback } from 'react';
+import { memo, useRef, useCallback, useState } from 'react';
 import type { Element } from '../types/element';
 import { categoryColors } from '../utils/colors';
 import { getVideoEntry } from '../data/videoManifest';
@@ -14,10 +14,12 @@ export const ElementCell = memo(function ElementCell({ element, onClick, tabInde
   const color = categoryColors[element.category];
   const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const preloadLinkRef = useRef<HTMLLinkElement | null>(null);
+  const [hasBeenHovered, setHasBeenHovered] = useState(false);
+  const entry = getVideoEntry(element.atomicNumber);
 
   const handleMouseEnter = useCallback(() => {
+    setHasBeenHovered(true);
     hoverTimerRef.current = setTimeout(() => {
-      const entry = getVideoEntry(element.atomicNumber);
       if (entry && !preloadLinkRef.current) {
         const link = document.createElement('link');
         link.rel = 'preload';
@@ -27,7 +29,7 @@ export const ElementCell = memo(function ElementCell({ element, onClick, tabInde
         preloadLinkRef.current = link;
       }
     }, 300);
-  }, [element.atomicNumber]);
+  }, [entry]);
 
   const handleMouseLeave = useCallback(() => {
     if (hoverTimerRef.current) {
@@ -49,8 +51,19 @@ export const ElementCell = memo(function ElementCell({ element, onClick, tabInde
         gridRow: element.gridRow,
         gridColumn: element.gridColumn,
         '--cat-color': color,
+        '--vt-name': `hero-${element.symbol}`,
       } as React.CSSProperties}
     >
+      {hasBeenHovered && entry && (
+        <img
+          className="element-cell__poster"
+          src={entry.poster}
+          alt=""
+          aria-hidden="true"
+          loading="lazy"
+          decoding="async"
+        />
+      )}
       <span className="element-cell__number">{element.atomicNumber}</span>
       <span className="element-cell__symbol">{element.symbol}</span>
       <span className="element-cell__name">{element.name}</span>

@@ -25,13 +25,27 @@ function setClipVars(rect: DOMRect) {
   s.setProperty('--clip-radius', `${Math.max(rect.width, rect.height) * 0.12}px`);
 }
 
-function viewTransition(update: () => void, types: string[]) {
+function viewTransition(update: () => void, types: string[], onFinish?: () => void) {
   if (!document.startViewTransition) {
     update();
+    onFinish?.();
     return;
   }
   // Chrome 125+ supports { update, types }
-  (document as any).startViewTransition({ update, types });
+  const vt = (document as any).startViewTransition({ update, types });
+  // All three ViewTransition promises can reject if the transition is
+  // skipped, aborted, or the update callback throws. Swallow each one so
+  // we don't emit unhandled-promise errors.
+  vt?.ready?.catch(() => {});
+  vt?.updateCallbackDone?.catch(() => {});
+  const done: Promise<unknown> = vt?.finished ?? Promise.resolve();
+  done.catch(() => {}).finally(() => onFinish?.());
+}
+
+function clearVtActive() {
+  document
+    .querySelectorAll<HTMLElement>('.element-cell.vt-active')
+    .forEach((el) => el.classList.remove('vt-active'));
 }
 
 function findCellForElement(element: Element): HTMLElement | null {
@@ -59,25 +73,50 @@ function App() {
       openTimeRef.current = Date.now();
       setAtomViewMode(DEFAULT_VIEW_MODE);
       trackElementOpened(element.symbol, element.atomicNumber);
-      if (originCell) setClipVars(originCell.getBoundingClientRect());
-      viewTransition(() => {
-        flushSync(() => {
-          navigate(`/element/${element.symbol}`);
-        });
-      }, ['detail-open']);
+      clearVtActive();
+      if (originCell) {
+        setClipVars(originCell.getBoundingClientRect());
+        // Name the cell BEFORE the OLD capture so it's snapshotted as hero-<sym>.
+        originCell.classList.add('vt-active');
+      }
+      viewTransition(
+        () => {
+          flushSync(() => {
+            navigate(`/element/${element.symbol}`);
+          });
+          // Detail is now in the DOM with hero-<sym> on the media-zone.
+          // Strip the name from the live cell so NEW capture only sees
+          // hero-<sym> on the media-zone (not both).
+          originCell?.classList.remove('vt-active');
+        },
+        ['detail-open'],
+      );
     },
-    [navigate]
+    [navigate],
   );
 
   const closeDetail = useCallback(() => {
     const cell = originCellRef.current;
     if (cell) setClipVars(cell.getBoundingClientRect());
-    viewTransition(() => {
-      flushSync(() => {
-        navigate('/');
-      });
-    }, ['detail-close']);
-    // Restore focus to originating cell after transition
+    viewTransition(
+      () => {
+        flushSync(() => {
+          navigate('/');
+        });
+        // React Router v7's useSyncExternalStore doesn't always commit the
+        // unmount synchronously inside flushSync, so `.detail__media-zone`
+        // may briefly linger with its hero-<sym> name. Clear any lingering
+        // name before handing hero-<sym> to the cell for NEW capture.
+        document.querySelectorAll<HTMLElement>('.detail__media-zone').forEach((el) => {
+          el.style.viewTransitionName = 'none';
+        });
+        cell?.classList.add('vt-active');
+      },
+      ['detail-close'],
+      () => {
+        cell?.classList.remove('vt-active');
+      },
+    );
     if (cell) requestAnimationFrame(() => cell.focus());
   }, [navigate]);
 

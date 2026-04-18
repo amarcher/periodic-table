@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Element } from '../types/element';
 import { elements } from '../data/elements';
 import { ElementCell } from './ElementCell';
@@ -63,8 +63,24 @@ interface PeriodicTableProps {
 }
 
 export function PeriodicTable({ onElementClick }: PeriodicTableProps) {
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0); // Hydrogen
+
+  // Measure the wrapper's actual content box and expose it as --pt-avail-h,
+  // so the grid sizes to the real space (handles Safari toolbar jitter,
+  // landscape, and safe-area inset changes) instead of a hardcoded calc.
+  useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      for (const e of entries) {
+        el.style.setProperty('--pt-avail-h', `${e.contentRect.height}px`);
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   const handleFocus = useCallback((e: React.FocusEvent) => {
     const target = e.target as HTMLElement;
@@ -103,7 +119,7 @@ export function PeriodicTable({ onElementClick }: PeriodicTableProps) {
   }, []);
 
   return (
-    <div className="periodic-table-wrapper">
+    <div className="periodic-table-wrapper" ref={wrapperRef}>
       <div
         ref={gridRef}
         className="periodic-table"

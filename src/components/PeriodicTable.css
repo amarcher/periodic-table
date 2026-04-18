@@ -5,16 +5,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 20px;
+  padding: 8px max(20px, env(safe-area-inset-right)) 8px max(20px, env(safe-area-inset-left));
 }
 
 .periodic-table {
-  /* Compute cell size: fit 18 cols or 9.4 rows, whichever is tighter */
+  /* Compute cell size: fit 18 cols or 9.4 rows, whichever is tighter.
+     --pt-avail-h is set imperatively by PeriodicTable.tsx via a
+     ResizeObserver on the wrapper. Fallback uses svh so the grid doesn't
+     jitter with the Safari url bar. */
   --gap: 3px;
   --col-gaps: calc(17 * var(--gap));
   --row-gaps: calc(9 * var(--gap));
   --avail-w: calc(100vw - 48px);
-  --avail-h: calc(100dvh - 110px);
+  --avail-h: var(--pt-avail-h, calc(100svh - 160px));
   --cell-by-w: calc((var(--avail-w) - var(--col-gaps)) / 18);
   --cell-by-h: calc((var(--avail-h) - var(--row-gaps)) / 9.4);
   --cell: min(var(--cell-by-w), var(--cell-by-h));
@@ -49,16 +52,20 @@
   }
 }
 
-/* Small phones: minimal spacing, less overhead for header/legend */
+/* Small phones: minimal spacing */
 @media (max-width: 560px) {
   .periodic-table-wrapper {
-    padding: 4px 6px;
+    padding:
+      4px
+      max(6px, env(safe-area-inset-right))
+      4px
+      max(6px, env(safe-area-inset-left));
   }
 
   .periodic-table {
     --gap: 1px;
     --avail-w: calc(100vw - 16px);
-    --avail-h: calc(100dvh - 70px);
+    --avail-h: var(--pt-avail-h, calc(100svh - 110px));
   }
 
   .table-label {
@@ -70,12 +77,12 @@
 /* Landscape phones: reclaim vertical space */
 @media (max-height: 500px) {
   .periodic-table-wrapper {
-    padding: 2px 8px;
+    padding: 2px max(8px, env(safe-area-inset-right)) 2px max(8px, env(safe-area-inset-left));
   }
 
   .periodic-table {
     --gap: 1px;
-    --avail-h: calc(100dvh - 50px);
+    --avail-h: var(--pt-avail-h, calc(100svh - 60px));
   }
 
   .table-label {
