@@ -97,7 +97,10 @@ export function ElementDetail({ element, onClose, atomViewMode, onAtomViewModeCh
       <div className="detail__layout">
         {/* LEFT: atom + identity + phase diagram */}
         <div className="detail__col-left">
-          <div className="detail__top-row detail__content">
+          <div
+            className="detail__top-row"
+            style={{ '--vt-name': 'detail-identity' } as React.CSSProperties}
+          >
             <div className="detail__atom-zone">
               <Suspense fallback={<div className="detail__atom-loading">Loading...</div>}>
                 <AtomVisualizer element={element} viewMode={atomViewMode} onViewModeChange={onAtomViewModeChange} />
@@ -116,7 +119,10 @@ export function ElementDetail({ element, onClose, atomViewMode, onAtomViewModeCh
           </div>
 
           {element.meltingPoint != null && (
-            <div className="detail__phase-zone detail__content">
+            <div
+              className="detail__phase-zone"
+              style={{ '--vt-name': 'detail-phase' } as React.CSSProperties}
+            >
               <PhaseDiagramViz element={element} catColor={catColor} />
             </div>
           )}
@@ -125,7 +131,10 @@ export function ElementDetail({ element, onClose, atomViewMode, onAtomViewModeCh
 
         {/* RIGHT: photo/video + viz cards + fun facts */}
         <div className="detail__col-right">
-          <div className="detail__media-zone detail__content">
+          <div
+            className="detail__media-zone"
+            style={{ '--vt-name': `hero-${element.symbol}` } as React.CSSProperties}
+          >
             {hasVideo ? (
               <ElementVideo element={element} />
             ) : (
@@ -133,13 +142,19 @@ export function ElementDetail({ element, onClose, atomViewMode, onAtomViewModeCh
             )}
           </div>
 
-          <div className="detail__viz-row detail__content">
+          <div
+            className="detail__viz-row"
+            style={{ '--vt-name': 'detail-viz' } as React.CSSProperties}
+          >
             {element.density != null && <DensityViz element={element} catColor={catColor} />}
             <RadioactivityViz element={element} catColor={catColor} />
             <ReactivityViz element={element} catColor={catColor} />
           </div>
 
-          <div className="detail__facts detail__content">
+          <div
+            className="detail__facts"
+            style={{ '--vt-name': 'detail-facts' } as React.CSSProperties}
+          >
             {element.funFacts.map((fact, i) => (
               <div key={i} className="detail__fact-card">
                 <span className="detail__fact-icon">
@@ -150,7 +165,10 @@ export function ElementDetail({ element, onClose, atomViewMode, onAtomViewModeCh
             ))}
           </div>
 
-          <div className="detail__meta detail__content">
+          <div
+            className="detail__meta"
+            style={{ '--vt-name': 'detail-meta' } as React.CSSProperties}
+          >
             {element.electronegativity != null && `Electronegativity ${element.electronegativity} · `}
             Discovered by {element.discoveredBy} ({element.yearDiscovered})
           </div>

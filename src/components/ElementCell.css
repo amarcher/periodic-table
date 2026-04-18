@@ -16,24 +16,78 @@
     color-mix(in srgb, var(--cat-color) 12%, hsl(220, 15%, 8%))
   );
   color: #e8e8f0;
-  transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+  transition:
+    box-shadow 180ms cubic-bezier(0.34, 1.2, 0.64, 1),
+    border-color 180ms cubic-bezier(0.34, 1.2, 0.64, 1),
+    transform 180ms cubic-bezier(0.34, 1.2, 0.64, 1);
   aspect-ratio: 1;
   min-width: 0;
   overflow: hidden;
+  isolation: isolate; /* contains the ::before scrim and poster */
 }
 
-.element-cell:hover {
-  transform: scale(1.08);
-  z-index: 10;
-  box-shadow:
-    0 0 16px color-mix(in srgb, var(--cat-color) 40%, transparent),
-    0 4px 12px rgba(0, 0, 0, 0.3);
-  border-color: color-mix(in srgb, var(--cat-color) 60%, transparent);
+/* View-transition name only applied during an active transition, so the
+   117 non-clicked cells don't get captured as separate groups. */
+.element-cell.vt-active {
+  view-transition-name: var(--vt-name);
 }
 
-.element-cell:focus-visible {
-  outline: 2px solid var(--cat-color);
-  outline-offset: 2px;
+/* Poster image: hidden at rest, fades in on hover (desktop only). */
+.element-cell__poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  transform: scale(0.94);
+  transition:
+    opacity 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 280ms cubic-bezier(0.34, 1.2, 0.64, 1);
+}
+
+/* Dark scrim over the poster, so the symbol keeps its contrast. */
+.element-cell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse at center,
+      color-mix(in srgb, var(--cat-color) 18%, transparent) 0%,
+      transparent 70%
+    ),
+    linear-gradient(180deg, transparent 35%, rgba(0, 0, 0, 0.55) 100%);
+  opacity: 0;
+  transition: opacity 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 1;
+}
+
+/* Inset rim accent in the category color — a second beat on hover. */
+.element-cell::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--cat-color) 55%, transparent);
+  opacity: 0;
+  transition: opacity 180ms cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 3;
+}
+
+/* Text sits above poster + scrim. */
+.element-cell__number,
+.element-cell__symbol,
+.element-cell__name,
+.element-cell__mass {
+  position: relative;
+  z-index: 2;
 }
 
 .element-cell__number {
@@ -43,6 +97,7 @@
   top: 3px;
   left: 4px;
   line-height: 1;
+  z-index: 2;
 }
 
 .element-cell__symbol {
@@ -70,7 +125,61 @@
   line-height: 1;
 }
 
-/* Small phones: hide name/mass, tighten padding */
+.element-cell:focus-visible {
+  outline: 2px solid var(--cat-color);
+  outline-offset: 2px;
+}
+
+/* ==========================================================
+   Hover: desktop (pointer) only
+   ========================================================== */
+@media (hover: hover) {
+  .element-cell:hover {
+    transform: scale(1.08);
+    z-index: 10;
+    box-shadow:
+      0 0 20px color-mix(in srgb, var(--cat-color) 45%, transparent),
+      0 8px 22px rgba(0, 0, 0, 0.35);
+    border-color: color-mix(in srgb, var(--cat-color) 70%, transparent);
+  }
+
+  .element-cell:hover .element-cell__poster {
+    opacity: 0.44;
+    transform: scale(1);
+  }
+
+  .element-cell:hover::before {
+    opacity: 1;
+  }
+
+  .element-cell:hover::after {
+    opacity: 1;
+  }
+
+  .element-cell:hover .element-cell__symbol {
+    text-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.75),
+      0 0 14px color-mix(in srgb, var(--cat-color) 35%, transparent);
+  }
+}
+
+/* ==========================================================
+   Touch: brief category-color pulse on tap
+   ========================================================== */
+@media (hover: none) {
+  .element-cell:active {
+    transform: scale(0.96);
+    box-shadow:
+      0 0 18px color-mix(in srgb, var(--cat-color) 55%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--cat-color) 70%, transparent);
+    transition:
+      transform 140ms ease,
+      box-shadow 140ms ease;
+  }
+}
+
+/* Small phones: hide name + mass, tighten padding — cells are too narrow
+   for anything but the symbol to read cleanly. */
 @media (max-width: 560px) {
   .element-cell {
     padding: 2px 1px;
@@ -93,17 +202,13 @@
   }
 
   .element-cell__mass {
-    font-size: 0.38em;
+    display: none;
   }
 }
 
-/* Very small portrait phones: symbol-only cells */
-@media (max-width: 400px) and (orientation: portrait) {
+/* Very small portrait phones: drop the atomic number too */
+@media (max-width: 360px) and (orientation: portrait) {
   .element-cell__number {
-    display: none;
-  }
-
-  .element-cell__mass {
     display: none;
   }
 
@@ -112,7 +217,7 @@
   }
 }
 
-/* Landscape phones: atomic number + lowercase symbol only */
+/* Landscape phones: atomic number + symbol only */
 @media (max-height: 500px) {
   .element-cell {
     padding: 2px 1px;
@@ -140,7 +245,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .element-cell {
+  .element-cell,
+  .element-cell__poster,
+  .element-cell::before,
+  .element-cell::after {
     transition: none;
   }
 

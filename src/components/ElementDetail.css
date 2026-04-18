@@ -9,22 +9,90 @@
 }
 
 /* ==========================================================
-   View Transitions — clip-path on root snapshots
+   View Transitions
+   ----------------------------------------------------------
+   On open:
+     - root NEW clip-path expands from the clicked cell to full viewport
+       (ease-out-quint, 420ms)
+     - hero-<symbol> group morphs the clicked cell into the media zone
+       (default UA morph, tuned to match root easing)
+     - the 5 detail sections (identity, phase, viz, facts, meta) only
+       exist in the NEW snapshot, so we animate their NEW pseudo-elements
+       as a forward cascade that begins just before the clip finishes
+   On close: same in reverse, with the content cascade running first
+     (reverse order) and then the clip collapses back to the origin cell.
    ========================================================== */
 
+/* ---- Easing vars ---- */
+:root {
+  --vt-open-ease: cubic-bezier(0.22, 1, 0.36, 1);   /* ease-out-quint */
+  --vt-close-ease: cubic-bezier(0.64, 0, 0.78, 0);  /* ease-in-quint */
+}
+
+/* ---- OPEN ---- */
+
 html:active-view-transition-type(detail-open) {
+  /* All groups share the root's open easing/duration for a cohesive feel. */
+  &::view-transition-group(*) {
+    animation-duration: 420ms;
+    animation-timing-function: var(--vt-open-ease);
+  }
+
+  /* Root snapshot: clip-path expands from cell rect to full viewport. */
   &::view-transition-new(root) {
-    animation: vt-clip-in 0.4s cubic-bezier(0.25, 0.1, 0.25, 1) both;
+    animation: vt-clip-in 420ms var(--vt-open-ease) both;
   }
   &::view-transition-old(root) {
     animation: none;
     opacity: 1;
   }
+
+  /* Detail sections only exist in NEW — fade + slide up with cascade. */
+  &::view-transition-new(detail-identity) {
+    animation: detail-appear 260ms var(--vt-open-ease) 300ms both;
+  }
+  &::view-transition-new(detail-phase) {
+    animation: detail-appear 260ms var(--vt-open-ease) 340ms both;
+  }
+  &::view-transition-new(detail-viz) {
+    animation: detail-appear 260ms var(--vt-open-ease) 380ms both;
+  }
+  &::view-transition-new(detail-facts) {
+    animation: detail-appear 260ms var(--vt-open-ease) 420ms both;
+  }
+  &::view-transition-new(detail-meta) {
+    animation: detail-appear 240ms var(--vt-open-ease) 460ms both;
+  }
 }
 
+/* ---- CLOSE ---- */
+
 html:active-view-transition-type(detail-close) {
+  &::view-transition-group(*) {
+    animation-duration: 300ms;
+    animation-timing-function: var(--vt-close-ease);
+  }
+
+  /* Sections vanish in reverse order BEFORE the clip collapses. */
+  &::view-transition-old(detail-meta) {
+    animation: detail-vanish 140ms var(--vt-close-ease) 0ms both;
+  }
+  &::view-transition-old(detail-facts) {
+    animation: detail-vanish 140ms var(--vt-close-ease) 20ms both;
+  }
+  &::view-transition-old(detail-viz) {
+    animation: detail-vanish 140ms var(--vt-close-ease) 40ms both;
+  }
+  &::view-transition-old(detail-phase) {
+    animation: detail-vanish 140ms var(--vt-close-ease) 60ms both;
+  }
+  &::view-transition-old(detail-identity) {
+    animation: detail-vanish 140ms var(--vt-close-ease) 80ms both;
+  }
+
+  /* Root snapshot collapses back to the cell rect, after the cascade. */
   &::view-transition-old(root) {
-    animation: vt-clip-out 0.35s cubic-bezier(0.25, 0.1, 0.25, 1) both;
+    animation: vt-clip-out 280ms var(--vt-close-ease) 160ms both;
     z-index: 1;
   }
   &::view-transition-new(root) {
@@ -40,7 +108,7 @@ html:active-view-transition-type(detail-close) {
       var(--clip-top) var(--clip-right) var(--clip-bottom) var(--clip-left)
       round var(--clip-radius)
     );
-    opacity: 0.8;
+    opacity: 0.85;
   }
   to {
     clip-path: inset(0 0 0 0 round 0px);
@@ -62,28 +130,37 @@ html:active-view-transition-type(detail-close) {
   }
 }
 
-/* ---- Content fade + scale (plays after clip-in on mount) ---- */
-
-.detail__content {
-  animation: content-appear 0.35s cubic-bezier(0.2, 0, 0.2, 1) both;
-  animation-delay: 0.45s;
-}
-
-.detail__col-left .detail__content:nth-child(2) { animation-delay: 0.50s; }
-.detail__col-right .detail__content:nth-child(1) { animation-delay: 0.48s; }
-.detail__col-right .detail__content:nth-child(2) { animation-delay: 0.54s; }
-.detail__col-right .detail__content:nth-child(3) { animation-delay: 0.60s; }
-.detail__col-right .detail__content:nth-child(4) { animation-delay: 0.66s; }
-
-@keyframes content-appear {
+@keyframes detail-appear {
   from {
     opacity: 0;
-    transform: scale(0.96) translateY(8px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
-    transform: scale(1) translateY(0);
+    transform: translateY(0);
   }
+}
+
+@keyframes detail-vanish {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+/* Name carriers for the detail sections. Keep this separate from the
+   layout rules so the names are co-located with the transition logic. */
+.detail__top-row,
+.detail__phase-zone,
+.detail__media-zone,
+.detail__viz-row,
+.detail__facts,
+.detail__meta {
+  view-transition-name: var(--vt-name);
 }
 
 /* ---- Background ---- */
@@ -115,8 +192,8 @@ html:active-view-transition-type(detail-close) {
 
 .detail__close {
   position: fixed;
-  top: 20px;
-  right: 20px;
+  top: calc(env(safe-area-inset-top) + 16px);
+  right: calc(env(safe-area-inset-right) + 16px);
   z-index: 110;
   width: 44px;
   height: 44px;
@@ -423,26 +500,195 @@ html:active-view-transition-type(detail-close) {
   flex: 0 0 auto;
 }
 
-/* ---- Mobile ---- */
+/* ==========================================================
+   Mobile / tablet: imagery-first layout
+   ----------------------------------------------------------
+   Hero media edge-to-edge above the fold; identity card floats
+   over the hero's bottom edge; atom becomes a compact inline
+   card; everything else stacks below with consistent margins.
+   ========================================================== */
+
+@media (max-width: 899px) {
+  .detail__layout {
+    flex-direction: column;
+    padding: 0 0 calc(48px + env(safe-area-inset-bottom));
+    gap: 0;
+  }
+
+  /* Flatten the column wrappers so we can reorder individual
+     sections with `order:`. The wrappers generate no box but
+     their named children (view-transition-name) still do. */
+  .detail__col-left,
+  .detail__col-right {
+    display: contents;
+  }
+
+  /* 1. Hero media: edge-to-edge, fixed-ish aspect, no radius */
+  .detail__media-zone {
+    order: 1;
+    flex: none;
+    width: 100%;
+    height: min(56vh, 62vw);
+    border-radius: 0;
+    margin-bottom: -2.25rem; /* identity floats up over this */
+  }
+  .detail__media-zone > * {
+    border-radius: 0;
+  }
+
+  /* 2. Identity glass card, overlapping the hero bottom. Uses the
+        existing top-row as its container (atom is now below it). */
+  .detail__top-row {
+    order: 2;
+    flex-direction: column-reverse; /* identity above atom */
+    align-items: stretch;
+    padding: 0 16px;
+    gap: 16px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .detail__identity {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto auto auto;
+    column-gap: 16px;
+    row-gap: 2px;
+    align-items: baseline;
+    padding: 16px 20px;
+    border-radius: 16px;
+    background: color-mix(in srgb, var(--cat-color) 14%, hsl(220, 20%, 9%));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55);
+    flex-wrap: nowrap;
+  }
+
+  .detail__identity .detail__symbol {
+    grid-column: 1;
+    grid-row: 1 / span 4;
+    font-size: clamp(3rem, 14vw, 4.5rem);
+    align-self: center;
+  }
+
+  .detail__identity .detail__number {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: 0.7rem;
+  }
+
+  .detail__identity .detail__name {
+    grid-column: 2;
+    grid-row: 2;
+    font-size: clamp(1.1rem, 4vw, 1.5rem);
+    font-weight: 600;
+  }
+
+  .detail__identity .detail__category {
+    grid-column: 2;
+    grid-row: 3;
+    font-size: 0.6rem;
+  }
+
+  .detail__identity .detail__mass {
+    grid-column: 2;
+    grid-row: 4;
+    font-size: 0.62rem;
+  }
+
+  /* 3. Atom zone: compact, inline, no longer eating the fold */
+  .detail__atom-zone {
+    height: 180px;
+  }
+
+  .detail__atom-loading {
+    height: 180px;
+  }
+
+  /* 4–7. Remaining sections, gutter margins */
+  .detail__phase-zone {
+    order: 3;
+    flex: none;
+    margin: 16px 16px 0;
+    height: clamp(220px, 48vw, 320px);
+  }
+
+  .detail__viz-row {
+    order: 4;
+    flex: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 16px 16px 0;
+  }
+
+  /* Phones (≤560px): stack viz cards full-width. Their internal
+     visualizations render cleanest at ≥200px, and a 3-card orphan in a
+     2-col grid leaves an awkward empty cell. Tablets (561–899px) keep
+     the 2-col grid. */
+  @media (max-width: 560px) {
+    .detail__viz-row {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .detail__facts {
+    order: 5;
+    margin: 16px 16px 0;
+  }
+
+  .detail__meta {
+    order: 6;
+    margin: 16px 16px 0;
+  }
+}
 
 @media (max-width: 560px) {
-  .detail__close { top: 12px; right: 12px; width: 40px; height: 40px; }
-  .detail__symbol { font-size: 3rem; }
-  .detail__name { font-size: 1.2rem; }
-  .detail__facts { grid-template-columns: 1fr; }
+  .detail__close {
+    top: calc(env(safe-area-inset-top) + 10px);
+    right: calc(env(safe-area-inset-right) + 10px);
+    width: 40px;
+    height: 40px;
+  }
+
+  .detail__facts {
+    grid-template-columns: 1fr;
+  }
+
+  .detail__top-row {
+    padding: 0 12px;
+  }
+
+  .detail__phase-zone,
+  .detail__viz-row,
+  .detail__facts,
+  .detail__meta {
+    margin-left: 12px;
+    margin-right: 12px;
+  }
 }
 
 /* ---- Reduced motion ---- */
 
 @media (prefers-reduced-motion: reduce) {
   html:active-view-transition-type(detail-open) ::view-transition-new(root),
-  html:active-view-transition-type(detail-close) ::view-transition-old(root) {
+  html:active-view-transition-type(detail-close) ::view-transition-old(root),
+  html:active-view-transition-type(detail-open) ::view-transition-new(detail-identity),
+  html:active-view-transition-type(detail-open) ::view-transition-new(detail-phase),
+  html:active-view-transition-type(detail-open) ::view-transition-new(detail-viz),
+  html:active-view-transition-type(detail-open) ::view-transition-new(detail-facts),
+  html:active-view-transition-type(detail-open) ::view-transition-new(detail-meta),
+  html:active-view-transition-type(detail-close) ::view-transition-old(detail-identity),
+  html:active-view-transition-type(detail-close) ::view-transition-old(detail-phase),
+  html:active-view-transition-type(detail-close) ::view-transition-old(detail-viz),
+  html:active-view-transition-type(detail-close) ::view-transition-old(detail-facts),
+  html:active-view-transition-type(detail-close) ::view-transition-old(detail-meta) {
     animation: none;
   }
 
-  .detail__content {
-    animation: none;
-    opacity: 1;
-    transform: none;
+  html:active-view-transition-type(detail-open) ::view-transition-group(*),
+  html:active-view-transition-type(detail-close) ::view-transition-group(*) {
+    animation-duration: 0.01ms;
   }
 }
