@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { ConversationProvider } from '@elevenlabs/react'
 
 import App from './App.tsx'
 import { initAnalytics } from './utils/analytics'
@@ -15,6 +16,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <ConversationProvider>
+      <RouterProvider router={router} />
+    </ConversationProvider>
   </StrictMode>,
 )
