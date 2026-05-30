@@ -243,9 +243,10 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
   const toggle = useCallback(async () => {
     if (!agentId) return;
 
-    // If connected, disconnect
+    // If connected, disconnect. endSession() returns void in @elevenlabs/react v1
+    // (no promise to .catch); errors surface via the onError callback.
     if (sessionStarted) {
-      await conversation.endSession().catch(() => {});
+      try { conversation.endSession(); } catch { /* already torn down */ }
       setSessionStarted(false);
       return;
     }
@@ -278,8 +279,10 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
     setSessionStarted(true);
     trackVoiceAgentActivated();
 
+    // startSession() returns void in v1; connection failures surface through
+    // the onError callback rather than a rejected promise.
     try {
-      await conversation.startSession({
+      conversation.startSession({
         agentId,
         connectionType: 'websocket',
       });
@@ -322,7 +325,7 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
   useEffect(() => {
     return () => {
       if (sessionStarted) {
-        conversation.endSession().catch(() => {});
+        try { conversation.endSession(); } catch { /* already torn down */ }
       }
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
