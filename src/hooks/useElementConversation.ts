@@ -245,11 +245,7 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
 
     // If connected, disconnect
     if (sessionStarted) {
-      try {
-        conversation.endSession();
-      } catch {
-        // ignore
-      }
+      await conversation.endSession().catch(() => {});
       setSessionStarted(false);
       return;
     }
@@ -326,11 +322,7 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
   useEffect(() => {
     return () => {
       if (sessionStarted) {
-        try {
-          conversation.endSession();
-        } catch {
-          // ignore
-        }
+        conversation.endSession().catch(() => {});
       }
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
