@@ -67,6 +67,11 @@ export function ElementVideo({ element }: ElementVideoProps) {
   if (reducedMotion) {
     return (
       <div className="element-video">
+        <div
+          className="element-video__backdrop"
+          style={{ backgroundImage: `url(${entry.poster})` }}
+          aria-hidden="true"
+        />
         <img
           className="element-video__poster"
           src={entry.poster}
@@ -80,6 +85,11 @@ export function ElementVideo({ element }: ElementVideoProps) {
   return (
     <div className="element-video">
       <div className="element-video__player-wrap">
+        <div
+          className="element-video__backdrop"
+          style={{ backgroundImage: `url(${entry.poster})` }}
+          aria-hidden="true"
+        />
         <video
           ref={videoRef}
           className="element-video__player"

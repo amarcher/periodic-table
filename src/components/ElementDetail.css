@@ -501,11 +501,15 @@ html:active-view-transition-type(detail-close) {
 }
 
 /* ==========================================================
-   Mobile / tablet: imagery-first layout
+   Mobile / tablet: video-first layout
    ----------------------------------------------------------
-   Hero media edge-to-edge above the fold; identity card floats
-   over the hero's bottom edge; atom becomes a compact inline
-   card; everything else stacks below with consistent margins.
+   The hero media owns the full viewport on entry — the video
+   letterboxed at its native 16:9 over a blurred poster fill,
+   so nothing is ever cropped. Content stacks below and scrolls.
+   Where scroll-driven animations are supported, the hero pins
+   to the top and shrinks to a 16:9 mini-player as you scroll,
+   so the kid keeps watching while reading. Elsewhere it simply
+   scrolls out of view.
    ========================================================== */
 
 @media (max-width: 899px) {
@@ -513,6 +517,18 @@ html:active-view-transition-type(detail-close) {
     flex-direction: column;
     padding: 0 0 calc(48px + env(safe-area-inset-bottom));
     gap: 0;
+    /* Drives the hero shrink + cue/caption fades (see @supports below) */
+    scroll-timeline: --detail-scroll block;
+    /* Scroll anchoring fights the scroll-driven hero shrink: the browser
+       "corrects" scrollTop by the shrink amount, pinning scroll at 0. */
+    overflow-anchor: none;
+    /* viewport-fit=cover: reserve notch insets in our own gutters */
+    --gutter-l: max(16px, env(safe-area-inset-left));
+    --gutter-r: max(16px, env(safe-area-inset-right));
+    /* Mini-player target: full-width 16:9 strip, capped so landscape
+       phones keep most of the screen for content. Inherited by the
+       hero (height) and the first content section (spacer). */
+    --hero-mini: min(56.25vw, 40svh);
   }
 
   /* Flatten the column wrappers so we can reorder individual
@@ -523,34 +539,44 @@ html:active-view-transition-type(detail-close) {
     display: contents;
   }
 
-  /* 1. Hero media: edge-to-edge, fixed-ish aspect, no radius */
+  /* 1. Hero media: full viewport. svh (not dvh) so the media stage
+     never resizes under the thumb as the browser toolbar collapses. */
   .detail__media-zone {
     order: 1;
     flex: none;
     width: 100%;
-    height: min(56vh, 62vw);
+    height: 100svh;
     border-radius: 0;
-    margin-bottom: -2.25rem; /* identity floats up over this */
+    position: relative;
+    background: #000;
   }
   .detail__media-zone > * {
     border-radius: 0;
   }
 
-  /* Identity card overlaps the media-zone's bottom via margin-bottom:
-     -2.25rem, which would cover any caption sitting inside the hero.
-     Hide captions on mobile — the video speaks for itself at that size. */
-  .element-video__caption,
-  .element-photo__caption {
-    display: none;
+  /* Scroll cue: bouncing chevron above the caption pill */
+  .detail__media-zone::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: calc(max(20px, env(safe-area-inset-bottom)) + 96px);
+    width: 14px;
+    height: 14px;
+    border-right: 3px solid rgba(255, 255, 255, 0.85);
+    border-bottom: 3px solid rgba(255, 255, 255, 0.85);
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
+    pointer-events: none;
+    z-index: 3;
+    animation: hero-cue-bounce 1.8s ease-in-out infinite;
   }
 
-  /* 2. Identity glass card, overlapping the hero bottom. Uses the
-        existing top-row as its container (atom is now below it). */
+  /* 2. Identity glass card, first thing below the hero. */
   .detail__top-row {
     order: 2;
     flex-direction: column-reverse; /* identity above atom */
     align-items: stretch;
-    padding: 0 16px;
+    padding: 0 var(--gutter-r) 0 var(--gutter-l);
+    margin-top: 16px;
     gap: 16px;
     position: relative;
     z-index: 2;
@@ -618,7 +644,7 @@ html:active-view-transition-type(detail-close) {
   .detail__phase-zone {
     order: 3;
     flex: none;
-    margin: 16px 16px 0;
+    margin: 16px var(--gutter-r) 0 var(--gutter-l);
     height: clamp(220px, 48vw, 320px);
   }
 
@@ -628,7 +654,7 @@ html:active-view-transition-type(detail-close) {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
-    margin: 16px 16px 0;
+    margin: 16px var(--gutter-r) 0 var(--gutter-l);
   }
 
   /* Phones (≤560px): stack viz cards full-width. Their internal
@@ -643,13 +669,81 @@ html:active-view-transition-type(detail-close) {
 
   .detail__facts {
     order: 5;
-    margin: 16px 16px 0;
+    margin: 16px var(--gutter-r) 0 var(--gutter-l);
   }
 
   .detail__meta {
     order: 6;
-    margin: 16px 16px 0;
+    margin: 16px var(--gutter-r) 0 var(--gutter-l);
   }
+
+  /* ---- Scroll-driven enhancement: pin + shrink the hero ----
+     The hero sticks to the top of the scroller and its height
+     animates from 100svh down to the 16:9 mini-player as the
+     first screenful is scrolled; content slides in beneath it.
+     Without support (or with reduced motion) the hero is simply
+     a full-viewport section that scrolls away. */
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .detail__media-zone {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+        animation: hero-shrink linear both;
+        animation-timeline: --detail-scroll;
+        animation-range: 0 calc(100svh - var(--hero-mini));
+      }
+
+      /* The hero's flow height shrinks 1:1 with scroll, which would let
+         the content below race up at 2x and tuck under the pinned hero
+         (the identity card would never be seen). Grow the first content
+         section's top margin at the same rate so total flow height stays
+         constant and content tracks 16px below the hero's bottom edge. */
+      .detail__top-row {
+        animation: hero-spacer-grow linear both;
+        animation-timeline: --detail-scroll;
+        animation-range: 0 calc(100svh - var(--hero-mini));
+      }
+
+      /* Cue chevron and caption fade out over the first stretch of
+         scroll (the bounce keeps its own document timeline). */
+      .detail__media-zone::after {
+        animation:
+          hero-cue-bounce 1.8s ease-in-out infinite,
+          hero-fade-out linear both;
+        animation-timeline: auto, --detail-scroll;
+        animation-range: normal, 0 20svh;
+      }
+
+      .element-video__caption,
+      .element-photo__caption {
+        animation: hero-fade-out linear both;
+        animation-timeline: --detail-scroll;
+        animation-range: 0 25svh;
+      }
+    }
+  }
+}
+
+@keyframes hero-shrink {
+  from { height: 100svh; }
+  to { height: var(--hero-mini); }
+}
+
+@keyframes hero-spacer-grow {
+  from { margin-top: 16px; }
+  to { margin-top: calc(100svh - var(--hero-mini) + 16px); }
+}
+
+@keyframes hero-cue-bounce {
+  0%, 100% { transform: translate(-50%, 0) rotate(45deg); }
+  50% { transform: translate(-50%, 8px) rotate(45deg); }
+}
+
+@keyframes hero-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }
 
 @media (max-width: 560px) {
@@ -664,16 +758,10 @@ html:active-view-transition-type(detail-close) {
     grid-template-columns: 1fr;
   }
 
-  .detail__top-row {
-    padding: 0 12px;
-  }
-
-  .detail__phase-zone,
-  .detail__viz-row,
-  .detail__facts,
-  .detail__meta {
-    margin-left: 12px;
-    margin-right: 12px;
+  /* Tighter gutters on phones; sections and top-row pick these up */
+  .detail__layout {
+    --gutter-l: max(12px, env(safe-area-inset-left));
+    --gutter-r: max(12px, env(safe-area-inset-right));
   }
 }
 

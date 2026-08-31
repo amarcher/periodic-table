@@ -281,10 +281,13 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
 
     // startSession() returns void in v1; connection failures surface through
     // the onError callback rather than a rejected promise.
+    // WebRTC (not websocket): its acoustic echo cancellation stops the agent
+    // from hearing its own voice through the device speaker — on phones and
+    // tablets that feedback made the agent interrupt itself mid-sentence.
     try {
       conversation.startSession({
         agentId,
-        connectionType: 'websocket',
+        connectionType: 'webrtc',
       });
     } catch (err) {
       console.error('[VoiceAgent] startSession failed:', err);

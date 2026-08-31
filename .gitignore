@@ -32,11 +32,9 @@ agents.json
 tools.json
 tests.json
 
-# Video generation — staging/output artifacts (large binary files)
-scripts/generate-videos/output/staging/
-scripts/generate-videos/output/cost-summary.json
-scripts/generate-videos/output/manifest.json
-scripts/generate-videos/output/review.html
+# Video generation — staging/output artifacts (large binaries + prompt scratch files)
+scripts/generate-videos/output/
+remaining-video-prompts.txt
 
 # Public element videos + thumbnails (served locally in dev, hosted on R2 in prod)
 public/element-videos/*.mp4
@@ -47,6 +45,9 @@ public/element-videos/*.jpg
 
 # Vercel
 .vercel/
+
+# Wrangler / Miniflare local R2 emulator state (machine-local cache)
+.wrangler/
 
 # ElevenLabs agent configs not related to this project
 agent_configs/Mark-My-Words-Host.json

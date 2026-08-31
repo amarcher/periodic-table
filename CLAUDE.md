@@ -22,6 +22,7 @@ Interactive periodic table web app for kids. Vite + React + TypeScript + Framer 
 - **Layout**: CSS Grid with 18 columns, 10 rows. Each element has explicit `gridRow`/`gridColumn` in the data (no empty placeholder divs). Rows 9–10 are lanthanides/actinides.
 - **Data**: All 118 elements are in `src/data/elements.ts` as a static TypeScript array. No API calls. Use `getElementBySymbol(symbol)` (case-insensitive) for lookups.
 - **Video thumbnails**: Each video has a sibling `.jpg` poster generated from a 1.5s frame via `scripts/r2-upload/thumbnails.ts`. `videoManifest.ts` builds URLs from `videoData.ts` + `VITE_VIDEO_CDN_URL`.
+- **Mobile detail layout (≤899px)**: The media zone is a full-viewport (`100svh`) hero — the 16:9 video letterboxed via `object-fit: contain` over a blurred poster backdrop, so nothing is cropped. Where scroll-driven animations are supported, the hero is `position: sticky` and shrinks to a pinned 16:9 mini-player driven by a named `scroll-timeline: --detail-scroll` on `.detail__layout`. Three coupled gotchas, all in `ElementDetail.css`: (1) the scroller needs `overflow-anchor: none` or scroll anchoring cancels every scroll by the shrink amount, pinning `scrollTop` at 0; (2) the shrinking flow height would let content race up at 2× and hide under the hero, so `hero-spacer-grow` inflates `.detail__top-row`'s top margin at the same rate; (3) the timeline is *named* because the media zone's `overflow: hidden` makes it a scroll container that would capture an anonymous `scroll(nearest)` from descendants. Fallback (no support, or reduced motion) is a static full-viewport hero that scrolls away. Use `svh` (not `dvh`) in hero math so the stage doesn't resize when the browser toolbar collapses.
 - **Styling**: Vanilla CSS with `color-mix()` for category-colored translucent backgrounds. Google Fonts loaded via CSS `@import`.
 
 ## Key Files
@@ -33,7 +34,7 @@ Interactive periodic table web app for kids. Vite + React + TypeScript + Framer 
 
 ## Voice Agent (ElevenLabs)
 
-- **Hook**: `src/hooks/useElementConversation.ts` — manages the ElevenLabs voice session, sends contextual updates on element clicks/closes, and registers client tools
+- **Hook**: `src/hooks/useElementConversation.ts` — manages the ElevenLabs voice session, sends contextual updates on element clicks/closes, and registers client tools. Sessions use `connectionType: 'webrtc'` (not `'websocket'`): WebRTC's acoustic echo cancellation stops the agent from hearing its own voice through the device speaker, which on phones/tablets made it interrupt itself. Don't switch back to websocket without a real-device speaker test.
 - **Client tools**: `navigate_to_element` and `go_back_to_table` are registered via `useConversation({ clientTools })` so the voice agent can control the UI
 - **Agent config**: `agent_configs/Chemical-Element-Periodic-Table-Guide.json` — the agent's prompt, voice, and tool settings (managed via `@elevenlabs/cli`)
 - **Tool configs**: `tool_configs/` — JSON schemas for client tools, also managed via CLI

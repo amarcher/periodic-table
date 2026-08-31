@@ -60,6 +60,11 @@ export function ElementPhoto({ element }: ElementPhotoProps) {
       {imageUrl ? (
         <>
           <div className="element-photo__img-wrap">
+            <div
+              className="element-photo__backdrop"
+              style={{ backgroundImage: `url(${imageUrl})` }}
+              aria-hidden="true"
+            />
             <img
               className="element-photo__img"
               src={imageUrl}
