@@ -8,7 +8,7 @@
             "keywords": []
         },
         "turn": {
-            "turn_timeout": 7,
+            "turn_timeout": 12,
             "silence_end_call_timeout": -1,
             "soft_timeout_config": {
                 "timeout_seconds": -1,
@@ -16,17 +16,38 @@
                 "use_llm_generated_message": false
             },
             "mode": "turn",
-            "turn_eagerness": "normal",
+            "turn_eagerness": "patient",
             "spelling_patience": "auto",
             "speculative_turn": true,
             "turn_model": "turn_v2"
         },
         "tts": {
-            "model_id": "eleven_flash_v2",
+            "model_id": "eleven_v3_conversational",
             "voice_id": "6Ac71viMXq5tLn2bwYdz",
             "supported_voices": [],
-            "expressive_mode": false,
-            "suggested_audio_tags": [],
+            "expressive_mode": true,
+            "suggested_audio_tags": [
+                {
+                    "tag": "excited",
+                    "description": "When revealing a cool fact or reacting to an explosive video"
+                },
+                {
+                    "tag": "laughs",
+                    "description": "Playful moments and silly comparisons"
+                },
+                {
+                    "tag": "whispers",
+                    "description": "Building suspense before a surprising fact"
+                },
+                {
+                    "tag": "gasps",
+                    "description": "Reacting to something dramatic on screen"
+                },
+                {
+                    "tag": "slow",
+                    "description": "Emphasizing an important idea or spelling a symbol"
+                }
+            ],
             "agent_output_audio_format": "pcm_16000",
             "optimize_streaming_latency": 3,
             "stability": 0.72,
