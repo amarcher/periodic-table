@@ -53,7 +53,19 @@ export function ElementPhoto({ element }: ElementPhotoProps) {
     return () => controller.abort();
   }, [element.name]);
 
-  if (error) return null;
+  // No photo available (synthetic elements often have no Wikipedia image):
+  // render a designed stage instead of collapsing, so the hero layout and
+  // scroll choreography stay consistent with elements that have media.
+  if (error) {
+    return (
+      <div className="element-photo element-photo--fallback">
+        <span className="element-photo__fallback-symbol">{element.symbol}</span>
+        <span className="element-photo__caption">
+          {element.name} — {element.appearance || 'made atom-by-atom in a lab, too rare to photograph!'}
+        </span>
+      </div>
+    );
+  }
 
   return (
     <div className="element-photo">

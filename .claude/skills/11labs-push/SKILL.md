@@ -44,3 +44,27 @@ echo "y" | elevenlabs tools pull --no-ui
 - Always dry-run before pushing
 - Tools must be pushed before agents if new tools were added (agent references tool IDs)
 - The `ELEVENLABS_API_KEY` in `.env` is scoped to ElevenAgents Write permission only
+
+## Scope warning (verified 2026-08-31)
+
+`elevenlabs agents push` pushes EVERY agent in `agents.json` — this workspace
+has 6, and only "Chemical Element Periodic Table Guide" belongs to this app.
+The local config files for the other 5 (Mark My Words, Crossword, Kaia, Milo,
+New agent) are stale relative to their remote state, so a blanket push would
+clobber remote edits. To push only this app's agent, temporarily filter the
+mapping:
+
+```bash
+cp agents.json agents.json.bak
+python3 -c "
+import json
+d = json.load(open('agents.json'))
+d['agents'] = [a for a in d['agents'] if 'Chemical' in a['config']]
+json.dump(d, open('agents.json', 'w'), indent=2)"
+echo "y" | ELEVENLABS_API_KEY=$KEY elevenlabs agents push
+mv agents.json.bak agents.json
+```
+
+Also: unknown flags are NOT rejected — `elevenlabs agents push --help` starts
+a real push. Only use `--dry-run` / `--no-ui` and never pipe the live push
+through `head` (SIGPIPE kills it mid-push).

@@ -61,6 +61,65 @@
   display: none;
 }
 
+/* ---- No-photo fallback stage (synthetic elements) ----
+   A glowing category-colored symbol with orbital rings, so the media
+   zone never renders as an empty black void. --cat-color inherits from
+   the detail container. */
+
+.element-photo--fallback {
+  position: relative;
+  width: 100%;
+  min-height: 240px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  background:
+    radial-gradient(
+      circle at 50% 42%,
+      color-mix(in srgb, var(--cat-color) 26%, transparent) 0%,
+      transparent 65%
+    ),
+    rgba(0, 0, 0, 0.25);
+}
+
+.element-photo--fallback::before,
+.element-photo--fallback::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  border: 1px solid color-mix(in srgb, var(--cat-color) 35%, transparent);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.element-photo--fallback::before {
+  width: min(70%, 340px);
+  aspect-ratio: 2.6 / 1;
+  transform: translate(-50%, -50%) rotate(-18deg);
+}
+
+.element-photo--fallback::after {
+  width: min(88%, 430px);
+  aspect-ratio: 3 / 1;
+  transform: translate(-50%, -50%) rotate(14deg);
+  border-color: color-mix(in srgb, var(--cat-color) 20%, transparent);
+}
+
+.element-photo__fallback-symbol {
+  font-family: 'Space Grotesk', 'JetBrains Mono', monospace;
+  font-size: clamp(4rem, 20vw, 8rem);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--cat-color);
+  text-shadow: 0 0 60px color-mix(in srgb, var(--cat-color) 55%, transparent);
+}
+
 /* ==========================================================
    Mobile / tablet hero (≤899px): mirror of the video hero —
    photo letterboxed at native aspect, blurred copy behind it.
@@ -71,6 +130,13 @@
     position: relative;
     height: 100%;
     display: block;
+  }
+
+  /* Fallback stage keeps its centered flex layout in the hero */
+  .element-photo--fallback {
+    display: flex;
+    border-radius: 0;
+    border: none;
   }
 
   .element-photo__img-wrap {
