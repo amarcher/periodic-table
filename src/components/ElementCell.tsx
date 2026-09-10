@@ -1,4 +1,4 @@
-import { memo, useRef, useCallback, useState } from 'react';
+import { memo, useState } from 'react';
 import type { Element } from '../types/element';
 import { categoryColors } from '../utils/colors';
 import { getVideoEntry } from '../data/videoManifest';
@@ -12,38 +12,19 @@ interface ElementCellProps {
 
 export const ElementCell = memo(function ElementCell({ element, onClick, tabIndex = -1 }: ElementCellProps) {
   const color = categoryColors[element.category];
-  const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const preloadLinkRef = useRef<HTMLLinkElement | null>(null);
   const [hasBeenHovered, setHasBeenHovered] = useState(false);
   const entry = getVideoEntry(element.atomicNumber);
 
-  const handleMouseEnter = useCallback(() => {
-    setHasBeenHovered(true);
-    hoverTimerRef.current = setTimeout(() => {
-      if (entry && !preloadLinkRef.current) {
-        const link = document.createElement('link');
-        link.rel = 'preload';
-        link.as = 'video';
-        link.href = entry.url;
-        document.head.appendChild(link);
-        preloadLinkRef.current = link;
-      }
-    }, 300);
-  }, [entry]);
-
-  const handleMouseLeave = useCallback(() => {
-    if (hoverTimerRef.current) {
-      clearTimeout(hoverTimerRef.current);
-      hoverTimerRef.current = null;
-    }
-  }, []);
-
   return (
-    <button
+    <a
+      href={`/element/${element.symbol}`}
       className="element-cell"
-      onClick={(e) => onClick(element, e)}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onClick={(e) => {
+        if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        e.preventDefault();
+        onClick(element, e);
+      }}
+      onMouseEnter={() => setHasBeenHovered(true)}
       tabIndex={tabIndex}
       data-row={element.gridRow}
       data-col={element.gridColumn}
@@ -68,7 +49,7 @@ export const ElementCell = memo(function ElementCell({ element, onClick, tabInde
       <span className="element-cell__symbol">{element.symbol}</span>
       <span className="element-cell__name">{element.name}</span>
       <span className="element-cell__mass">{element.atomicMass.toFixed(2)}</span>
-    </button>
+    </a>
   );
 }, (prev, next) =>
   prev.element.atomicNumber === next.element.atomicNumber &&

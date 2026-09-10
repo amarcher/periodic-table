@@ -7,7 +7,7 @@ import { dirname, resolve } from 'node:path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..');
-const ORIGIN = 'https://www.periodictable.tech';
+const ORIGIN = 'https://periodictable.tech';
 
 const source = readFileSync(resolve(REPO_ROOT, 'src/data/elements.ts'), 'utf8');
 
@@ -19,18 +19,15 @@ if (unique.length !== 118) {
   console.warn(`[sitemap] expected 118 elements, found ${unique.length} — proceeding anyway`);
 }
 
-const today = new Date().toISOString().slice(0, 10);
 const urls = [
   `  <url>
     <loc>${ORIGIN}/</loc>
-    <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>`,
   ...unique.map(
     (s) => `  <url>
     <loc>${ORIGIN}/element/${s}</loc>
-    <lastmod>${today}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>`

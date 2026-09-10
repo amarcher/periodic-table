@@ -50,7 +50,7 @@ describe('api/element-og', () => {
     expect(res._body).toContain('<title>Gold (Au) — Periodic Table</title>');
     expect(res._body).toContain('property="og:title" content="Gold (Au) — Periodic Table"');
     expect(res._body).toContain(
-      'property="og:url" content="https://www.periodictable.tech/element/Au"'
+      'property="og:url" content="https://periodictable.tech/element/Au"'
     );
   });
 
@@ -69,7 +69,7 @@ describe('api/element-og', () => {
     const res = call({ url: '/element/Lv' });
     expect(res._status).toBe(200);
     expect(res._body).toContain(
-      'property="og:image" content="https://www.periodictable.tech/og-image.png"'
+      'property="og:image" content="https://periodictable.tech/og-image.png"'
     );
     expect(res._body).not.toContain('og:video"');
   });

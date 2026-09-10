@@ -1,125 +1,103 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { Element } from '../types/element';
 import { getVideoEntry } from '../data/videoManifest';
-import { trackVideoPlayToggle, trackVideoLoop } from '../utils/analytics';
+import { trackDiagnostic, trackEvent, trackVideoPlayToggle, trackVideoLoop } from '../utils/analytics';
+import { VideoPlaybackTracker } from '../utils/mediaTracking';
+import { useMediaVisible, useReducedMotion, useSaveData } from '../hooks/useDisplayPreferences';
 import './ElementVideo.css';
 
-interface ElementVideoProps {
-  element: Element;
-}
-
-export function ElementVideo({ element }: ElementVideoProps) {
+export function ElementVideo({ element }: { element: Element }) {
   const entry = getVideoEntry(element.atomicNumber);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [reducedMotion, setReducedMotion] = useState(false);
-  const loopCountRef = useRef(0);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const visible = useMediaVisible(wrapperRef);
+  const reducedMotion = useReducedMotion();
+  const saveData = useSaveData();
+  const [userPlaying, setUserPlaying] = useState<boolean | null>(null);
+  const wantsPlayback = userPlaying ?? (!reducedMotion && !saveData);
+  const shouldPlay = wantsPlayback && visible;
+  const [failed, setFailed] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const tracker = useRef(new VideoPlaybackTracker());
+  const started = useRef(false);
+  const loadedAt = useRef(0);
+  const props = { symbol: element.symbol, atomic_number: element.atomicNumber };
 
-  // Detect prefers-reduced-motion
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setReducedMotion(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
-
-  // Count video loops and fire analytics on unmount
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
-    loopCountRef.current = 0;
-    const handleEnded = () => { loopCountRef.current += 1; };
-    video.addEventListener('ended', handleEnded);
-    const el = element;
+    if (!video || failed) return;
+    if (shouldPlay) video.play().catch(() => setIsPlaying(false));
+    else {
+      video.pause();
+      tracker.current.sample(0, 0, false, false);
+    }
+  }, [shouldPlay, failed]);
+
+  useEffect(() => {
+    const playback = tracker.current;
+    const flush = () => {
+      const watched = playback.takeWatchedMs();
+      if (watched > 0) trackEvent('video_engagement', { symbol: element.symbol, atomic_number: element.atomicNumber, watched_ms: watched });
+    };
+    const hide = () => { if (document.hidden) flush(); };
+    const timer = setInterval(flush, 30_000);
+    window.addEventListener('pagehide', flush);
+    document.addEventListener('visibilitychange', hide);
     return () => {
-      video.removeEventListener('ended', handleEnded);
-      if (loopCountRef.current > 0) {
-        trackVideoLoop(el.symbol, el.atomicNumber, loopCountRef.current);
-      }
+      clearInterval(timer);
+      window.removeEventListener('pagehide', flush);
+      document.removeEventListener('visibilitychange', hide);
+      flush();
     };
   }, [element]);
 
-  // Sync play/pause state with video element
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    if (isPlaying) {
-      video.play().catch(() => setIsPlaying(false));
-    } else {
-      video.pause();
+  const sampleVideo = (video: HTMLVideoElement) => {
+    if (tracker.current.sample(video.currentTime, video.duration, !video.paused && visible && !document.hidden, video.seeking)) {
+      trackVideoLoop(element.symbol, element.atomicNumber, tracker.current.loopCount);
     }
-  }, [isPlaying]);
+  };
 
-  const handleToggle = useCallback(() => {
-    setIsPlaying((prev) => {
-      const next = !prev;
-      trackVideoPlayToggle(element.symbol, element.atomicNumber, next);
-      return next;
-    });
-  }, [element]);
-
-  if (!entry) {
-    return null;
-  }
-
-  // Reduced-motion: show poster as a static image instead of video
-  if (reducedMotion) {
-    return (
-      <div className="element-video">
-        <div
-          className="element-video__backdrop"
-          style={{ backgroundImage: `url(${entry.poster})` }}
-          aria-hidden="true"
-        />
-        <img
-          className="element-video__poster"
-          src={entry.poster}
-          alt={entry.description}
-        />
-        <span className="element-video__caption">{entry.description}</span>
-      </div>
-    );
-  }
-
-  return (
-    <div className="element-video">
-      <div className="element-video__player-wrap">
-        <div
-          className="element-video__backdrop"
-          style={{ backgroundImage: `url(${entry.poster})` }}
-          aria-hidden="true"
-        />
-        <video
-          ref={videoRef}
-          className="element-video__player"
-          src={entry.url}
-          poster={entry.poster}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="none"
-          aria-label={entry.description}
-        />
-        <button
-          className="element-video__toggle"
-          onClick={handleToggle}
-          aria-label={isPlaying ? 'Pause video' : 'Play video'}
-        >
-          {isPlaying ? (
-            <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true">
-              <rect x="3" y="2" width="3" height="12" rx="1" />
-              <rect x="10" y="2" width="3" height="12" rx="1" />
-            </svg>
-          ) : (
-            <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true">
-              <path d="M4 2.5l10 5.5-10 5.5V2.5z" />
-            </svg>
-          )}
-        </button>
-      </div>
-      <span className="element-video__caption">{entry.description}</span>
+  if (!entry) return null;
+  return <div className="element-video" ref={wrapperRef}>
+    <div className="element-video__player-wrap">
+      <div className="element-video__backdrop" style={{ backgroundImage: `url(${entry.poster})` }} aria-hidden="true" />
+      {failed ? <img className="element-video__poster" src={entry.poster} alt={entry.description} /> : <video
+        ref={videoRef}
+        className="element-video__player"
+        src={userPlaying !== null || (!reducedMotion && !saveData) ? entry.url : undefined}
+        poster={entry.poster}
+        autoPlay={shouldPlay}
+        muted loop playsInline preload="none"
+        aria-label={entry.description}
+        onLoadStart={() => { loadedAt.current = performance.now(); }}
+        onLoadedData={() => trackDiagnostic('video_loaded', { ...props, load_ms: Math.round(performance.now() - loadedAt.current) })}
+        onPlaying={() => {
+          setIsPlaying(true);
+          if (!started.current) { started.current = true; trackEvent('video_started', props); }
+        }}
+        onPause={() => { setIsPlaying(false); tracker.current.sample(0, 0, false, false); }}
+        onSeeking={e => sampleVideo(e.currentTarget)}
+        onTimeUpdate={e => sampleVideo(e.currentTarget)}
+        onWaiting={() => { if (started.current && shouldPlay) trackDiagnostic('video_stalled', props); }}
+        onError={e => {
+          // Removing a source to honor pause/save-data is not a failed video load.
+          if (!e.currentTarget.getAttribute('src')) return;
+          setFailed(true);
+          trackDiagnostic('video_error', { ...props, code: e.currentTarget.error?.code ?? 0 });
+        }}
+      />}
+      {!failed && <button className="element-video__toggle" onClick={() => {
+        const next = !isPlaying;
+        setUserPlaying(next);
+        trackVideoPlayToggle(element.symbol, element.atomicNumber, next);
+        // Also retry playback after a browser autoplay rejection.
+        if (next) videoRef.current?.play().catch(() => setIsPlaying(false));
+      }} aria-label={isPlaying ? 'Pause video' : 'Play video'}>
+        {isPlaying ? <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><rect x="3" y="2" width="3" height="12" /><rect x="10" y="2" width="3" height="12" /></svg>
+          : <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M4 2.5l10 5.5-10 5.5V2.5z" /></svg>}
+      </button>}
     </div>
-  );
+    <span className="element-video__caption">{entry.description}</span>
+    {failed && <p role="status">Video unavailable. You can still explore the element’s properties and facts.</p>}
+  </div>;
 }

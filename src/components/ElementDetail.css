@@ -788,3 +788,11 @@ html:active-view-transition-type(detail-close) {
     animation-duration: 0.01ms;
   }
 }
+
+.detail__summary {
+  grid-column: 1 / -1;
+  margin: 0 0 8px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
+  line-height: 1.65;
+}

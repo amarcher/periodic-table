@@ -20,14 +20,11 @@ function MicIcon() {
 }
 
 const MIC_ERROR_MESSAGES: Record<NonNullable<MicError>, string> = {
-  timeout:
-    'Microphone not responding. Try quitting audio apps like Wispr Flow or superwhisper, then restart your browser.',
-  'not-allowed':
-    'Microphone access denied. Please allow microphone access in your browser settings and try again.',
-  device:
-    "Couldn't access your microphone. Please check that a microphone is connected.",
-  'no-input':
-    'No audio input detected. Your microphone may be muted or the wrong device is selected. Check your input device in System Settings → Sound → Input.',
+  timeout: 'The microphone did not respond. You can keep exploring, or try voice again.',
+  'not-allowed': 'Microphone access is off. You can explore every element without it.',
+  device: 'No microphone is available. You can still use the table and science controls.',
+  'no-input': 'No sound detected. Check that your microphone is unmuted, or continue exploring without voice.',
+  connection: 'The voice guide could not connect. You can keep exploring and try again later.',
 };
 
 function statusText(status: VoiceStatus, isSpeaking: boolean, micError: MicError): string {

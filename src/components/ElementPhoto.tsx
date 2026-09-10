@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { Element } from '../types/element';
 import './ElementPhoto.css';
+import { trackDiagnostic } from '../utils/analytics';
 
 interface ElementPhotoProps {
   element: Element;
@@ -17,28 +18,27 @@ interface WikiSummary {
   };
 }
 
-export function ElementPhoto({ element }: ElementPhotoProps) {
+function Photo({ element }: ElementPhotoProps) {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    setError(false);
-    setImageUrl(null);
-
     const controller = new AbortController();
+    let image: HTMLImageElement | undefined;
 
     fetch(
       `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(element.name)}`,
       { signal: controller.signal }
     )
-      .then((res) => res.json())
+      .then((res) => { if (!res.ok) throw new Error('Image request failed'); return res.json(); })
       .then((data: WikiSummary) => {
-        const url = data.originalimage?.source || data.thumbnail?.source;
+        const url = data.thumbnail?.source || data.originalimage?.source;
         if (url) {
           // Pre-load the image so it reveals instantly, no progressive paint
           const img = new Image();
-          img.onload = () => setImageUrl(url);
-          img.onerror = () => setError(true);
+          image = img;
+          img.onload = () => { if (!controller.signal.aborted) setImageUrl(url); };
+          img.onerror = () => { if (!controller.signal.aborted) { setError(true); trackDiagnostic('image_error', { symbol: element.symbol }); } };
           img.src = url;
         } else {
           setError(true);
@@ -47,11 +47,15 @@ export function ElementPhoto({ element }: ElementPhotoProps) {
       .catch((err) => {
         if (err.name !== 'AbortError') {
           setError(true);
+          trackDiagnostic('image_error', { symbol: element.symbol });
         }
       });
 
-    return () => controller.abort();
-  }, [element.name]);
+    return () => {
+      controller.abort();
+      if (image) { image.onload = null; image.onerror = null; image.src = ''; }
+    };
+  }, [element]);
 
   // No photo available (synthetic elements often have no Wikipedia image):
   // render a designed stage instead of collapsing, so the hero layout and
@@ -92,4 +96,8 @@ export function ElementPhoto({ element }: ElementPhotoProps) {
       )}
     </div>
   );
+}
+
+export function ElementPhoto({ element }: ElementPhotoProps) {
+  return <Photo key={element.atomicNumber} element={element} />;
 }

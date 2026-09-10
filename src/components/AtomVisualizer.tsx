@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
+import { OrbitControls, PerformanceMonitor } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
@@ -20,11 +20,14 @@ import { HybridOrbital } from './atom/HybridOrbital';
 import { CategoryEffects } from './atom/CategoryEffects';
 import { trackValenceToggle, trackOrbitalFilter, trackUnfilledToggle, trackHybridization } from '../utils/analytics';
 import './AtomVisualizer.css';
+import { useMediaVisible } from '../hooks/useDisplayPreferences';
+import { trackDiagnostic } from '../utils/analytics';
 
 interface AtomVisualizerProps {
   element: Element;
   viewMode?: AtomViewMode;
   onViewModeChange?: (mode: AtomViewMode) => void;
+  onContextLost: () => void;
 }
 
 /**
@@ -148,7 +151,22 @@ function HybridView({
   );
 }
 
-function AtomScene({ element, viewMode }: { element: Element; viewMode: AtomViewMode }) {
+let reducedQuality = false;
+
+function CanvasHealth({ onContextLost }: { onContextLost: () => void }) {
+  const canvas = useThree(s => s.gl.domElement);
+  useEffect(() => {
+    canvas.addEventListener('webglcontextlost', onContextLost);
+    return () => canvas.removeEventListener('webglcontextlost', onContextLost);
+  }, [canvas, onContextLost]);
+  return null;
+}
+
+function AtomScene({ element, viewMode, visible, onContextLost }: {
+  element: Element; viewMode: AtomViewMode; visible: boolean; onContextLost: () => void;
+}) {
+  const [lowQuality, setLowQuality] = useState(() => reducedQuality ||
+    navigator.hardwareConcurrency <= 4 || ((navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8) <= 4);
   const config = useMemo(() => getAtomConfig(element.atomicNumber), [element.atomicNumber]);
   const effect = useMemo(() => getCategoryEffect(element.category), [element.category]);
   const detailLevel = useMemo(() => getDetailLevel(element.atomicNumber), [element.atomicNumber]);
@@ -183,7 +201,8 @@ function AtomScene({ element, viewMode }: { element: Element; viewMode: AtomView
   return (
     <Canvas
       camera={{ position: [0, 1, cameraZ], fov: 50 }}
-      dpr={[1, 2]}
+      dpr={lowQuality ? 1 : [1, 1.5]}
+      frameloop={visible ? 'always' : 'never'}
       gl={{
         antialias: true,
         alpha: true,
@@ -192,13 +211,19 @@ function AtomScene({ element, viewMode }: { element: Element; viewMode: AtomView
       }}
       style={{ background: 'transparent' }}
     >
+      <CanvasHealth onContextLost={onContextLost} />
+      {!lowQuality && <PerformanceMonitor bounds={() => [30, 55]} onDecline={({ fps }) => {
+        reducedQuality = true;
+        setLowQuality(true);
+        trackDiagnostic('atom_quality_reduced', { fps: Math.round(fps) });
+      }} />}
       <ambientLight intensity={0.2} />
       <pointLight position={[10, 10, 10]} intensity={0.6} />
       <pointLight position={[-10, -5, -10]} intensity={0.3} color={color} />
 
       <Nucleus
         radius={config.nucleusRadius}
-        showIndividual={config.showIndividualNucleons}
+        showIndividual={!lowQuality && config.showIndividualNucleons}
         protons={config.protons}
         color={color}
       />
@@ -220,7 +245,7 @@ function AtomScene({ element, viewMode }: { element: Element; viewMode: AtomView
             index={i}
             color={color}
             totalSubshells={config.subshells.length}
-            detailLevel={detailLevel}
+            detailLevel={lowQuality ? 'low' : detailLevel}
             dimmed={shellDimmed}
             hidden={shellHidden}
             showUnfilled={shellShowUnfilled}
@@ -238,11 +263,11 @@ function AtomScene({ element, viewMode }: { element: Element; viewMode: AtomView
         />
       )}
 
-      <CategoryEffects
+      {!lowQuality && <CategoryEffects
         effect={effect}
         color={color}
         nucleusRadius={config.nucleusRadius}
-      />
+      />}
 
       <AtomCameraRig
         valenceOnly={viewMode.valenceOnly}
@@ -250,14 +275,14 @@ function AtomScene({ element, viewMode }: { element: Element; viewMode: AtomView
         fullCameraZ={cameraZ}
       />
 
-      <EffectComposer>
+      {!lowQuality && <EffectComposer>
         <Bloom
           luminanceThreshold={0.15}
           luminanceSmoothing={0.9}
           intensity={1.8}
           mipmapBlur
         />
-      </EffectComposer>
+      </EffectComposer>}
     </Canvas>
   );
 }
@@ -352,10 +377,12 @@ function AtomControls({ element, viewMode, onViewModeChange }: {
   );
 }
 
-export function AtomVisualizer({ element, viewMode = DEFAULT_VIEW_MODE, onViewModeChange }: AtomVisualizerProps) {
+export function AtomVisualizer({ element, viewMode = DEFAULT_VIEW_MODE, onViewModeChange, onContextLost }: AtomVisualizerProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const visible = useMediaVisible(ref);
   return (
-    <div className="atom-visualizer">
-      <AtomScene element={element} viewMode={viewMode} />
+    <div className="atom-visualizer" ref={ref}>
+      <AtomScene element={element} viewMode={viewMode} visible={visible} onContextLost={onContextLost} />
       {onViewModeChange && (
         <AtomControls element={element} viewMode={viewMode} onViewModeChange={onViewModeChange} />
       )}
