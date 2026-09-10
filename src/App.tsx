@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Component, lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import type { Element } from './types/element';
@@ -8,10 +9,22 @@ import { DEFAULT_VIEW_MODE, type AtomViewMode } from './components/atom/atomConf
 import { PeriodicTable } from './components/PeriodicTable';
 import { ElementDetail } from './components/ElementDetail';
 import { CategoryLegend } from './components/CategoryLegend';
-import { VoiceAgent } from './components/VoiceAgent';
-import { useElementConversation } from './hooks/useElementConversation';
-import { trackElementOpened, trackElementClosed } from './utils/analytics';
+import { trackDiagnostic, trackElementRoute } from './utils/analytics';
+import { updatePageMetadata } from './utils/pageMetadata';
 import './App.css';
+
+const VoiceExperience = lazy(() => import('./components/VoiceExperience'));
+
+class VoiceBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  componentDidCatch() { trackDiagnostic('voice_unavailable', { reason: 'load_or_render_error' }); }
+  render() {
+    return this.state.failed
+      ? <span role="status">Voice is unavailable. You can keep exploring.</span>
+      : this.props.children;
+  }
+}
 
 function setClipVars(rect: DOMRect) {
   const s = document.documentElement.style;
@@ -34,7 +47,7 @@ function viewTransition(
     return;
   }
   // Chrome 125+ supports { update, types }
-  const vt = (document as any).startViewTransition({ update, types });
+  const vt = (document as Document & { startViewTransition: (options: { update: () => void | Promise<void>; types: string[] }) => ViewTransition }).startViewTransition({ update, types });
   // All three ViewTransition promises can reject if the transition is
   // skipped, aborted, or the update callback throws. Swallow each one so
   // we don't emit unhandled-promise errors.
@@ -58,11 +71,13 @@ function findCellForElement(element: Element): HTMLElement | null {
 
 function App() {
   const navigate = useNavigate();
-  const { symbol } = useParams<{ symbol: string }>();
+  const { pathname } = useLocation();
+  const symbol = /^\/element\/([A-Za-z]{1,3})\/?$/.exec(pathname)?.[1];
   const selected = symbol ? getElementBySymbol(symbol) ?? null : null;
+  useEffect(() => { updatePageMetadata(selected); }, [selected]);
+  useEffect(() => { trackElementRoute(selected); }, [selected]);
   const [atomViewMode, setAtomViewMode] = useState<AtomViewMode>(DEFAULT_VIEW_MODE);
   const originCellRef = useRef<HTMLElement | null>(null);
-  const openTimeRef = useRef<number>(0);
 
   // If the URL has a bogus symbol, bounce back to the root.
   useEffect(() => {
@@ -72,9 +87,8 @@ function App() {
   const openElement = useCallback(
     (element: Element, originCell: HTMLElement | null) => {
       originCellRef.current = originCell;
-      openTimeRef.current = Date.now();
       setAtomViewMode(DEFAULT_VIEW_MODE);
-      trackElementOpened(element.symbol, element.atomicNumber);
+      updatePageMetadata(element);
       clearVtActive();
       if (originCell) {
         setClipVars(originCell.getBoundingClientRect());
@@ -101,6 +115,7 @@ function App() {
   );
 
   const closeDetail = useCallback(() => {
+    updatePageMetadata(null);
     const cell = originCellRef.current;
     if (cell) setClipVars(cell.getBoundingClientRect());
     viewTransition(
@@ -131,34 +146,12 @@ function App() {
     closeDetail();
   }, [closeDetail]);
 
-  const voice = useElementConversation({
-    onNavigate: handleVoiceNavigate,
-    onGoBack: handleVoiceGoBack,
-    onSetAtomViewMode: setAtomViewMode,
-  });
-
   const handleElementClick = useCallback(
     (element: Element, e: React.MouseEvent) => {
       openElement(element, e.currentTarget as HTMLElement);
     },
     [openElement]
   );
-
-  const handleClose = useCallback(() => {
-    if (selected) {
-      trackElementClosed(selected.symbol, selected.atomicNumber, Date.now() - openTimeRef.current);
-    }
-    voice.notifyElementClosed();
-    closeDetail();
-  }, [voice, closeDetail, selected]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Keep the voice agent's context in sync with the URL regardless of how
-  // the user navigated (click, voice, paste, back button).
-  useEffect(() => {
-    if (selected) {
-      voice.notifyElementChange(selected);
-    }
-  }, [selected?.atomicNumber]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="app">
@@ -170,22 +163,22 @@ function App() {
       <PeriodicTable onElementClick={handleElementClick} />
       <CategoryLegend />
 
-      {voice.agentId && (
+      {import.meta.env.VITE_ELEVENLABS_AGENT_ID && (
         <div className="app__voice-float">
-          <VoiceAgent
-            status={voice.status}
-            isSpeaking={voice.isSpeaking}
-            onToggle={voice.toggle}
-            micError={voice.micError}
-            onDismissError={voice.clearMicError}
-          />
+          <VoiceBoundary>
+            <Suspense fallback={<span role="status">Loading voice guide…</span>}>
+              <VoiceExperience selected={selected} onNavigate={handleVoiceNavigate}
+                onGoBack={handleVoiceGoBack} onSetAtomViewMode={setAtomViewMode} />
+            </Suspense>
+          </VoiceBoundary>
         </div>
       )}
 
       {selected && (
         <ElementDetail
+          key={selected.symbol}
           element={selected}
-          onClose={handleClose}
+          onClose={closeDetail}
           atomViewMode={atomViewMode}
           onAtomViewModeChange={setAtomViewMode}
         />

@@ -1,716 +1,597 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://www.periodictable.tech/</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/H</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/H</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/He</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/He</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Li</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Li</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Be</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Be</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/B</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/B</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/C</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/C</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/N</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/N</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/O</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/O</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/F</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/F</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Ne</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Ne</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Na</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Na</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Mg</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Mg</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Al</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Al</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Si</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Si</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/P</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/P</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/S</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/S</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Cl</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Cl</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Ar</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Ar</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/K</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/K</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Ca</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Ca</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Sc</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Sc</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Ti</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Ti</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/V</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/V</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Cr</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Cr</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Mn</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Mn</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Fe</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Fe</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Co</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Co</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Ni</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Ni</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Cu</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Cu</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Zn</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Zn</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Ga</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Ga</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Ge</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Ge</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/As</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/As</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Se</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Se</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Br</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Br</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Kr</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Kr</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Rb</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Rb</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Sr</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Sr</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Y</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Y</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Zr</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Zr</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Nb</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Nb</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Mo</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Mo</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Tc</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Tc</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Ru</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Ru</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Rh</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Rh</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Pd</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Pd</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Ag</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Ag</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Cd</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Cd</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/In</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/In</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Sn</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Sn</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Sb</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Sb</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Te</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Te</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/I</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/I</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Xe</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Xe</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Cs</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Cs</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Ba</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Ba</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/La</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/La</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Ce</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Ce</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Pr</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Pr</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Nd</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Nd</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Pm</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Pm</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Sm</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Sm</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Eu</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Eu</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Gd</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Gd</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Tb</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Tb</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Dy</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Dy</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Ho</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Ho</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Er</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Er</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Tm</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Tm</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Yb</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Yb</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Lu</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Lu</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Hf</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Hf</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Ta</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Ta</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/W</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/W</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Re</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Re</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Os</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Os</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Ir</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Ir</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Pt</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Pt</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Au</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Au</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Hg</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Hg</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Tl</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Tl</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Pb</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Pb</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Bi</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Bi</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Po</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Po</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/At</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/At</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Rn</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Rn</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Fr</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Fr</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Ra</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Ra</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Ac</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Ac</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Th</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Th</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Pa</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Pa</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/U</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/U</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Np</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Np</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Pu</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Pu</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Am</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Am</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Cm</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Cm</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Bk</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Bk</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Cf</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Cf</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Es</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Es</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Fm</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Fm</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Md</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Md</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/No</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/No</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Lr</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Lr</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Rf</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Rf</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Db</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Db</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Sg</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Sg</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Bh</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Bh</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Hs</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Hs</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Mt</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Mt</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Ds</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Ds</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Rg</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Rg</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Cn</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Cn</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Nh</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Nh</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Fl</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Fl</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Mc</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Mc</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Lv</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Lv</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Ts</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Ts</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.periodictable.tech/element/Og</loc>
-    <lastmod>2026-04-18</lastmod>
+    <loc>https://periodictable.tech/element/Og</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

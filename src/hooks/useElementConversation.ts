@@ -7,7 +7,8 @@ import { getVideoEntry } from '../data/videoManifest';
 import { getRadioactivity } from '../utils/elementDerived';
 import { getReactivity } from '../utils/elementDerived';
 import { DEFAULT_VIEW_MODE, getAtomConfig, getValenceIndices, type AtomViewMode, type OrbitalFilter } from '../components/atom/atomConfig';
-import { trackVoiceAgentActivated } from '../utils/analytics';
+import { trackEvent } from '../utils/analytics';
+import { checkMicrophone, VoiceAttempt } from '../utils/mediaTracking';
 
 interface ConversationCallbacks {
   onNavigate: (element: Element) => void;
@@ -16,7 +17,7 @@ interface ConversationCallbacks {
 }
 
 export type VoiceStatus = 'off' | 'connecting' | 'connected' | 'error';
-export type MicError = 'timeout' | 'not-allowed' | 'device' | 'no-input' | null;
+export type MicError = 'timeout' | 'not-allowed' | 'device' | 'no-input' | 'connection' | null;
 
 function getDensityContext(density: number): string {
   if (density < 0.01) return 'So light it floats in air';
@@ -45,7 +46,7 @@ function buildElementContext(element: Element): string {
     '',
     `[WHAT THE CHILD SEES ON SCREEN]`,
     `LEFT SIDE:`,
-    `- A spinning 3D atom model showing ${element.symbol}'s electron orbitals.`,
+    `- An atom explorer for ${element.symbol}. It can show interactive 3D orbitals or a still summary. Ask which view they see before describing motion.`,
     `  You can control the atom view with these tools:`,
     `  - show_valence_electrons: highlights just the outermost electrons, dims inner shells`,
     `  - show_orbital_type: shows only s, p, d, or f orbitals to reveal their shapes`,
@@ -71,7 +72,7 @@ function buildElementContext(element: Element): string {
   // Video or photo
   if (video) {
     parts.push(
-      `- VIDEO (playing right now): "${video.description}"`,
+      `- VIDEO (may be paused or showing a poster): "${video.description}"`,
       `  IMPORTANT: Describe THIS specific video to the child, not what you think the element generally looks like. The video shows exactly what is described above.`,
     );
   } else {
@@ -116,7 +117,7 @@ function buildElementContext(element: Element): string {
 
 /**
  * Persistent voice agent at App level.
- * Starts immediately on page load — greets the kid on the periodic table.
+ * Starts only after an explicit user gesture and microphone permission.
  * Element clicks are sent as contextual updates.
  */
 export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode }: ConversationCallbacks) {
@@ -126,6 +127,10 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
   const pendingElementRef = useRef<Element | null>(null);
   const currentElementRef = useRef<number | null>(null);
   const inputVolumeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const attempt = useRef(new VoiceAttempt(trackEvent));
+  const requestVersion = useRef(0);
+  const connectionTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const conversation = useConversation({
     clientTools: {
@@ -190,6 +195,9 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
       },
     },
     onConnect: () => {
+      clearTimeout(connectionTimer.current);
+      if (!attempt.current.active) { conversation.endSession(); return; }
+      attempt.current.connected();
       // If an element was clicked before connection completed, send it now
       if (pendingElementRef.current) {
         const ctx = buildElementContext(pendingElementRef.current);
@@ -198,8 +206,17 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
         pendingElementRef.current = null;
       }
     },
-    onError: (error: unknown) => {
-      console.error('[VoiceAgent] session error:', error);
+    onDisconnect: () => {
+      clearTimeout(connectionTimer.current);
+      attempt.current.finish('remote');
+      setSessionStarted(false);
+    },
+    onError: () => {
+      clearTimeout(connectionTimer.current);
+      attempt.current.finish('connection_error');
+      setSessionStarted(false);
+      setMicError('connection');
+      try { conversation.endSession(); } catch { /* Already disconnected. */ }
     },
   });
 
@@ -239,61 +256,49 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
     };
   }, [conversation.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  /** Toggle session on/off — must be called from a user gesture (click) */
+  /** A second click cancels permission/connection work without starting another session. */
   const toggle = useCallback(async () => {
     if (!agentId) return;
-
-    // If connected, disconnect. endSession() returns void in @elevenlabs/react v1
-    // (no promise to .catch); errors surface via the onError callback.
-    if (sessionStarted) {
-      try { conversation.endSession(); } catch { /* already torn down */ }
+    if (attempt.current.active) {
+      requestVersion.current++;
+      clearTimeout(connectionTimer.current);
+      attempt.current.finish('user');
+      try { conversation.endSession(); } catch { /* Already disconnected. */ }
       setSessionStarted(false);
       return;
     }
-
-    // Acquire mic permission NOW while the user gesture is still valid.
-    // The ElevenLabs SDK calls getUserMedia internally, but by the time it
-    // gets there Chrome's gesture allowance has expired and the prompt is
-    // suppressed (getUserMedia hangs forever). By acquiring+releasing the
-    // mic here, the permission state becomes 'granted' so the SDK's own
-    // getUserMedia call resolves immediately without needing a gesture.
-    try {
-      const micPromise = navigator.mediaDevices.getUserMedia({ audio: true });
-      const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new DOMException('getUserMedia timed out', 'TimeoutError')), 5_000)
-      );
-      const tempStream = await Promise.race([micPromise, timeoutPromise]);
-      tempStream.getTracks().forEach(t => t.stop());
-    } catch (err) {
-      const error = err as DOMException;
-      if (error.name === 'TimeoutError') {
-        setMicError('timeout');
-      } else if (error.name === 'NotAllowedError') {
-        setMicError('not-allowed');
-      } else {
-        setMicError('device');
-      }
-      return;
-    }
-
+    const version = ++requestVersion.current;
+    setMicError(null);
     setSessionStarted(true);
-    trackVoiceAgentActivated();
-
-    // startSession() returns void in v1; connection failures surface through
-    // the onError callback rather than a rejected promise.
-    // WebRTC (not websocket): its acoustic echo cancellation stops the agent
-    // from hearing its own voice through the device speaker — on phones and
-    // tablets that feedback made the agent interrupt itself mid-sentence.
+    attempt.current.start();
     try {
-      conversation.startSession({
-        agentId,
-        connectionType: 'webrtc',
-      });
+      await checkMicrophone(() => navigator.mediaDevices.getUserMedia({ audio: true }));
     } catch (err) {
-      console.error('[VoiceAgent] startSession failed:', err);
+      if (version !== requestVersion.current) return;
+      const name = err instanceof DOMException ? err.name : '';
+      const reason = name === 'TimeoutError' ? 'microphone_timeout'
+        : name === 'NotAllowedError' ? 'microphone_denied' : 'microphone_device';
+      attempt.current.finish(reason);
+      setMicError(reason === 'microphone_timeout' ? 'timeout' : reason === 'microphone_denied' ? 'not-allowed' : 'device');
       setSessionStarted(false);
+      return;
     }
-  }, [agentId, sessionStarted, conversation]);
+    if (version !== requestVersion.current) return;
+    connectionTimer.current = setTimeout(() => {
+      attempt.current.finish('connection_error');
+      setSessionStarted(false);
+      setMicError('connection');
+      try { conversation.endSession(); } catch { /* Already disconnected. */ }
+    }, 20_000);
+    try {
+      conversation.startSession({ agentId, connectionType: 'webrtc' });
+    } catch {
+      clearTimeout(connectionTimer.current);
+      attempt.current.finish('connection_error');
+      setSessionStarted(false);
+      setMicError('connection');
+    }
+  }, [agentId, conversation]);
 
   const clearMicError = useCallback(() => {
     setMicError(null);
@@ -316,29 +321,37 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
   }, [agentId, conversation]);
 
   const notifyElementClosed = useCallback(() => {
-    if (!agentId || conversation.status !== 'connected') return;
+    const hadElement = currentElementRef.current !== null;
     currentElementRef.current = null;
+    pendingElementRef.current = null;
+    if (!agentId || !hadElement || conversation.status !== 'connected') return;
     conversation.sendContextualUpdate(
       '[ELEMENT CLOSED] The child closed the element view and is back on the periodic table. ' +
       'Encourage them to pick another element to explore!'
     );
   }, [agentId, conversation]);
 
-  // Cleanup on unmount
+  const endSession = conversation.endSession;
   useEffect(() => {
-    return () => {
-      if (sessionStarted) {
-        try { conversation.endSession(); } catch { /* already torn down */ }
+    const lifecycle = attempt.current;
+    const close = () => {
+      requestVersion.current++;
+      clearTimeout(connectionTimer.current);
+      if (lifecycle.active) {
+        lifecycle.finish('page_exit');
+        try { endSession(); } catch { /* Already disconnected. */ }
       }
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    window.addEventListener('pagehide', close);
+    return () => { window.removeEventListener('pagehide', close); close(); };
+  }, [endSession]);
 
   // Map ElevenLabs status to our simpler status
   let status: VoiceStatus = 'off';
   if (sessionStarted) {
     if (conversation.status === 'connected') status = 'connected';
     else if (conversation.status === 'connecting') status = 'connecting';
-    else if (conversation.status === 'disconnected') status = 'error';
+    else if (conversation.status === 'disconnected') status = 'connecting';
     else status = 'connecting';
   }
 

@@ -1,4 +1,5 @@
 .element-cell {
+  text-decoration: none;
   position: relative;
   display: flex;
   flex-direction: column;

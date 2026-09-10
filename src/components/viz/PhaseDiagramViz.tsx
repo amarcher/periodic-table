@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useCallback, useId, useMemo, useRef, useState } from 'react';
 import type { Element } from '../../types/element';
 import { getPhaseData, getPhaseAtPoint } from './phase-data';
 import type { PhaseDiagramData, PhasePoint } from './phase-data';
@@ -49,14 +49,10 @@ export function PhaseDiagramViz({ element, catColor }: Props) {
   const dragging = useRef(false);
   const hasInteracted = useRef(false);
 
-  // Track phase diagram interaction on unmount
-  useEffect(() => {
-    const el = element;
-    return () => {
-      if (hasInteracted.current) {
-        trackPhaseDiagramUsed(el.symbol, el.atomicNumber);
-      }
-    };
+  const recordInteraction = useCallback(() => {
+    if (hasInteracted.current) return;
+    hasInteracted.current = true;
+    trackPhaseDiagramUsed(element.symbol, element.atomicNumber);
   }, [element]);
 
   const tToX = useCallback((t: number) => {
@@ -105,11 +101,11 @@ export function PhaseDiagramViz({ element, catColor }: Props) {
 
   const handlePointerDown = useCallback((e: React.PointerEvent<SVGSVGElement>) => {
     dragging.current = true;
-    hasInteracted.current = true;
+    recordInteraction();
     (e.target as SVGElement).setPointerCapture(e.pointerId);
     const tp = pointerToTP(e);
     if (tp) { setTemp(tp.t); setPressure(tp.p); }
-  }, [pointerToTP]);
+  }, [pointerToTP, recordInteraction]);
 
   const handlePointerMove = useCallback((e: React.PointerEvent<SVGSVGElement>) => {
     if (!dragging.current) return;
@@ -128,7 +124,6 @@ export function PhaseDiagramViz({ element, catColor }: Props) {
     const tStep = (tMax - tMin) / 40;
     const pFactor = 1.15;
     let handled = true;
-    hasInteracted.current = true;
     switch (e.key) {
       case 'ArrowRight': setTemp(t => Math.min(t + tStep, tMax)); break;
       case 'ArrowLeft': setTemp(t => Math.max(t - tStep, tMin)); break;
@@ -136,8 +131,8 @@ export function PhaseDiagramViz({ element, catColor }: Props) {
       case 'ArrowDown': setPressure(p => Math.max(p / pFactor, pMin)); break;
       default: handled = false;
     }
-    if (handled) e.preventDefault();
-  }, [data]);
+    if (handled) { e.preventDefault(); recordInteraction(); }
+  }, [data, recordInteraction]);
 
   // Build region polygon paths
   const regionPaths = useMemo(() => {
@@ -210,7 +205,7 @@ export function PhaseDiagramViz({ element, catColor }: Props) {
           max={Math.log10(data.pRange[1])}
           step={0.01}
           value={Math.log10(pressure)}
-          onChange={e => { hasInteracted.current = true; setPressure(Math.pow(10, parseFloat(e.target.value))); }}
+          onChange={e => { recordInteraction(); setPressure(Math.pow(10, parseFloat(e.target.value))); }}
           aria-label="Pressure"
         />
 
@@ -333,7 +328,7 @@ export function PhaseDiagramViz({ element, catColor }: Props) {
         max={data.tRange[1]}
         step={(data.tRange[1] - data.tRange[0]) / 200}
         value={temp}
-        onChange={e => { hasInteracted.current = true; setTemp(parseFloat(e.target.value)); }}
+        onChange={e => { recordInteraction(); setTemp(parseFloat(e.target.value)); }}
         aria-label="Temperature"
       />
 

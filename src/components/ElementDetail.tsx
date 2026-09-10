@@ -1,4 +1,4 @@
-import { useEffect, useRef, lazy, Suspense } from 'react';
+import { useEffect, useRef } from 'react';
 import type { Element } from '../types/element';
 import type { AtomViewMode } from './atom/atomConfig';
 import { categoryColors, categoryLabels } from '../utils/colors';
@@ -10,10 +10,7 @@ import { PhaseDiagramViz } from './viz/PhaseDiagramViz';
 import { RadioactivityViz } from './viz/RadioactivityViz';
 import { ReactivityViz } from './viz/ReactivityViz';
 import './ElementDetail.css';
-
-const AtomVisualizer = lazy(() =>
-  import('./AtomVisualizer').then((m) => ({ default: m.AtomVisualizer }))
-);
+import { AtomDisplay } from './AtomDisplay';
 
 interface ElementDetailProps {
   element: Element;
@@ -102,9 +99,7 @@ export function ElementDetail({ element, onClose, atomViewMode, onAtomViewModeCh
             style={{ '--vt-name': 'detail-identity' } as React.CSSProperties}
           >
             <div className="detail__atom-zone">
-              <Suspense fallback={<div className="detail__atom-loading">Loading...</div>}>
-                <AtomVisualizer element={element} viewMode={atomViewMode} onViewModeChange={onAtomViewModeChange} />
-              </Suspense>
+              <AtomDisplay element={element} viewMode={atomViewMode} onViewModeChange={onAtomViewModeChange} />
             </div>
 
             <div className="detail__identity">
@@ -155,6 +150,7 @@ export function ElementDetail({ element, onClose, atomViewMode, onAtomViewModeCh
             className="detail__facts"
             style={{ '--vt-name': 'detail-facts' } as React.CSSProperties}
           >
+            <p className="detail__summary">{element.summary}</p>
             {element.funFacts.map((fact, i) => (
               <div key={i} className="detail__fact-card">
                 <span className="detail__fact-icon">
