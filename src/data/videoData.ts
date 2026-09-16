@@ -376,4 +376,8 @@ export const VIDEO_DATA: Partial<Record<number, VideoRawEntry>> = {
     filename: '094-Pu-veo31fast.mp4',
     description: "A plutonium oxide pellet radiating a deep red-orange glow from its own radioactive decay heat",
   },
+  113: {
+    filename: '113-Nh-veo31fast.mp4',
+    description: "Zinc and bismuth nuclei spiralling together, fusing into nihonium, then ejecting a neutron and an alpha particle",
+  },
 };
