@@ -28,8 +28,8 @@ const FUSION_PREMISE =
 // Shared by the GSI Darmstadt elements (107–112); from the Era 5 intro in the source doc.
 const GSI_WORKSHOP =
   'This element is one of six made at GSI in Darmstadt. All six used a lead or bismuth target and gave off exactly one neutron, ' +
-  'in the same building, with the same separator called SHIP, and the same two scientists, Peter Armbruster and Gottfried Münzenberg, ' +
-  'across fifteen years.';
+  'in the same building, with the same separator called SHIP. Peter Armbruster and Gottfried Münzenberg led the discoveries of elements 107 to 109, ' +
+  'and Sigurd Hofmann led the team that found elements 110 to 112, with Armbruster and Münzenberg still on it.';
 
 // Shared by 114–118; from the Era 6 intro in the source doc.
 const HOT_FUSION =
@@ -42,8 +42,9 @@ export const elementStories: ElementStory[] = [
     story:
       'Protactinium is not a synthetic element. It is natural, and it is pulled out of uranium ore. ' +
       'It is found in a mineral called uraninite at about 0.3 to 3 parts per million, because protactinium-231 forms when uranium-235 decays. ' +
-      'It was discovered in 1917 and 1918 by two teams working separately: Lise Meitner and Otto Hahn in Germany, and Frederick Soddy and John Cranston in the UK. ' +
-      'IUPAC confirmed it in 1949. Protactinium-231 has a half-life of 32,760 years. ' +
+      'Kasimir Fajans and Oswald Göhring first identified element 91 in 1913, as a short-lived form they called brevium. ' +
+      'Then in 1917 and 1918, two teams working separately found its long-lived form, protactinium-231: Lise Meitner and Otto Hahn in Germany, and Frederick Soddy and John Cranston in the UK. ' +
+      'The name protactinium was made official in 1949. Protactinium-231 has a half-life of 32,760 years. ' +
       'The big story: in 1961 the UK Atomic Energy Authority ran 60 tonnes of waste through a 12-stage plant to get out just 127 grams of 99.9 percent pure protactinium-231, ' +
       'at a cost of about 500,000 dollars. That was the world\'s supply for decades. ' +
       'Scientists use it to date ocean sediment going back 175,000 years, like reading clocks in the seafloor.',
@@ -52,7 +53,8 @@ export const elementStories: ElementStory[] = [
     atomicNumber: 95,
     symbol: 'Am',
     story:
-      'Americium was made by Glenn Seaborg\'s team at Berkeley in 1944, using the 60-inch cyclotron to bombard plutonium with neutrons. ' +
+      'Americium was first identified in late 1944 at the Metallurgical Laboratory at the University of Chicago, by Glenn Seaborg, Ralph James, Leon Morgan, and Albert Ghiorso. ' +
+      'They made it by hitting plutonium with neutrons in a nuclear reactor. ' +
       'It was kept secret through the Manhattan Project. Then in November 1945 it was announced publicly on a children\'s radio quiz show, ' +
       'so Seaborg told kids before he told scientists! ' +
       'Today it is produced when plutonium-239 takes in two neutrons to become plutonium-241, which beta decays into americium-241. ' +
@@ -161,7 +163,8 @@ export const elementStories: ElementStory[] = [
     symbol: 'Rf',
     story:
       'Rutherfordium was one of the first big fights in the Transfermium Wars, a Cold War argument over who discovered new elements and what to call them. ' +
-      'Dubna made it between 1966 and 1969 by hitting plutonium-242 with neon-22. ' +
+      'Dubna claimed element 104 in 1964, but that early claim did not hold up. ' +
+      'Dubna kept working on it between 1966 and 1969, hitting plutonium-242 with neon-22. ' +
       'Berkeley made it in 1969 by hitting californium-249 with carbon-12, which made rutherfordium-257 and 4 neutrons. ' +
       'The Soviets proposed the name kurchatovium, with the symbol K. U., and the Americans proposed rutherfordium. ' +
       'In 1992 a working group credited both teams. IUPAC only settled on rutherfordium in 1997, nearly 30 years after the discovery. ' +
@@ -257,11 +260,14 @@ export const elementStories: ElementStory[] = [
     atomicNumber: 113,
     symbol: 'Nh',
     story:
-      'Nihonium was made at RIKEN in Japan, with Kosuke Morita, by hitting bismuth-209 with zinc-70, which made nihonium-278 and one neutron. ' +
+      'Nihonium was made at RIKEN in Japan, by a team led by Kosuke Morita, by hitting bismuth-209 with zinc-70, which made nihonium-278 and one neutron. ' +
       'It is the ultimate patience story: three atoms in nine years. ' +
       'The bombardment started in September 2003. The first atom came in July 2004, the second in April 2005, ' +
       'and the decisive third in August 2012, after 450 more days of irradiation. ' +
-      'Its whole decay chain was observed, four alpha decays in a row: nihonium-278 became roentgenium-274, then meitnerium-270, then bohrium-266, then dubnium-262, which ended in spontaneous fission. ' +
+      'Each atom left a decay chain. Nihonium-278 became roentgenium-274, then meitnerium-270, then bohrium-266, then dubnium-262. ' +
+      'For the first two atoms, dubnium-262 split apart by fission. ' +
+      'But in the decisive 2012 atom the chain kept going: dubnium-262 gave off an alpha particle to become lawrencium-258, then another to become mendelevium-254. That is six alpha decays in a row! ' +
+      'Unlike its neighbors from 114 to 118, nihonium was made by cold fusion, not with a calcium-48 beam. ' +
       'Nihonium-286 has a half-life of about 10 seconds. ' +
       'RIKEN\'s claim was recognized in 2015, making nihonium the first element discovered in Asia. ' +
       FUSION_PREMISE,
@@ -270,8 +276,10 @@ export const elementStories: ElementStory[] = [
     atomicNumber: 114,
     symbol: 'Fl',
     story:
-      'Flerovium was made at JINR in Dubna in June 1999 by hitting plutonium-244 with calcium-48, which made flerovium-290 and 2 neutrons. ' +
-      'The first signal came in December 1998: a single atom that gave off an alpha particle after 30.4 seconds. ' +
+      'Flerovium was made at JINR in Dubna. In December 1998 they fired calcium-48 at plutonium-244 and saw a single atom that lasted about 30 seconds. ' +
+      'It was first labelled flerovium-289, and that was later reassigned. ' +
+      'In 1999 more atoms came from plutonium-242, which made flerovium-287, and from another plutonium-244 run. ' +
+      'IUPAC credited the discovery to the team\'s later experiments, in 2004. ' +
       'Flerovium-289 has a half-life of about 1.9 seconds. ' +
       'Flerovium is tied to the island of stability. Flerovium-298, with 114 protons and 184 neutrons, is predicted to be doubly magic: ' +
       'a superheavy that might last far longer than anything made so far. Nobody has reached it yet. ' +
@@ -284,7 +292,7 @@ export const elementStories: ElementStory[] = [
     story:
       'Moscovium was made in August 2003 by JINR in Dubna together with Lawrence Livermore National Lab. ' +
       'They hit americium-243 with calcium-48, which made moscovium-288 and 3 neutrons, and also moscovium-287 and 4 neutrons. ' +
-      'Moscovium gives off an alpha particle and turns into nihonium, element 113, in about 100 milliseconds, and its decay chain ends at dubnium-268. ' +
+      'Moscovium-288 gives off an alpha particle and turns into nihonium, element 113, with a half-life of about 190 milliseconds. ' +
       'So this is where nihonium comes from when you make it the other way! ' +
       'Moscovium-290 has a half-life of 650 milliseconds. It is named for Moscow Oblast. ' +
       HOT_FUSION + ' ' + FUSION_PREMISE,
@@ -322,7 +330,7 @@ export const elementStories: ElementStory[] = [
     symbol: 'Og',
     story:
       'Oganesson was made by JINR in Dubna together with Lawrence Livermore National Lab, by hitting californium-249 with calcium-48, which made oganesson-294 and 3 neutrons. ' +
-      'It was made in 2002 and announced in 2006. Only three or four nuclei have ever been made. Oganesson-294 has a half-life of 0.7 milliseconds. ' +
+      'It was made in 2002 and announced in 2006. Only about five atoms have ever been detected. Oganesson-294 has a half-life of 0.7 milliseconds. ' +
       'Its decay chain: oganesson-294 becomes livermorium-290, then flerovium-286, then copernicium-282, which ends in spontaneous fission. ' +
       'The naming story: it is named for Yuri Oganessian, who was alive and on the call. ' +
       'In a March 2016 conference call among the discoverers of elements 115 to 118, they waited for Oganessian to leave the call, then all agreed to name it after him. ' +
