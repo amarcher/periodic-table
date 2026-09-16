@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import handler from './element-og.js';
 
 type FakeReq = { url?: string; query?: Record<string, string | string[]> };
@@ -64,9 +64,18 @@ describe('api/element-og', () => {
     );
   });
 
-  it('falls back to og-image.png when no video exists for the element', () => {
-    // Livermorium (Lv, 116) has no video in VIDEO_DATA.
-    const res = call({ url: '/element/Lv' });
+  it('falls back to og-image.png when no video exists for the element', async () => {
+    // Every element now has a video, so this branch can't be reached with a real
+    // symbol — stub VIDEO_DATA empty to exercise it. The branch still matters: it
+    // is what runs if a manifest entry is ever missing or removed.
+    vi.resetModules();
+    vi.doMock('../src/data/videoData.js', () => ({ VIDEO_DATA: {} }));
+    const { default: freshHandler } = await import('./element-og.js');
+    const res = makeRes();
+    freshHandler({ url: '/element/Lv' } as never, res as never);
+    vi.doUnmock('../src/data/videoData.js');
+    vi.resetModules();
+
     expect(res._status).toBe(200);
     expect(res._body).toContain(
       'property="og:image" content="https://periodictable.tech/og-image.png"'

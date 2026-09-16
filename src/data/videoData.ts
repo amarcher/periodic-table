@@ -364,6 +364,10 @@ export const VIDEO_DATA: Partial<Record<number, VideoRawEntry>> = {
     filename: '090-Th-veo31fast.mp4',
     description: "Thorium metal turnings igniting into a blazing, brilliant white incandescence",
   },
+  91: {
+    filename: '091-Pa-veo31fast.mp4',
+    description: "A freshly cut silvery protactinium sample gleaming inside a sealed glass ampoule",
+  },
   92: {
     filename: '092-U-veo31fast.mp4',
     description: "Uranium glass glowing with intense green fluorescence under UV light",
@@ -375,5 +379,101 @@ export const VIDEO_DATA: Partial<Record<number, VideoRawEntry>> = {
   94: {
     filename: '094-Pu-veo31fast.mp4',
     description: "A plutonium oxide pellet radiating a deep red-orange glow from its own radioactive decay heat",
+  },
+  95: {
+    filename: '095-Am-veo31fast.mp4',
+    description: "Inside a smoke detector — the americium-241 disc ionizing the air until smoke breaks the current",
+  },
+  96: {
+    filename: '096-Cm-veo31fast.mp4',
+    description: "A curium sample in a sealed vial revealing its own eerie purple glow as the lights go down",
+  },
+  97: {
+    filename: '097-Bk-veo31fast.mp4',
+    description: "A microscopic speck of berkelium under a lens — years of reactor breeding for a barely visible grain",
+  },
+  98: {
+    filename: '098-Cf-veo31fast.mp4',
+    description: "A sealed californium-252 capsule, an unremarkable cylinder pouring out billions of neutrons",
+  },
+  99: {
+    filename: '099-Es-veo31fast.mp4',
+    description: "Einsteinium glowing vivid blue in a tiny capsule, hot enough to damage its own crystal lattice",
+  },
+  100: {
+    filename: '100-Fm-veo31fast.mp4',
+    description: "A thermonuclear fireball cooling into debris, where a single fermium nucleus forms and sheds an alpha particle",
+  },
+  101: {
+    filename: '101-Md-veo31fast.mp4',
+    description: "Helium and einsteinium nuclei spiralling together and fusing into mendelevium, then winking in and out one atom at a time",
+  },
+  102: {
+    filename: '102-No-veo31fast.mp4',
+    description: "Neon and uranium nuclei spiralling together and fusing into nobelium, which holds calm far longer than it should before ejecting an alpha particle",
+  },
+  103: {
+    filename: '103-Lr-veo31fast.mp4',
+    description: "Boron and californium nuclei spiralling together and fusing into lawrencium, whose electron shells visibly rearrange around it",
+  },
+  104: {
+    filename: '104-Rf-veo31fast.mp4',
+    description: "Carbon and californium nuclei spiralling together and fusing into rutherfordium, claimed in turn by two rival auras before one finally holds",
+  },
+  105: {
+    filename: '105-Db-veo31fast.mp4',
+    description: "Nitrogen and californium nuclei spiralling together and fusing into dubnium, which endures unusually long before splitting cleanly in two",
+  },
+  106: {
+    filename: '106-Sg-veo31fast.mp4',
+    description: "Oxygen and californium nuclei spiralling together and fusing into seaborgium, burning with a dignified steady light before releasing an alpha particle",
+  },
+  107: {
+    filename: '107-Bh-veo31fast.mp4',
+    description: "Chromium and bismuth nuclei spiralling together and fusing into bohrium, which bonds with oxygen and drifts away as a volatile molecule",
+  },
+  108: {
+    filename: '108-Hs-veo31fast.mp4',
+    description: "Iron and lead nuclei spiralling together and fusing into hassium, which grabs four oxygen atoms and lifts away as a volatile tetroxide",
+  },
+  109: {
+    filename: '109-Mt-veo31fast.mp4',
+    description: "Iron and bismuth nuclei spiralling together and fusing into meitnerium, a single atom glowing alone in enormous darkness",
+  },
+  110: {
+    filename: '110-Ds-veo31fast.mp4',
+    description: "Nickel and lead nuclei spiralling together and fusing into darmstadtium, shining like a captured star before cascading into alpha decays",
+  },
+  111: {
+    filename: '111-Rg-veo31fast.mp4',
+    description: "Nickel and bismuth nuclei spiralling together and fusing into roentgenium, radiating fine rays outward like the x-rays it is named for",
+  },
+  112: {
+    filename: '112-Cn-veo31fast.mp4',
+    description: "Zinc and lead nuclei spiralling together and fusing into copernicium, which turns mirror-bright like mercury, then seals shut and refuses to react",
+  },
+  114: {
+    filename: '114-Fl-veo31fast.mp4',
+    description: "Calcium and plutonium nuclei spiralling together and fusing into flerovium, shimmering like liquid metal before a distant shore — the island of stability",
+  },
+  115: {
+    filename: '115-Mc-veo31fast.mp4',
+    description: "Calcium and americium nuclei spiralling together and fusing into moscovium, erupting almost at once into a firecracker chain of alpha decays",
+  },
+  116: {
+    filename: '116-Lv-veo31fast.mp4',
+    description: "Calcium and curium nuclei spiralling together and fusing into livermorium, gone in less than a blink, bursting into smaller and smaller fragments",
+  },
+  117: {
+    filename: '117-Ts-veo31fast.mp4',
+    description: "Calcium and berkelium nuclei spiralling together and fusing into tennessine, the product of the rarest target ever prepared, gone in an instant",
+  },
+  118: {
+    filename: '118-Og-veo31fast.mp4',
+    description: "Calcium and californium nuclei spiralling together and fusing into oganesson, wrapped in a diffuse fog of electrons rather than neat rings, easily disturbed",
+  },
+  113: {
+    filename: '113-Nh-veo31fast.mp4',
+    description: "Zinc and bismuth nuclei spiralling together, fusing into nihonium, then ejecting a neutron and an alpha particle",
   },
 };
