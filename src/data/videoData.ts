@@ -364,6 +364,10 @@ export const VIDEO_DATA: Partial<Record<number, VideoRawEntry>> = {
     filename: '090-Th-veo31fast.mp4',
     description: "Thorium metal turnings igniting into a blazing, brilliant white incandescence",
   },
+  91: {
+    filename: '091-Pa-veo31fast.mp4',
+    description: "A freshly cut silvery protactinium sample gleaming inside a sealed glass ampoule",
+  },
   92: {
     filename: '092-U-veo31fast.mp4',
     description: "Uranium glass glowing with intense green fluorescence under UV light",
@@ -375,6 +379,26 @@ export const VIDEO_DATA: Partial<Record<number, VideoRawEntry>> = {
   94: {
     filename: '094-Pu-veo31fast.mp4',
     description: "A plutonium oxide pellet radiating a deep red-orange glow from its own radioactive decay heat",
+  },
+  95: {
+    filename: '095-Am-veo31fast.mp4',
+    description: "Inside a smoke detector — the americium-241 disc ionizing the air until smoke breaks the current",
+  },
+  96: {
+    filename: '096-Cm-veo31fast.mp4',
+    description: "A curium sample in a sealed vial revealing its own eerie purple glow as the lights go down",
+  },
+  97: {
+    filename: '097-Bk-veo31fast.mp4',
+    description: "A microscopic speck of berkelium under a lens — years of reactor breeding for a barely visible grain",
+  },
+  98: {
+    filename: '098-Cf-veo31fast.mp4',
+    description: "A sealed californium-252 capsule, an unremarkable cylinder pouring out billions of neutrons",
+  },
+  99: {
+    filename: '099-Es-veo31fast.mp4',
+    description: "Einsteinium glowing vivid blue in a tiny capsule, hot enough to damage its own crystal lattice",
   },
   113: {
     filename: '113-Nh-veo31fast.mp4',
