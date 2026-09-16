@@ -7,7 +7,10 @@ const DEFAULT_VIDEO_CDN = 'https://pub-31265833619c4b07a0d5cae75480e369.r2.dev';
 const FALLBACK_OG_IMAGE = `${SITE_ORIGIN}/og-image.png`;
 
 function videoCdn(): string {
-  return process.env.VIDEO_CDN_URL || DEFAULT_VIDEO_CDN;
+  // Trim before use: a trailing newline in the configured value produced
+  // og:image/og:video URLs broken across two lines, which crawlers reject.
+  const configured = (process.env.VIDEO_CDN_URL ?? '').trim().replace(/\/+$/, '');
+  return configured || DEFAULT_VIDEO_CDN;
 }
 
 function escapeHtml(s: string): string {

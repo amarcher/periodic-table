@@ -83,6 +83,20 @@ describe('api/element-og', () => {
     expect(res._body).not.toContain('og:video"');
   });
 
+  it('keeps og URLs on one line when VIDEO_CDN_URL has stray whitespace', () => {
+    // Reproduces production: the configured value carried a trailing newline, so
+    // every og:image and og:video URL was split across two lines.
+    process.env.VIDEO_CDN_URL = 'https://cdn.example.test/\n';
+    const res = call({ url: '/element/Au' });
+    expect(res._body).toContain(
+      'property="og:image" content="https://cdn.example.test/079-Au-veo31fast.jpg"'
+    );
+    expect(res._body).toContain(
+      'property="og:video" content="https://cdn.example.test/079-Au-veo31fast.mp4"'
+    );
+    expect(res._body).not.toMatch(/content="[^"]*\n/);
+  });
+
   it('accepts a symbol query param as a fallback (vercel dev path)', () => {
     const res = call({ url: '/api/element-og?symbol=Fe', query: { symbol: 'Fe' } });
     expect(res._status).toBe(200);
