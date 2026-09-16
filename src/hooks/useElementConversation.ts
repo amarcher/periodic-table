@@ -144,7 +144,7 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
         onNavigate(match);
         return `Navigated to ${match.name}`;
       },
-      get_element_story: (params: { name?: string }) => {
+      get_element_story: (params: { name?: unknown }) => {
         return getElementStoryToolResponse(params?.name, currentElementRef.current);
       },
       go_back_to_table: () => {

@@ -70,6 +70,19 @@ describe('getElementStoryToolResponse', () => {
     expect(getElementStoryToolResponse('   ', 117)).toBe(tennessine);
   });
 
+  it('coerces non-string names instead of throwing', () => {
+    expect(getElementStoryToolResponse(117, null)).toBe(tennessine);
+    expect(getElementStoryToolResponse(null, 117)).toBe(tennessine);
+    expect(getElementStoryToolResponse({}, 117)).toBe(tennessine);
+    expect(getElementStoryToolResponse(79, null)).toMatch(/no verified story for Gold/i);
+  });
+
+  it('resolves a numeric string by atomic number', () => {
+    expect(getElementStoryToolResponse('117', null)).toBe(tennessine);
+    expect(getElementStoryToolResponse(' 91 ', null)).toBe(getElementStory('Pa')!.story);
+    expect(getElementStoryToolResponse('999', null)).toMatch(/no verified story/i);
+  });
+
   it('tells the agent not to guess when there is no story', () => {
     for (const response of [
       getElementStoryToolResponse('Gold', null),

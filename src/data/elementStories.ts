@@ -1,4 +1,5 @@
 import { elements, getElementBySymbol } from './elements';
+import type { Element } from '../types/element';
 
 /**
  * Verified discovery stories for the elements that have no video: protactinium (91)
@@ -21,7 +22,7 @@ const FUSION_PREMISE =
   'Making these elements uses a beam that is about a million times gentler per particle, ' +
   'and the goal is the opposite: get two nuclei to barely touch and stick. ' +
   'Too slow and they push each other away and bounce off. Too fast and the merged nucleus is so hot it breaks apart instantly. ' +
-  'The right speed window is only a few MeV wide, and it is different for every beam and target pairing. ' +
+  'The right energy window is only a few MeV wide, and it is different for every beam and target pairing. ' +
   'It is a docking maneuver, not a demolition derby.';
 
 // Shared by the GSI Darmstadt elements (107–112); from the Era 5 intro in the source doc.
@@ -39,7 +40,7 @@ export const elementStories: ElementStory[] = [
     atomicNumber: 91,
     symbol: 'Pa',
     story:
-      'Protactinium is not made in a lab at all. It is natural, and it is pulled out of uranium ore. ' +
+      'Protactinium is not a synthetic element. It is natural, and it is pulled out of uranium ore. ' +
       'It is found in a mineral called uraninite at about 0.3 to 3 parts per million, because protactinium-231 forms when uranium-235 decays. ' +
       'It was discovered in 1917 and 1918 by two teams working separately: Lise Meitner and Otto Hahn in Germany, and Frederick Soddy and John Cranston in the UK. ' +
       'IUPAC confirmed it in 1949. Protactinium-231 has a half-life of 32,760 years. ' +
@@ -75,10 +76,10 @@ export const elementStories: ElementStory[] = [
     symbol: 'Bk',
     story:
       'Berkelium was first made at Berkeley in 1949 by hitting americium-241 with helium-4, which made berkelium-243 and two neutrons. ' +
-      'Today berkelium-249 is bred in the HFIR reactor at Oak Ridge, where plutonium-239 captures neutron after neutron, step by step, up to curium-249, which beta decays into berkelium-249. ' +
+      'Today berkelium-249 is bred in the HFIR reactor at Oak Ridge, where plutonium-239 captures neutron after neutron, and decays along the way, until it becomes curium-249, which beta decays into berkelium-249. ' +
       'Berkelium-249 has a half-life of 330 days, and berkelium-247 has a half-life of 1,380 years. ' +
       'Here is how rare it is: just over one gram total has been made at Oak Ridge since 1967, at roughly 1 million dollars per batch. ' +
-      'It is the scarcest raw material on Earth, and it is what scientists used to make tennessine, element 117.',
+      'It is one of the scarcest materials on Earth, and it is what scientists used to make tennessine, element 117.',
   },
   {
     atomicNumber: 98,
@@ -137,7 +138,7 @@ export const elementStories: ElementStory[] = [
       'Berkeley could not reproduce it either; their results turned out to be fermium isomers. ' +
       'The discovery was confirmed at Dubna in 1966: uranium-238 hit with neon-22 made nobelium-254 and 6 neutrons. ' +
       'In 1992 IUPAC and IUPAP ruled that only Dubna\'s 1966 work was correct. The Soviet team proposed the name joliotium, ' +
-      'but the wrong name had stuck too hard to change. Science corrected itself in public, and lost the argument anyway. ' +
+      'but the wrong name had stuck too hard to change. So scientists fixed the mistake, but the name stayed anyway. ' +
       'Nobelium-259 has a half-life of 58 minutes. ' +
       FUSION_PREMISE,
   },
@@ -159,7 +160,7 @@ export const elementStories: ElementStory[] = [
     atomicNumber: 104,
     symbol: 'Rf',
     story:
-      'Rutherfordium started the Transfermium Wars, a Cold War fight over naming new elements. ' +
+      'Rutherfordium was one of the first big fights in the Transfermium Wars, a Cold War argument over who discovered new elements and what to call them. ' +
       'Dubna made it between 1966 and 1969 by hitting plutonium-242 with neon-22. ' +
       'Berkeley made it in 1969 by hitting californium-249 with carbon-12, which made rutherfordium-257 and 4 neutrons. ' +
       'The Soviets proposed the name kurchatovium, with the symbol K. U., and the Americans proposed rutherfordium. ' +
@@ -175,7 +176,7 @@ export const elementStories: ElementStory[] = [
       'Berkeley made it in April 1970 by hitting californium-249 with nitrogen-15, which made dubnium-260 and 4 neutrons. ' +
       'The naming fight got silly: four different names were in play, nielsbohrium, hahnium, joliotium, and dubnium, before it was settled in 1997. ' +
       'Dubnium-268 has a half-life of about 16 hours, a number revised in 2022. That makes it the longest-lived of any element above 103. ' +
-      'Dubnium-270 lasts about 1 hour, and that is known from only three atoms ever observed. ' +
+      'Dubnium-270 lasts about 1 hour, and that is known from only three observed atoms. ' +
       FUSION_PREMISE,
   },
   {
@@ -238,7 +239,7 @@ export const elementStories: ElementStory[] = [
       'Roentgenium was made at GSI on December 8, 1994, by hitting bismuth-209 with nickel-64, which made roentgenium-272 and one neutron. ' +
       'They saw three nuclei, and three more when the experiment was repeated in 2002. ' +
       'Roentgenium-282 has a half-life of 100 seconds. ' +
-      'It is named for Wilhelm Röntgen, the man who discovered X-rays, and fittingly it is an element that can only be seen by its radiation. ' +
+      'It is named for Wilhelm Röntgen, the man who discovered X-rays. Like him, scientists can only "see" this element through the radiation it gives off. ' +
       GSI_WORKSHOP + ' ' + FUSION_PREMISE,
   },
   {
@@ -297,7 +298,7 @@ export const elementStories: ElementStory[] = [
       'It was a single atom, and it gave off an alpha particle to become flerovium. Livermorium-293 has a half-life of about 80 milliseconds. ' +
       'IUPAC recognized it on June 1, 2011. ' +
       'The name has a fun chain: it is named for Lawrence Livermore National Lab, which is named for the town of Livermore, California, ' +
-      'which is named for Robert Livermore, a rancher. So a superheavy nucleus is named after a 19th-century cattleman! ' +
+      'which is named for Robert Livermore, a rancher. So the name traces all the way back to a 19th-century cattleman! ' +
       HOT_FUSION + ' ' + FUSION_PREMISE,
   },
   {
@@ -307,13 +308,13 @@ export const elementStories: ElementStory[] = [
       'Tennessine was made in 2010 by a team from JINR in Dubna, Oak Ridge, Lawrence Livermore National Lab, and Vanderbilt. ' +
       'They hit berkelium-249 with calcium-48. That made tennessine-294 and 3 neutrons once, and tennessine-293 and 4 neutrons five times. Six atoms in all. ' +
       'Tennessine-294 has a half-life of about 112 milliseconds, and tennessine-293 about 21 milliseconds. ' +
-      'The best story on the whole table is how they got the target. ' +
+      'One of the best stories on the table is how they got the target. ' +
       'The berkelium-249 was bred in the HFIR reactor at Oak Ridge over a 250-day irradiation that ended in late December 2008, and it made just 22 milligrams. ' +
       'Then it needed 90 days of cooling and 90 days of chemical processing. ' +
-      'Then it had to get to Dubna before it decayed away, because berkelium-249 has a half-life of 330 days. ' +
+      'Then it had to get to Dubna before too much of it decayed, because berkelium-249 has a half-life of 330 days. ' +
       'But Russian customs rejected the shipment twice because the paperwork was incomplete, and the berkelium crossed the Atlantic five times! ' +
       'It finally entered Russia in June 2009, was laid down as a thin film on titanium, and reached Dubna in July 2009. ' +
-      'The rarest material on Earth, stuck in customs, decaying the whole time. ' +
+      'One of the rarest materials on Earth was stuck in customs, decaying the whole time. ' +
       HOT_FUSION + ' ' + FUSION_PREMISE,
   },
   {
@@ -334,26 +335,36 @@ export const elementStories: ElementStory[] = [
 
 const storiesByAtomicNumber = new Map(elementStories.map((s) => [s.atomicNumber, s]));
 
+/** Resolves a trimmed, non-empty element name, symbol, or atomic number string (case-insensitive). */
+function resolveElement(query: string): Element | undefined {
+  if (/^\d+$/.test(query)) return elements.find((el) => el.atomicNumber === Number(query));
+  const lower = query.toLowerCase();
+  return getElementBySymbol(query) ?? elements.find((el) => el.name.toLowerCase() === lower);
+}
+
 /** Case-insensitive lookup by element name or symbol. Returns undefined for elements without a story. */
 export function getElementStory(nameOrSymbol: string): ElementStory | undefined {
-  const target = nameOrSymbol.trim().toLowerCase();
-  if (!target) return undefined;
-  const element =
-    getElementBySymbol(target) ?? elements.find((el) => el.name.toLowerCase() === target);
+  const target = nameOrSymbol.trim();
+  const element = target ? resolveElement(target) : undefined;
   return element ? storiesByAtomicNumber.get(element.atomicNumber) : undefined;
 }
 
 /**
  * Response text for the voice agent's `get_element_story` client tool.
- * A blank `name` falls back to the element currently open (by atomic number).
+ * `name` comes from the LLM, so it is not trusted to be a string: numbers are
+ * stringified, and anything blank or non-string falls back to the element
+ * currently open (by atomic number).
  */
 export function getElementStoryToolResponse(
-  name: string | undefined,
+  name: unknown,
   currentAtomicNumber: number | null,
 ): string {
-  const requested = name?.trim() ?? '';
+  const requested =
+    typeof name === 'string' ? name.trim()
+    : typeof name === 'number' && Number.isFinite(name) ? String(name)
+    : '';
   const element = requested
-    ? getElementBySymbol(requested) ?? elements.find((el) => el.name.toLowerCase() === requested.toLowerCase())
+    ? resolveElement(requested)
     : elements.find((el) => el.atomicNumber === currentAtomicNumber);
   const story = element ? storiesByAtomicNumber.get(element.atomicNumber) : undefined;
   if (story) return story.story;
