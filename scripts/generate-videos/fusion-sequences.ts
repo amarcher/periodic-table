@@ -36,7 +36,9 @@ export interface FusionSpec {
 export const FUSION: Record<number, FusionSpec> = {
   101: { beam: 'helium', beamColor: 'pale green', target: 'einsteinium', targetColor: 'fierce blue-white',
     neutrons: 1, productColor: 'deep violet',
-    ending: 'the violet nucleus fades almost as soon as it forms, then another appears beside it, then another — seventeen in all, each winking into existence and out again like fireflies, the first element ever built one single atom at a time' },
+    // Don't enumerate a count here — "seventeen in all" made the model lay out a
+    // regular tiled grid of identical atoms instead of showing them one at a time.
+    ending: 'the violet nucleus fades almost as soon as it forms, and in the empty darkness where it was a second one flickers into being and dies, then a third somewhere else entirely — lone points of violet light appearing and vanishing one at a time, scattered and irregular like fireflies over dark water' },
   102: { beam: 'neon', beamColor: 'orange-pink', target: 'uranium', targetColor: 'dull green-grey',
     neutrons: 6, productColor: 'warm amber-gold',
     ending: 'the amber nucleus holds steady far longer than it should, calm and unhurried, before finally ejecting an alpha particle and fading' },
@@ -98,11 +100,11 @@ const DROPLET = (n: number) =>
 /** Clip A — inspiral, contact, coalescence, wobble, neutron evaporation. */
 export function clipAVideo(s: FusionSpec): string {
   return (
-    `Extreme close-up against pure black: two glowing molten nuclei — ${a(s.beamColor)} ${s.beam} drop and a larger ${s.targetColor} ${s.target} drop — ` +
-    `whirl around each other in a tight binary orbit, already fast and accelerating hard, the orbit tightening turn after turn. ` +
+    `Extreme close-up against pure black: two glowing molten nuclei — ${a(s.beamColor)} ${s.beam} nucleus and a larger ${s.targetColor} ${s.target} nucleus — ` +
+    `both rounded spheres of molten light, whirl around each other in a tight binary orbit, already fast and accelerating hard, the orbit tightening turn after turn. ` +
     `They sweep around one another again and again at a dizzying, sickening pace, each revolution faster and closer than the last, ` +
     `smearing into motion-blurred arcs, luminous spiral trails winding inward behind them like an inspiralling binary. ` +
-    `The whirl becomes almost too fast to follow — then the two drops slam together and flatten against each other, a searing white seam blazing along the contact face. ` +
+    `The whirl becomes almost too fast to follow — then the two molten spheres slam together and flatten against each other, a searing white seam blazing along the contact face. ` +
     `Surface tension takes over: a thick molten neck draws between them and they flow into one another, their colours bleeding together as the two liquids mix. ` +
     `The merged body stretches into a long peanut shape, pinched hard at the waist, wobbling and shuddering violently on the brink of tearing back into two. ` +
     `At the peak of that wobble ${DROPLET(s.neutrons)} into the darkness. ` +
@@ -114,7 +116,7 @@ export function clipAVideo(s: FusionSpec): string {
 export function clipAStart(s: FusionSpec): string {
   return (
     `Extreme close-up against pure black: two glowing molten nuclei locked in a tight, extremely fast binary orbit around a shared centre — ` +
-    `a ${s.beamColor} ${s.beam} drop and a larger ${s.targetColor} ${s.target} drop, already very close together, caught mid-whirl. ` +
+    `a ${s.beamColor} ${s.beam} nucleus and a larger ${s.targetColor} ${s.target} nucleus, both rounded spheres of molten light, already very close together, caught mid-whirl. ` +
     `Both are smeared into motion-blurred crescent arcs by their speed, with long luminous spiral trails winding inward behind them, ` +
     `the whole frame conveying violent rotational velocity. They are circling, not yet touching.`
   );
