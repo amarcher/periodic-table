@@ -207,7 +207,7 @@ behaving exactly like osmium's heavier twin.
 
 **109 · Meitnerium (Mt)** — GSI, **29 Aug 1982**: ²⁰⁹Bi + ⁵⁸Fe → ²⁶⁶Mt + n. **One single atom.**
 Confirmed at Dubna three years later. Mt-278 half-life **4.5 s**.
-*Story beat:* Lise Meitner co-discovered protactinium and co-discovered nuclear fission, and
+*Story beat:* Lise Meitner helped discover protactinium-231 and co-discovered nuclear fission, and
 was passed over for the Nobel. Hers is **the only element named specifically after a
 non-mythological woman.** *Visual:* one atom, one woman, one long overdue correction.
 
@@ -244,7 +244,7 @@ volatile than mercury**, with noble-gas-like behavior — possibly **the first g
 **114 · Flerovium (Fl)** — JINR Dubna
 - Dec 1998: ²⁴⁴Pu + ⁴⁸Ca gave a single atom that lasted about 30 s; first labelled Fl-289,
   later reassigned. 1999: more atoms from ²⁴²Pu (Fl-287) and another ²⁴⁴Pu run. IUPAC credited
-  the discovery to the team's later experiments (2004). Fl-289 half-life **~1.9 s**
+  the discovery to the team's 2004 experiments. Fl-289 half-life **~1.9 s**
 - **Story beat:** **the island of stability.** Fl-298 (Z=114, N=184) is predicted doubly magic —
   a superheavy that might last far longer than anything yet made. Nobody has reached it.
 - **Visual:** chemistry experiments in 2007–08 found it unexpectedly volatile for group 14;

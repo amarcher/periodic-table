@@ -221,7 +221,7 @@ export const elementStories: ElementStory[] = [
     story:
       'Meitnerium was made at GSI on August 29, 1982, by hitting bismuth-209 with iron-58, which made meitnerium-266 and one neutron. ' +
       'Just one single atom! It was confirmed at Dubna three years later. Meitnerium-278 has a half-life of 4.5 seconds. ' +
-      'It is named for Lise Meitner, who co-discovered protactinium and co-discovered nuclear fission, and was passed over for the Nobel. ' +
+      'It is named for Lise Meitner, who helped discover protactinium-231 and co-discovered nuclear fission, and was passed over for the Nobel. ' +
       'Hers is the only element named specifically after a woman who was not from mythology. ' +
       GSI_WORKSHOP + ' ' + FUSION_PREMISE,
   },
@@ -242,7 +242,7 @@ export const elementStories: ElementStory[] = [
       'Roentgenium was made at GSI on December 8, 1994, by hitting bismuth-209 with nickel-64, which made roentgenium-272 and one neutron. ' +
       'They saw three nuclei, and three more when the experiment was repeated in 2002. ' +
       'Roentgenium-282 has a half-life of 100 seconds. ' +
-      'It is named for Wilhelm Röntgen, the man who discovered X-rays. Like him, scientists can only "see" this element through the radiation it gives off. ' +
+      'It is named for Wilhelm Röntgen, the man who discovered X-rays. Fittingly, nobody can see this element directly. Scientists only detect the radiation it gives off.' +
       GSI_WORKSHOP + ' ' + FUSION_PREMISE,
   },
   {
@@ -260,14 +260,14 @@ export const elementStories: ElementStory[] = [
     atomicNumber: 113,
     symbol: 'Nh',
     story:
-      'Nihonium was made at RIKEN in Japan, by a team led by Kosuke Morita, by hitting bismuth-209 with zinc-70, which made nihonium-278 and one neutron. ' +
+      'Nihonium was made at RIKEN in Japan by a team led by Kosuke Morita. They hit bismuth-209 with zinc-70, which made nihonium-278 and one neutron. ' +
       'It is the ultimate patience story: three atoms in nine years. ' +
       'The bombardment started in September 2003. The first atom came in July 2004, the second in April 2005, ' +
       'and the decisive third in August 2012, after 450 more days of irradiation. ' +
       'Each atom left a decay chain. Nihonium-278 became roentgenium-274, then meitnerium-270, then bohrium-266, then dubnium-262. ' +
       'For the first two atoms, dubnium-262 split apart by fission. ' +
       'But in the decisive 2012 atom the chain kept going: dubnium-262 gave off an alpha particle to become lawrencium-258, then another to become mendelevium-254. That is six alpha decays in a row! ' +
-      'Unlike its neighbors from 114 to 118, nihonium was made by cold fusion, not with a calcium-48 beam. ' +
+      'It was made the same way as elements 107 to 112, with a zinc beam, not a calcium-48 beam. ' +
       'Nihonium-286 has a half-life of about 10 seconds. ' +
       'RIKEN\'s claim was recognized in 2015, making nihonium the first element discovered in Asia. ' +
       FUSION_PREMISE,
@@ -277,9 +277,9 @@ export const elementStories: ElementStory[] = [
     symbol: 'Fl',
     story:
       'Flerovium was made at JINR in Dubna. In December 1998 they fired calcium-48 at plutonium-244 and saw a single atom that lasted about 30 seconds. ' +
-      'It was first labelled flerovium-289, and that was later reassigned. ' +
-      'In 1999 more atoms came from plutonium-242, which made flerovium-287, and from another plutonium-244 run. ' +
-      'IUPAC credited the discovery to the team\'s later experiments, in 2004. ' +
+      'At first scientists thought it was flerovium-289, but they later decided it was something else. ' +
+      'In 1999 more atoms came from plutonium-242, which made flerovium-287, and from another try with plutonium-244. ' +
+      'IUPAC gave credit for the discovery to experiments the team did later, in 2004. ' +
       'Flerovium-289 has a half-life of about 1.9 seconds. ' +
       'Flerovium is tied to the island of stability. Flerovium-298, with 114 protons and 184 neutrons, is predicted to be doubly magic: ' +
       'a superheavy that might last far longer than anything made so far. Nobody has reached it yet. ' +
