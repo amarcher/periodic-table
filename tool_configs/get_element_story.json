@@ -1,0 +1,21 @@
+{
+    "name": "get_element_story",
+    "description": "Get the verified story of how an element was discovered, made, or named. ALWAYS call this before answering when the child asks how protactinium (91) or any element from americium (95) to oganesson (118) was discovered, made, or named, or asks for its story. ALWAYS pass name when the child named the element or when you just navigated to it with navigate_to_element (the screen may not have updated yet). Leave name empty only when the child says 'this one' or 'it' about the element already on screen. Retell the returned facts in a kid-friendly way instead of answering from memory.",
+    "type": "client",
+    "expects_response": true,
+    "response_timeout_secs": 30,
+    "parameters": {
+        "type": "object",
+        "description": "Parameters for the client tool",
+        "properties": {
+            "name": {
+                "type": "string",
+                "description": "Optional element name (e.g. 'Tennessine') or symbol (e.g. 'Ts'). Pass it whenever the child named the element or you just navigated to it. Leave empty only for 'this one' or 'it' about the element already on screen."
+            }
+        },
+        "required": []
+    },
+    "dynamic_variables": {
+        "dynamic_variable_placeholders": {}
+    }
+}

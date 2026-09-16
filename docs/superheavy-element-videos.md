@@ -33,7 +33,7 @@ technique changes roughly in atomic-number order — so clicking across becomes 
 | 3. Bomb debris | Es, Fm (99–100) | Thermonuclear test fallout | 1952 Pacific, filter planes, coral |
 | 4. Light-ion fusion | Md–Sg (101–106) | Cyclotron, alpha/boron/carbon beams | One atom at a time; Cold War naming wars |
 | 5. Cold fusion | Bh–Cn (107–112) | Pb/Bi targets, medium beams, 1n out | GSI Darmstadt, the SHIP separator |
-| 6. Hot fusion | Nh–Og (113–118) | Ca-48 onto actinide targets, 3–4n out | Dubna and RIKEN; the rarest targets on Earth |
+| 6. Hot fusion | Fl–Og (114–118), plus Nh (113) by date | Ca-48 onto actinide targets, 3–4n out (except Nh: cold fusion, Bi-209 + Zn-70, 1n out) | Dubna and RIKEN; the rarest targets on Earth |
 
 ## The four axes that vary every single time
 
@@ -58,8 +58,10 @@ shows how we know the thing existed — without faking footage of a single atom.
 
 **91 · Protactinium (Pa)** — *not synthetic at all*
 - Natural, in uraninite at 0.3–3 ppm; Pa-231 forms from U-235 decay
-- Discovered 1917–18 independently by Lise Meitner & Otto Hahn (Germany) and
-  Frederick Soddy & John Cranston (UK); IUPAC confirmed 1949
+- First identified 1913 by Kasimir Fajans & Oswald Göhring, as a short-lived form they called
+  "brevium". Its long-lived form (Pa-231) was found 1917–18 independently by Lise Meitner &
+  Otto Hahn (Germany) and Frederick Soddy & John Cranston (UK); the name protactinium was made
+  official in 1949
 - Pa-231 half-life **32,760 years**
 - **Story beat:** in 1961 the UK Atomic Energy Authority processed **60 tonnes of waste**
   through a 12-stage plant to extract **127 g** of 99.9% pure Pa-231, at about **$500,000**.
@@ -70,7 +72,9 @@ shows how we know the thing existed — without faking footage of a single atom.
 ### Era 2 — Reactor breeding (weighable, and some of it is in your house)
 
 **95 · Americium (Am)**
-- Seaborg's team, Berkeley 1944, 60-inch cyclotron, neutron bombardment of plutonium
+- First identified late 1944 at the Metallurgical Laboratory, University of Chicago, by Glenn
+  Seaborg, Ralph James, Leon Morgan, and Albert Ghiorso: plutonium bombarded with neutrons in a
+  nuclear reactor
 - Produced today as Pu-239 + 2n → Pu-241 → β⁻ → Am-241; ~100 g per tonne of spent fuel
 - Am-241 half-life **432 years**, decaying to Np-237
 - **Story beat:** kept secret through the Manhattan Project, then announced publicly in
@@ -157,7 +161,8 @@ shows how we know the thing existed — without faking footage of a single atom.
 - **Visual:** the periodic table itself rearranging — the one element whose *address* is contested.
 
 **104 · Rutherfordium (Rf)**
-- Dubna 1966–69: Pu-242 + Ne-22. Berkeley 1969: ²⁴⁹Cf + ¹²C → ²⁵⁷Rf + 4n
+- Dubna claimed element 104 in 1964, but that early claim didn't hold up. Dubna kept working
+  1966–69: Pu-242 + Ne-22. Berkeley 1969: ²⁴⁹Cf + ¹²C → ²⁵⁷Rf + 4n
 - Rf-267 half-life **~48 min**
 - **Story beat:** opening shot of the **Transfermium Wars**. Soviets proposed *kurchatovium* (Ku),
   Americans *rutherfordium* (Rf). The 1992 working group credited both teams; IUPAC settled on
@@ -183,8 +188,9 @@ shows how we know the thing existed — without faking footage of a single atom.
 ### Era 5 — Cold fusion at GSI Darmstadt
 
 All six use a lead or bismuth target and evaporate exactly **one** neutron. Same building,
-same separator (SHIP), same two scientists — Peter Armbruster and Gottfried Münzenberg —
-across fifteen years. Lean into the repetition here; it's a *workshop*, and each element is
+same separator (SHIP), across fifteen years. Peter Armbruster and Gottfried Münzenberg led the
+discoveries of 107–109; Sigurd Hofmann led the team that found 110–112, with Armbruster and
+Münzenberg still on it. Lean into the repetition here; it's a *workshop*, and each element is
 one more impossible thing made in it.
 
 **107 · Bohrium (Bh)** — GSI 1981: ²⁰⁹Bi + ⁵⁴Cr → ²⁶²Bh + n. **Five atoms.**
@@ -201,7 +207,7 @@ behaving exactly like osmium's heavier twin.
 
 **109 · Meitnerium (Mt)** — GSI, **29 Aug 1982**: ²⁰⁹Bi + ⁵⁸Fe → ²⁶⁶Mt + n. **One single atom.**
 Confirmed at Dubna three years later. Mt-278 half-life **4.5 s**.
-*Story beat:* Lise Meitner co-discovered protactinium and co-discovered nuclear fission, and
+*Story beat:* Lise Meitner helped discover protactinium-231 and co-discovered nuclear fission, and
 was passed over for the Nobel. Hers is **the only element named specifically after a
 non-mythological woman.** *Visual:* one atom, one woman, one long overdue correction.
 
@@ -223,24 +229,29 @@ volatile than mercury**, with noble-gas-like behavior — possibly **the first g
 
 ### Era 6 — Hot fusion: calcium-48 and the rarest targets on Earth
 
-**113 · Nihonium (Nh)** — RIKEN, Japan (Kōsuke Morita): ²⁰⁹Bi + ⁷⁰Zn → ²⁷⁸Nh + n
+**113 · Nihonium (Nh)** — RIKEN, Japan (team led by Kōsuke Morita): ²⁰⁹Bi + ⁷⁰Zn → ²⁷⁸Nh + n
+- **Method note:** listed in this era for chronology, but nihonium was made by **cold fusion**
+  (bismuth-209 + zinc-70, one neutron out), not calcium-48 hot fusion
 - **Three atoms in nine years.** Bombardment began Sept 2003; first atom July 2004; second
   April 2005; the decisive third in **August 2012 after 450 more days of irradiation**
-- Decay chain (fully observed, four alphas): **²⁷⁸Nh → ²⁷⁴Rg → ²⁷⁰Mt → ²⁶⁶Bh → spontaneous
-  fission of ²⁶²Db**
+- Decay chain: **²⁷⁸Nh → ²⁷⁴Rg → ²⁷⁰Mt → ²⁶⁶Bh → ²⁶²Db**. In the first two atoms ²⁶²Db
+  underwent spontaneous fission; in the decisive 2012 atom it alpha-decayed instead,
+  **→ ²⁵⁸Lr → ²⁵⁴Md** (six alphas in a row)
 - Nh-286 half-life **~10 s**. Priority recognized 2015 — first element discovered in Asia
 - **Visual:** the purest "patience" story on the table. Nine years of a machine running for
   three events. This decay chain is fully characterized — use it as the reference animation.
 
-**114 · Flerovium (Fl)** — JINR Dubna, June 1999: ²⁴⁴Pu + ⁴⁸Ca → ²⁹⁰Fl + 2n
-- First signal Dec 1998: a single atom alpha-decaying after 30.4 s. Fl-289 half-life **~1.9 s**
+**114 · Flerovium (Fl)** — JINR Dubna
+- Dec 1998: ²⁴⁴Pu + ⁴⁸Ca gave a single atom that lasted about 30 s; first labelled Fl-289,
+  later reassigned. 1999: more atoms from ²⁴²Pu (Fl-287) and another ²⁴⁴Pu run. IUPAC credited
+  the discovery to the team's 2004 experiments. Fl-289 half-life **~1.9 s**
 - **Story beat:** **the island of stability.** Fl-298 (Z=114, N=184) is predicted doubly magic —
   a superheavy that might last far longer than anything yet made. Nobody has reached it.
 - **Visual:** chemistry experiments in 2007–08 found it unexpectedly volatile for group 14;
   it sticks to gold the way copernicium does, and may be a gas.
 
 **115 · Moscovium (Mc)** — JINR + LLNL, Aug 2003: ²⁴³Am + ⁴⁸Ca → ²⁸⁸Mc + 3n (and ²⁸⁷Mc + 4n)
-- Alpha-decays to **nihonium** in about 100 ms; chain terminates at Db-268
+- Mc-288 alpha-decays to **nihonium** with a half-life of about 190 ms
 - Mc-290 half-life **650 ms**. Named for Moscow Oblast
 - **Visual:** the handoff — this is where element 113 comes from when you make it the other way.
   Show the chain running *down* into a neighbor the viewer just visited.
@@ -265,7 +276,7 @@ volatile than mercury**, with noble-gas-like behavior — possibly **the first g
   customs, decaying.
 
 **118 · Oganesson (Og)** — JINR + LLNL: ²⁴⁹Cf + ⁴⁸Ca → ²⁹⁴Og + 3n
-- 2002 (announced 2006); **three to four nuclei, ever**. Og-294 half-life **0.7 ms**
+- 2002 (announced 2006); **only about five atoms have ever been detected**. Og-294 half-life **0.7 ms**
 - Decay chain: **²⁹⁴Og → ²⁹⁰Lv → ²⁸⁶Fl → ²⁸²Cn (spontaneous fission)**
 - **Story beat:** named for **Yuri Oganessian, who was alive and on the call.** In a March 2016
   conference call among the discoverers of 115–118, they waited for Oganessian to leave the
@@ -280,7 +291,8 @@ volatile than mercury**, with noble-gas-like behavior — possibly **the first g
 
 Two chains are fully characterized in the sources checked and are ready to animate as-is:
 
-- **Nh-278:** 4 alphas → ²⁷⁴Rg → ²⁷⁰Mt → ²⁶⁶Bh → SF of ²⁶²Db
+- **Nh-278:** 4 alphas → ²⁷⁴Rg → ²⁷⁰Mt → ²⁶⁶Bh → ²⁶²Db, then SF of ²⁶²Db (first two atoms), or
+  2 more alphas → ²⁵⁸Lr → ²⁵⁴Md (the 2012 atom, 6 alphas total)
 - **Og-294:** 3 alphas → ²⁹⁰Lv → ²⁸⁶Fl → SF of ²⁸²Cn
 
 The rest need per-step alpha energies and per-step half-lives pulled from NUBASE2020 or the
@@ -296,6 +308,7 @@ the IAEA nuclear data service was returning 502s during this pass. See Sourcing 
   date ranges but carries **no** reaction or decay data.
 - GSI's public "New Elements" page confirms which elements it discovered and when, but likewise
   carries no beam/target detail.
+- **Corrected 2026-09-16:** Pa discovery (Fajans & Göhring 1913; 1949 was the name, not the discovery); Am discovery (Chicago Met Lab, reactor, not Berkeley cyclotron); Rf 1964 Dubna claim; GSI team leads (Hofmann for 110–112); Nh cold-fusion method, Morita as team lead, and 2012 decay chain to Md-254; Fl discovery timeline; Mc-288 decay half-life (~190 ms, dropped Db-268 endpoint); Og atom count (~5).
 
 **Not yet verified against primary sources:** per-step alpha energies and per-step half-lives
 for the decay chains, and the handful of half-lives flagged "unconfirmed" above

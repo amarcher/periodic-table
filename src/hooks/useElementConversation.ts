@@ -3,6 +3,7 @@ import { useConversation } from '@elevenlabs/react';
 import type { Element } from '../types/element';
 import { categoryLabels } from '../utils/colors';
 import { elements } from '../data/elements';
+import { getElementStoryToolResponse } from '../data/elementStories';
 import { getVideoEntry } from '../data/videoManifest';
 import { getRadioactivity } from '../utils/elementDerived';
 import { getReactivity } from '../utils/elementDerived';
@@ -142,6 +143,9 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
         if (!match) return `No element found matching "${params.name}"`;
         onNavigate(match);
         return `Navigated to ${match.name}`;
+      },
+      get_element_story: (params: { name?: unknown }) => {
+        return getElementStoryToolResponse(params?.name, currentElementRef.current);
       },
       go_back_to_table: () => {
         currentElementRef.current = null;
