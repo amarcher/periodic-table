@@ -39,4 +39,17 @@ describe('searchable pages', () => {
     expect(home.match(/href="\/element\//g)).toHaveLength(118);
     expect(home).not.toContain('<div id="root"></div>');
   });
+
+  it('emits single-line media URLs even when the configured CDN has stray whitespace', () => {
+    // Reproduces production: VITE_VIDEO_CDN_URL carried a trailing newline, and
+    // seo.ts stripped only a trailing slash, so every og:image and og:video URL
+    // was split across two lines and rejected by crawlers.
+    const gold = elements.find(e => e.symbol === 'Au')!;
+    const html = renderStaticPage(template, gold, 'https://cdn.example.test/\n');
+    expect(html).toContain('content="https://cdn.example.test/079-Au-veo31fast.jpg"');
+    expect(html).toContain('content="https://cdn.example.test/079-Au-veo31fast.mp4"');
+    // No content attribute may run to end-of-line with its value unterminated.
+    expect(html).not.toMatch(/content="[^"]*\n/);
+    expect(pageMetadata(gold, 'https://cdn.example.test/\n').image).not.toMatch(/\s/);
+  });
 });

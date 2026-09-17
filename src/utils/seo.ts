@@ -32,7 +32,13 @@ export function elementDescription(element: Element, hasVideo: boolean): string 
 export function pageMetadata(element?: Element | null, cdn = DEFAULT_VIDEO_CDN) {
   const video = element ? VIDEO_DATA[element.atomicNumber] : undefined;
   // Relative development media paths are never used in public metadata.
-  const base = /^https:\/\//.test(cdn) ? cdn.replace(/\/$/, '') : DEFAULT_VIDEO_CDN;
+  // Trim first: the configured CDN value has carried a trailing newline, and
+  // stripping only a trailing slash left it in, so every og:image and og:video
+  // URL was emitted broken across two lines and rejected by crawlers.
+  const configured = cdn.trim();
+  const base = /^https:\/\//.test(configured)
+    ? configured.replace(/\/+$/, '')
+    : DEFAULT_VIDEO_CDN;
   return {
     title: element ? elementTitle(element) : SITE_TITLE,
     description: element ? elementDescription(element, Boolean(video)) : SITE_DESCRIPTION,
