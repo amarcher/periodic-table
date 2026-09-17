@@ -1,6 +1,6 @@
 # The Periodic Table
 
-An interactive, visually stunning periodic table web app designed to make science fun and accessible for kids. Click any element to see it expand into a detailed card with properties, electron configurations, and kid-friendly fun facts.
+An interactive, visually stunning periodic table web app designed to make science fun and accessible for everyone. Click any element to see it expand into a detailed card with properties, electron configurations, and kid-friendly fun facts.
 
 ![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
@@ -12,8 +12,8 @@ An interactive, visually stunning periodic table web app designed to make scienc
 - **Hero animation** — clicking an element smoothly expands it from its grid position into a centered detail card using View Transitions with clip-path
 - **Glass-morphism design** — dark theme with luminous, category-colored element cells
 - **10 category colors** — alkali metals, noble gases, transition metals, lanthanides, and more each have a distinct hue
-- **Kid-friendly fun facts** — 3–4 engaging facts per element
-- **Voice agent** — ElevenLabs-powered voice buddy that talks to kids about elements, navigates the app by voice, and responds to questions
+- **Fun facts** — 3–4 engaging facts per element
+- **Voice agent** — ElevenLabs-powered voice guide that talks about elements, navigates the app by voice, and responds to questions
 - **Keyboard accessible** — focus-trapped modal with Escape to close, focus restoration to originating cell
 - **Responsive** — works on desktop and mobile
 
@@ -43,7 +43,7 @@ npm run preview
 
 ## Voice Agent
 
-The app includes an ElevenLabs conversational AI voice agent that acts as a "science buddy" for kids. It can:
+The app includes an ElevenLabs conversational AI voice agent that acts as a "science buddy". It can:
 
 - Talk about whichever element is currently open
 - Navigate to elements by voice ("show me gold", "what about Ca?")

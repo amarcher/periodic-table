@@ -22,7 +22,7 @@ body {
   color: #e8e8f0;
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
-  /* Touch-first kids' app: a long-press must not select the UI chrome
+  /* Touch-first app: a long-press must not select the UI chrome
      (iOS shows a Copy/Search callout over the whole screen). Prose
      islands below re-enable selection. */
   user-select: none;
@@ -31,7 +31,7 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Real prose stays selectable for parents/older kids */
+/* Real prose stays selectable for readers */
 .detail__fact-text,
 .detail__meta,
 .element-video__caption,

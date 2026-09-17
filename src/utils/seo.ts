@@ -1,9 +1,10 @@
 import type { Element } from '../types/element';
 import { VIDEO_DATA } from '../data/videoData';
+import { categoryLabels } from './colors';
 
 export const SITE_ORIGIN = 'https://periodictable.tech';
-export const SITE_TITLE = 'Periodic Table — Interactive Element Explorer for Kids';
-export const SITE_DESCRIPTION = 'Explore all 118 elements with an AI voice guide. Discover properties, categories, and fun facts in an interactive periodic table built for curious kids.';
+export const SITE_TITLE = 'Interactive Periodic Table: Element Facts, Videos & 3D Atoms';
+export const SITE_DESCRIPTION = 'Explore all 118 elements with facts, properties, electron configurations, videos, and 3D atom models, plus an optional AI voice guide. Free, no sign-up.';
 export const DEFAULT_VIDEO_CDN = 'https://pub-31265833619c4b07a0d5cae75480e369.r2.dev';
 
 export function escapeHtml(value: string): string {
@@ -11,13 +12,30 @@ export function escapeHtml(value: string): string {
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
+// Search result snippets are cut off around 160 characters, so optional clauses are only added while they fit.
+const DESCRIPTION_LIMIT = 160;
+
+export function elementTitle(element: Element): string {
+  return `${element.name} (${element.symbol}): Facts & Properties of Element ${element.atomicNumber}`;
+}
+
+export function elementDescription(element: Element, hasVideo: boolean): string {
+  const category = categoryLabels[element.category].toLowerCase();
+  const clauses = [
+    ` Atomic number ${element.atomicNumber}, ${/^[aeiou]/.test(category) ? 'an' : 'a'} ${category}.`,
+    hasVideo ? ' See it in a video and a 3D atom model.' : ' Explore its 3D atom model.',
+  ];
+  return clauses.reduce((text, clause) =>
+    text.length + clause.length <= DESCRIPTION_LIMIT ? text + clause : text, element.summary);
+}
+
 export function pageMetadata(element?: Element | null, cdn = DEFAULT_VIDEO_CDN) {
   const video = element ? VIDEO_DATA[element.atomicNumber] : undefined;
   // Relative development media paths are never used in public metadata.
   const base = /^https:\/\//.test(cdn) ? cdn.replace(/\/$/, '') : DEFAULT_VIDEO_CDN;
   return {
-    title: element ? `${element.name} (${element.symbol}) — Periodic Table` : SITE_TITLE,
-    description: element ? element.summary : SITE_DESCRIPTION,
+    title: element ? elementTitle(element) : SITE_TITLE,
+    description: element ? elementDescription(element, Boolean(video)) : SITE_DESCRIPTION,
     url: `${SITE_ORIGIN}${element ? `/element/${element.symbol}` : '/'}`,
     image: video ? `${base}/${video.filename.replace(/\.mp4$/i, '.jpg')}` : `${SITE_ORIGIN}/og-image.png`,
     video: video ? `${base}/${video.filename}` : null,

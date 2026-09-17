@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Interactive periodic table web app for kids. Vite + React + TypeScript + Framer Motion. Dark theme with glass-morphism design.
+Interactive periodic table web app for general science education (students, teachers, curious people of any age). Vite + React + TypeScript + Framer Motion. Dark theme with glass-morphism design.
 
 ## Commands
 
@@ -47,7 +47,8 @@ Interactive periodic table web app for kids. Vite + React + TypeScript + Framer 
 - **Route shape**: `/element/:symbol` is deep-linkable. A browser visit hydrates the SPA; a social-crawler visit is rewritten to `/api/element-og` via a `has: user-agent` rule in `vercel.json` and returned as a static per-element HTML doc.
 - **Serverless function**: `api/element-og.ts` reads the symbol from the URL path (or `?symbol=` query param for `vercel dev`, which ignores `has` rewrites), looks up the element via `getElementBySymbol`, and returns title/description plus `og:image` (the R2 video poster, falling back to `/og-image.png`) and `og:video` tags when a video exists.
 - **Crawler UA list**: Facebook, Twitter, WhatsApp, Slack, LinkedIn, Discord, Telegram, **Applebot + AppleNewsBot** (iMessage), Pinterest, Reddit, Skype. If you add another crawler, update `vercel.json` only — there is no secondary UA check inside the handler, so there's nothing to keep in sync.
-- **Sitemap**: `scripts/generate-sitemap.mjs` rewrites `public/sitemap.xml` with 119 entries (homepage + 118 elements). Runs automatically via `npm run build`. After deploy, resubmit `https://www.periodictable.tech/sitemap.xml` in Google Search Console.
+- **Sitemap**: `scripts/generate-sitemap.mjs` rewrites `public/sitemap.xml` with 119 entries (homepage + 118 elements). Runs automatically via `npm run build`. After deploy, resubmit `https://periodictable.tech/sitemap.xml` in Google Search Console.
+- **IndexNow (Bing)**: Bing sends more search visitors than Google here. After a production deploy that changes page content or metadata, run `npm run indexnow` (all sitemap URLs) or `npm run indexnow -- /element/Au` (specific paths). The key lives in `public/<32-hex>.txt` and must be live before pinging; the script checks. Google ignores IndexNow.
 - **Thumbnails**: 88 of 118 elements have videos. Run `npx tsx scripts/r2-upload/thumbnails.ts --all` with R2 creds in `.env` to generate first-frame JPGs locally and upload them to R2 alongside the MP4s. Elements without videos fall back to the homepage OG image.
 - **Env var for the OG handler**: set `VIDEO_CDN_URL` in Vercel to the R2 public URL (`https://pub-31265833619c4b07a0d5cae75480e369.r2.dev`). A safe default is baked in so the function still works if the env var is unset.
 

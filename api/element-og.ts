@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getElementBySymbol } from '../src/data/elements.js';
 import { VIDEO_DATA } from '../src/data/videoData.js';
+import { elementTitle } from '../src/utils/seo.js';
 
 const SITE_ORIGIN = 'https://periodictable.tech';
 const DEFAULT_VIDEO_CDN = 'https://pub-31265833619c4b07a0d5cae75480e369.r2.dev';
@@ -47,7 +48,7 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const canonicalUrl = `${SITE_ORIGIN}/element/${element.symbol}`;
-  const title = `${element.name} (${element.symbol}) — Periodic Table`;
+  const title = elementTitle(element);
   const description = truncate(element.summary, 200);
 
   const video = VIDEO_DATA[element.atomicNumber];

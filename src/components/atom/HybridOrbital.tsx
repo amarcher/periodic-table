@@ -16,7 +16,7 @@ const LATHE_PROFILE_SAMPLES = 32;
 /**
  * A single hybrid-orbital lobe (sp/sp²/sp³) rendered as a LatheGeometry teardrop.
  * The lobe axis determines lobe direction (unit vector in world space). Electrons
- * bob along the lobe's long axis — a kid-friendly density cue that avoids the
+ * bob along the lobe's long axis — an intuitive density cue that avoids the
  * awkward figure-8 cusp of textbook p-orbital dumbbells while still reading as
  * "these electrons live along this axis."
  */
