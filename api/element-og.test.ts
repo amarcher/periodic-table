@@ -47,8 +47,8 @@ describe('api/element-og', () => {
     const res = call({ url: '/element/Au' });
     expect(res._status).toBe(200);
     expect(res._headers['Content-Type']).toContain('text/html');
-    expect(res._body).toContain('<title>Gold (Au) — Periodic Table</title>');
-    expect(res._body).toContain('property="og:title" content="Gold (Au) — Periodic Table"');
+    expect(res._body).toContain('<title>Gold (Au): Facts &amp; Properties of Element 79</title>');
+    expect(res._body).toContain('property="og:title" content="Gold (Au): Facts &amp; Properties of Element 79"');
     expect(res._body).toContain(
       'property="og:url" content="https://periodictable.tech/element/Au"'
     );

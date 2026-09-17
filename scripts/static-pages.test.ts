@@ -23,6 +23,15 @@ describe('searchable pages', () => {
     }
     expect(titles.size).toBe(118);
   });
+  it('keeps search titles and descriptions within snippet length and general-audience', () => {
+    for (const element of elements) {
+      const { title, description } = pageMetadata(element);
+      expect(title.length).toBeLessThanOrEqual(60);
+      expect(description.length).toBeLessThanOrEqual(160);
+      expect(description.startsWith(element.summary)).toBe(true);
+    }
+    expect(renderStaticPage(template)).not.toMatch(/\bkids?\b/i);
+  });
   it('preserves authored video sharing and has a complete homepage without JavaScript', () => {
     const gold = elements.find(e => e.symbol === 'Au')!;
     expect(renderStaticPage(template, gold, 'https://cdn.example.test')).toContain('https://cdn.example.test/079-Au-veo31fast.mp4');
