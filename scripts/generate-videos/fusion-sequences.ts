@@ -133,19 +133,32 @@ export function clipAEnd(s: FusionSpec): string {
 
 /** Clip B — the wobble damps, the new element settles, then decays. */
 export function clipBVideo(s: FusionSpec): string {
+  // Budget the 8s deliberately. The previous version spent six beats settling the
+  // nucleus, idled on a static sphere for ~3s, and left the element's own ending to
+  // the final frames — it read as the video stopping early. Settle fast, then give
+  // the ending the rest of the clip.
   return (
-    `Continuous shot, extreme close-up against pure black. A violently wobbling molten nucleus shaped like an elongated peanut, pinched hard at the waist, strains as if about to tear in two. ` +
-    `Instead the oscillation damps: the pinched waist thickens and fills in, the lobes draw together, and the body slowly rounds out, ` +
-    `surface waves shrinking with each pass as the molten liquid settles under its own surface tension. ` +
-    `It becomes a single rounded nucleus glowing steady ${s.productColor}, breathing gently — a newborn atom, finally whole. It holds for a beat, calm. ` +
-    `Then ${s.ending}. ` +
+    `Continuous shot, extreme close-up against pure black. Open on a wobbling molten nucleus pinched at the waist; ` +
+    `within the first second its oscillation damps and it rounds into a single nucleus glowing steady ${s.productColor}. ` +
+    `Do not hold on it — immediately, and for the entire remainder of the shot, ${s.ending}. ` +
+    `That final action is the subject of this clip and must play out slowly and completely across the whole second half, ` +
+    `unhurried and fully visible, never rushed into the last moment. No static holds, no pauses on a still nucleus. ` +
     `Liquid surface tension, viscous damping, slow-motion molten physics throughout.`
   );
 }
 
 export function clipBEnd(s: FusionSpec): string {
+  // The end frame is a DESTINATION, not a scene: Veo interpolates toward it and only
+  // arrives on the final frame. So this must be the state *after* the ending has
+  // finished, never the ending itself — otherwise the payoff gets a single frame.
+  //
+  // Known and accepted (Andrew, 2026-09-17): the model tends to resolve this into a
+  // solid sphere rather than the emptying-out frame described below. It reads slightly
+  // oddly on the loop, and it was reviewed and judged fine. Don't spend a regeneration
+  // pass "fixing" it without asking first.
   return (
-    `Extreme close-up against pure black: the aftermath of a newly formed ${s.productColor} nucleus as ${s.ending}. ` +
-    `Molten liquid surfaces, glowing against deep darkness, caught mid-motion rather than at rest.`
+    `Extreme close-up against pure black: the quiet aftermath, well after a ${s.productColor} nucleus has finished decaying. ` +
+    `Only faint scattered remnants remain — dim fading fragments and sparks drifting apart and away through the darkness, ` +
+    `losing their glow as they go. Mostly empty black space. The event is over and the frame is emptying out.`
   );
 }
