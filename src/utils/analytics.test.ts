@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-const posthog = vi.hoisted(() => ({ init: vi.fn(), capture: vi.fn() }));
+const posthog = vi.hoisted(() => ({ init: vi.fn(), capture: vi.fn(), register: vi.fn() }));
 vi.mock('posthog-js', () => ({ default: posthog }));
 const gtag = vi.fn();
 beforeEach(() => {
@@ -18,6 +18,13 @@ describe('independent analytics destinations', () => {
     analytics.trackPhaseDiagramUsed('H', 1);
     expect(gtag).toHaveBeenCalledWith('event', 'phase_diagram_used', { symbol: 'H', atomic_number: 1 });
     expect(posthog.init).not.toHaveBeenCalled();
+  });
+  it('trims a newline-terminated key and tags events with the app', async () => {
+    vi.stubEnv('VITE_POSTHOG_KEY', 'test-key\n');
+    const analytics = await import('./analytics');
+    analytics.initAnalytics();
+    expect(posthog.init).toHaveBeenCalledWith('test-key', expect.anything());
+    expect(posthog.register).toHaveBeenCalledWith({ app: 'periodic-table' });
   });
   it('keeps PostHog working when GA throws, and GA working when PostHog throws', async () => {
     vi.stubEnv('VITE_POSTHOG_KEY', 'test-key');
