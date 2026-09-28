@@ -35,13 +35,17 @@ export function trackDiagnostic(name: string, properties: EventProperties = {}) 
 export function initAnalytics() {
   if (listening) return;
   listening = true;
-  const key = import.meta.env.VITE_POSTHOG_KEY;
+  // Env values set through `vercel env add` via stdin can carry a trailing
+  // newline; an untrimmed key silently breaks every PostHog capture.
+  const key = (import.meta.env.VITE_POSTHOG_KEY as string | undefined)?.trim();
   if (key && enabled()) {
     try {
       posthog.init(key, {
-        api_host: import.meta.env.VITE_POSTHOG_HOST || 'https://us.i.posthog.com',
+        api_host: (import.meta.env.VITE_POSTHOG_HOST as string | undefined)?.trim() || 'https://us.i.posthog.com',
         autocapture: false, capture_pageview: true, persistence: 'localStorage',
       });
+      // Several apps share one PostHog project; tag every event with its app.
+      posthog.register({ app: 'periodic-table' });
       initialized = true;
     } catch { /* GA remains available if PostHog cannot initialize. */ }
   }
