@@ -38,7 +38,21 @@ function getDensityContext(density: number): string {
   return 'One of the densest things on Earth';
 }
 
-function buildElementContext(element: Element): string {
+/**
+ * The agent's own prompt addresses a young child who cannot read yet. Someone
+ * typing can read, so a typed session opens with this register instead.
+ */
+const TYPED_SESSION_NOTE = [
+  '[TYPED SESSION] This visitor is typing questions and reading your replies as text. Nothing is spoken aloud.',
+  'For this whole session, disregard the instruction that you are talking to a young child.',
+  'Write for a curious teenager or adult: accurate, plain and direct, usually two to four sentences.',
+  'Use correct scientific terms, with a brief explanation where one helps.',
+  'No exclamation marks, no interjections such as "Ooh" or "Wow", no pet names, and no closing question about what to explore next.',
+  'Do not describe what is on screen unless asked. You can still use your tools to navigate or change the atom view when asked.',
+].join(' ');
+
+function buildElementContext(element: Element, typed = false): string {
+  const who = typed ? 'visitor' : 'child';
   const video = getVideoEntry(element.atomicNumber);
   const { level: radioLevel } = getRadioactivity(element);
   const { label: reactLabel, description: reactDesc } = getReactivity(element);
@@ -48,12 +62,12 @@ function buildElementContext(element: Element): string {
     : element.boilingPoint != null && element.boilingPoint > 293 ? 'liquid' : 'gas';
 
   const parts = [
-    `[ELEMENT CLICK] The child just clicked on ${element.name} (symbol: ${element.symbol}, atomic number: ${element.atomicNumber}).`,
+    `[ELEMENT CLICK] The ${who} just opened ${element.name} (symbol: ${element.symbol}, atomic number: ${element.atomicNumber}).`,
     `It is a ${categoryLabels[element.category]}. Atomic mass: ${element.atomicMass.toFixed(2)} u.`,
     `Electron configuration: ${element.electronConfiguration}.`,
     `Appearance: ${element.appearance || 'unknown'}.`,
     '',
-    `[WHAT THE CHILD SEES ON SCREEN]`,
+    `[WHAT THE ${who.toUpperCase()} SEES ON SCREEN]`,
     `LEFT SIDE:`,
     `- An atom explorer for ${element.symbol}. It can show interactive 3D orbitals or a still summary. Ask which view they see before describing motion.`,
     `  You can control the atom view with these tools:`,
@@ -72,7 +86,7 @@ function buildElementContext(element: Element): string {
       `  At room temperature (20°C, 1 atm), ${element.name} is a ${roomPhase}.`,
       mpC != null ? `  Melting point: ${mpC}°C.` : '',
       bpC != null ? `  Boiling point: ${bpC}°C.` : '',
-      `  The child can drag sliders to change temperature and pressure and see the phase change.`,
+      `  The ${who} can drag sliders to change temperature and pressure and see the phase change.`,
     );
   }
 
@@ -82,7 +96,7 @@ function buildElementContext(element: Element): string {
   if (video) {
     parts.push(
       `- VIDEO (may be paused or showing a poster): "${video.description}"`,
-      `  IMPORTANT: Describe THIS specific video to the child, not what you think the element generally looks like. The video shows exactly what is described above.`,
+      `  IMPORTANT: Describe THIS specific video to the ${who}, not what you think the element generally looks like. The video shows exactly what is described above.`,
     );
   } else {
     parts.push(`- A photograph of ${element.name} from Wikipedia showing what it looks like.`);
@@ -119,7 +133,9 @@ function buildElementContext(element: Element): string {
   // Discovery
   parts.push('', `Discovered by ${element.discoveredBy} (${element.yearDiscovered}).`);
 
-  parts.push('', `Get excited about ${element.name} and tell the child about what they're seeing! Reference the visuals — the video, the phase diagram, the atomic model.`);
+  parts.push('', typed
+    ? `Wait for the visitor's question about ${element.name}; do not volunteer a description.`
+    : `Get excited about ${element.name} and tell the child about what they're seeing! Reference the visuals — the video, the phase diagram, the atomic model.`);
 
   return parts.filter(Boolean).join('\n');
 }
@@ -256,8 +272,9 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
         attempt.current.connected();
       }
       // Every new session starts without context, so describe the open element
+      if (textSession.current) conversation.sendContextualUpdate(TYPED_SESSION_NOTE);
       if (openElementRef.current) {
-        conversation.sendContextualUpdate(buildElementContext(openElementRef.current));
+        conversation.sendContextualUpdate(buildElementContext(openElementRef.current, textSession.current));
         currentElementRef.current = openElementRef.current.atomicNumber;
       }
       if (textSession.current) {
@@ -449,7 +466,7 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
     currentElementRef.current = element.atomicNumber;
 
     if (conversation.status === 'connected') {
-      const ctx = buildElementContext(element);
+      const ctx = buildElementContext(element, textSession.current);
       conversation.sendContextualUpdate(ctx);
     }
   }, [agentId, conversation]);
@@ -459,9 +476,10 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
     currentElementRef.current = null;
     openElementRef.current = null;
     if (!agentId || !hadElement || conversation.status !== 'connected') return;
-    conversation.sendContextualUpdate(
-      '[ELEMENT CLOSED] The child closed the element view and is back on the periodic table. ' +
-      'Encourage them to pick another element to explore!'
+    conversation.sendContextualUpdate(textSession.current
+      ? '[ELEMENT CLOSED] The visitor closed the element view and is back on the periodic table.'
+      : '[ELEMENT CLOSED] The child closed the element view and is back on the periodic table. ' +
+        'Encourage them to pick another element to explore!'
     );
   }, [agentId, conversation]);
 
