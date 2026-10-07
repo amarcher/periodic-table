@@ -132,7 +132,10 @@ function App() {
         cell?.classList.remove('vt-active');
       },
     );
-    if (cell) requestAnimationFrame(() => cell.focus());
+    if (cell) requestAnimationFrame(() => {
+      // A typed question can close the detail; leave focus in the question box
+      if (!document.activeElement?.closest('.voice-agent__ask')) cell.focus();
+    });
   }, [navigate]);
 
   const handleVoiceNavigate = useCallback(

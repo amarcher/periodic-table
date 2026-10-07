@@ -1,4 +1,5 @@
 .voice-agent {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -117,6 +118,151 @@
 
 .voice-agent__error:hover {
   color: #ffc059;
+}
+
+/* Typed questions — a quiet text link that opens a small panel above the orb */
+.voice-agent__ask-toggle {
+  appearance: none;
+  -webkit-appearance: none;
+  background: none;
+  border: none;
+  min-height: 32px;
+  margin-top: -8px;
+  padding: 4px 8px;
+  font: inherit;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.45);
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.2);
+  text-underline-offset: 3px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.voice-agent__ask-toggle:hover,
+.voice-agent__ask-toggle:active,
+.voice-agent__ask-toggle[aria-expanded='true'] {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.voice-agent__ask-toggle:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.voice-agent__ask {
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  width: min(340px, calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right)));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 16px;
+  background: hsla(220, 20%, 9%, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55);
+}
+
+.voice-agent__ask-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  /* --ask-viewport tracks the visible area while the keyboard is up */
+  max-height: min(280px, calc(var(--ask-viewport, 100svh) - 240px));
+  min-height: 1.4em;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.voice-agent__ask-message {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #e8e8f0;
+  overflow-wrap: anywhere;
+}
+
+.voice-agent__ask-message--user {
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 600;
+}
+
+.voice-agent__ask-note {
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.voice-agent__ask-note--error {
+  color: #f5a623;
+}
+
+.voice-agent__ask-row {
+  display: flex;
+  gap: 8px;
+}
+
+.voice-agent__ask-input {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  color: #e8e8f0;
+  font: inherit;
+  /* 16px minimum: iOS Safari zooms the page on focus below that and never zooms back */
+  font-size: 16px;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.voice-agent__ask-input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.voice-agent__ask-input:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.7);
+  outline-offset: 1px;
+}
+
+.voice-agent__ask-send {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+}
+
+.voice-agent__ask-send:hover,
+.voice-agent__ask-send:active {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.voice-agent__ask-send:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.voice-agent__ask-send:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 2px;
 }
 
 /* No agent configured message */

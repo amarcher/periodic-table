@@ -20,7 +20,9 @@ function VoiceSession(props: Props) {
     else notifyElementClosed();
   }, [props.selected, notifyElementChange, notifyElementClosed]);
   return <VoiceAgent status={voice.status} isSpeaking={voice.isSpeaking} onToggle={voice.toggle}
-    micError={voice.micError} onDismissError={voice.clearMicError} />;
+    micError={voice.micError} onDismissError={voice.clearMicError}
+    askStatus={voice.askStatus} askMessages={voice.askMessages} onAsk={voice.ask} onCloseAsk={voice.closeAsk}
+    askTopic={props.selected?.name} />;
 }
 
 export default function VoiceExperience(props: Props) {
