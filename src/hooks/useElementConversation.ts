@@ -19,6 +19,14 @@ interface ConversationCallbacks {
 
 export type VoiceStatus = 'off' | 'connecting' | 'connected' | 'error';
 export type MicError = 'timeout' | 'not-allowed' | 'device' | 'no-input' | 'connection' | null;
+export type AskStatus = 'idle' | 'waiting' | 'error';
+export interface AskMessage { id: number; role: 'user' | 'agent'; text: string }
+
+const ASK_MAX_CHARS = 300;
+const ASK_REPLY_TIMEOUT_MS = 30_000;
+/** The agent opens every session with a spoken-style greeting; typed sessions skip it. */
+const ASK_GREETING_WAIT_MS = 2500;
+const now = () => performance.now();
 
 function getDensityContext(density: number): string {
   if (density < 0.01) return 'So light it floats in air';
@@ -125,13 +133,56 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
   const agentId = import.meta.env.VITE_ELEVENLABS_AGENT_ID as string | undefined;
   const [sessionStarted, setSessionStarted] = useState(false);
   const [micError, setMicError] = useState<MicError>(null);
-  const pendingElementRef = useRef<Element | null>(null);
+  const openElementRef = useRef<Element | null>(null);
   const currentElementRef = useRef<number | null>(null);
   const inputVolumeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const attempt = useRef(new VoiceAttempt(trackEvent));
   const requestVersion = useRef(0);
   const connectionTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  /** A remote disconnect only belongs to voice once its session was actually requested. */
+  const voiceRequested = useRef(false);
+
+  // Typed questions run as a text-only session on the same agent: no microphone, no audio.
+  const [askStatus, setAskStatus] = useState<AskStatus>('idle');
+  const [askMessages, setAskMessages] = useState<AskMessage[]>([]);
+  const textSession = useRef(false);
+  const pendingQuestion = useRef<string | null>(null);
+  const awaitingGreeting = useRef(false);
+  const greetingTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const replyTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const askedAt = useRef(0);
+  const askWaiting = useRef(false);
+  const askMessageId = useRef(0);
+  const statusRef = useRef<string>('disconnected');
+
+  const appendAskMessage = (role: AskMessage['role'], text: string) =>
+    setAskMessages(messages => [...messages, { id: ++askMessageId.current, role, text }]);
+
+  const sendPendingQuestion = () => {
+    clearTimeout(greetingTimer.current);
+    awaitingGreeting.current = false;
+    const question = pendingQuestion.current;
+    pendingQuestion.current = null;
+    if (question) conversation.sendUserMessage(question);
+  };
+
+  const endTextSession = () => {
+    if (!textSession.current) return;
+    textSession.current = false;
+    askWaiting.current = false;
+    pendingQuestion.current = null;
+    awaitingGreeting.current = false;
+    clearTimeout(greetingTimer.current);
+    clearTimeout(replyTimer.current);
+    try { conversation.endSession(); } catch { /* Already disconnected. */ }
+  };
+
+  const failAsk = (reason: 'timeout' | 'connection_error' | 'remote') => {
+    endTextSession();
+    setAskStatus('error');
+    trackEvent('ask_failed', { reason });
+  };
 
   const conversation = useConversation({
     clientTools: {
@@ -200,22 +251,48 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
     },
     onConnect: () => {
       clearTimeout(connectionTimer.current);
-      if (!attempt.current.active) { conversation.endSession(); return; }
-      attempt.current.connected();
-      // If an element was clicked before connection completed, send it now
-      if (pendingElementRef.current) {
-        const ctx = buildElementContext(pendingElementRef.current);
-        conversation.sendContextualUpdate(ctx);
-        currentElementRef.current = pendingElementRef.current.atomicNumber;
-        pendingElementRef.current = null;
+      if (!textSession.current) {
+        if (!attempt.current.active) { conversation.endSession(); return; }
+        attempt.current.connected();
+      }
+      // Every new session starts without context, so describe the open element
+      if (openElementRef.current) {
+        conversation.sendContextualUpdate(buildElementContext(openElementRef.current));
+        currentElementRef.current = openElementRef.current.atomicNumber;
+      }
+      if (textSession.current) {
+        awaitingGreeting.current = true;
+        greetingTimer.current = setTimeout(sendPendingQuestion, ASK_GREETING_WAIT_MS);
       }
     },
+    onMessage: ({ message, role }) => {
+      if (!textSession.current || role !== 'agent') return;
+      if (awaitingGreeting.current) { sendPendingQuestion(); return; }
+      if (!message.trim()) return;
+      clearTimeout(replyTimer.current);
+      appendAskMessage('agent', message.trim());
+      if (askWaiting.current) {
+        askWaiting.current = false;
+        trackEvent('ask_answered', { latency_ms: Math.round(now() - askedAt.current) });
+      }
+      setAskStatus('idle');
+    },
     onDisconnect: () => {
+      if (textSession.current) {
+        // Idle or max-duration closes are routine; the next question reconnects.
+        if (askWaiting.current) failAsk('remote');
+        else endTextSession();
+        return;
+      }
+      if (!voiceRequested.current) return;
+      voiceRequested.current = false;
       clearTimeout(connectionTimer.current);
       attempt.current.finish('remote');
       setSessionStarted(false);
     },
     onError: () => {
+      if (textSession.current) { failAsk('connection_error'); return; }
+      voiceRequested.current = false;
       clearTimeout(connectionTimer.current);
       attempt.current.finish('connection_error');
       setSessionStarted(false);
@@ -226,7 +303,7 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
 
   // Poll input volume after connecting to detect silent/wrong input device
   useEffect(() => {
-    if (conversation.status !== 'connected') {
+    if (conversation.status !== 'connected' || !sessionStarted) {
       if (inputVolumeIntervalRef.current !== null) {
         clearInterval(inputVolumeIntervalRef.current);
         inputVolumeIntervalRef.current = null;
@@ -258,19 +335,27 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
         inputVolumeIntervalRef.current = null;
       }
     };
-  }, [conversation.status]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [conversation.status, sessionStarted]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => { statusRef.current = conversation.status; }, [conversation.status]);
 
   /** A second click cancels permission/connection work without starting another session. */
-  const toggle = useCallback(async () => {
+  const toggle = async () => {
     if (!agentId) return;
     if (attempt.current.active) {
       requestVersion.current++;
+      voiceRequested.current = false;
       clearTimeout(connectionTimer.current);
       attempt.current.finish('user');
       try { conversation.endSession(); } catch { /* Already disconnected. */ }
       setSessionStarted(false);
       return;
     }
+    // Voice replaces a typed session; the two share one connection.
+    const replacingText = textSession.current;
+    endTextSession();
+    setAskStatus('idle');
+    setAskMessages([]);
     const version = ++requestVersion.current;
     setMicError(null);
     setSessionStarted(true);
@@ -288,7 +373,16 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
       return;
     }
     if (version !== requestVersion.current) return;
+    if (replacingText) {
+      const deadline = now() + 2000;
+      while (statusRef.current !== 'disconnected' && now() < deadline) {
+        await new Promise(resolve => setTimeout(resolve, 50));
+      }
+      if (version !== requestVersion.current) return;
+    }
+    voiceRequested.current = true;
     connectionTimer.current = setTimeout(() => {
+      voiceRequested.current = false;
       attempt.current.finish('connection_error');
       setSessionStarted(false);
       setMicError('connection');
@@ -297,12 +391,48 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
     try {
       conversation.startSession({ agentId, connectionType: 'webrtc' });
     } catch {
+      voiceRequested.current = false;
       clearTimeout(connectionTimer.current);
       attempt.current.finish('connection_error');
       setSessionStarted(false);
       setMicError('connection');
     }
-  }, [agentId, conversation]);
+  };
+
+  /** Send a typed question, opening a text-only session on first use. */
+  const ask = (raw: string) => {
+    const question = raw.trim().slice(0, ASK_MAX_CHARS);
+    if (!agentId || !question || attempt.current.active) return;
+    const reconnecting = !textSession.current;
+    appendAskMessage('user', question);
+    setAskStatus('waiting');
+    askWaiting.current = true;
+    askedAt.current = now();
+    trackEvent('ask_sent', { new_session: reconnecting });
+    clearTimeout(replyTimer.current);
+    replyTimer.current = setTimeout(() => failAsk('timeout'), ASK_REPLY_TIMEOUT_MS);
+    if (!reconnecting) {
+      if (statusRef.current === 'connected' && !awaitingGreeting.current) conversation.sendUserMessage(question);
+      else pendingQuestion.current = question;
+      return;
+    }
+    textSession.current = true;
+    pendingQuestion.current = question;
+    try {
+      conversation.startSession({
+        agentId, connectionType: 'websocket', textOnly: true,
+        overrides: { conversation: { textOnly: true } },
+      });
+    } catch {
+      failAsk('connection_error');
+    }
+  };
+
+  const closeAsk = () => {
+    endTextSession();
+    setAskStatus('idle');
+    setAskMessages([]);
+  };
 
   const clearMicError = useCallback(() => {
     setMicError(null);
@@ -311,6 +441,9 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
   const notifyElementChange = useCallback((element: Element) => {
     if (!agentId) return;
 
+    // onConnect sends this to any session that starts while the element is open
+    openElementRef.current = element;
+
     // Skip if same element
     if (currentElementRef.current === element.atomicNumber) return;
     currentElementRef.current = element.atomicNumber;
@@ -318,16 +451,13 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
     if (conversation.status === 'connected') {
       const ctx = buildElementContext(element);
       conversation.sendContextualUpdate(ctx);
-    } else {
-      // Queue it — onConnect will flush
-      pendingElementRef.current = element;
     }
   }, [agentId, conversation]);
 
   const notifyElementClosed = useCallback(() => {
     const hadElement = currentElementRef.current !== null;
     currentElementRef.current = null;
-    pendingElementRef.current = null;
+    openElementRef.current = null;
     if (!agentId || !hadElement || conversation.status !== 'connected') return;
     conversation.sendContextualUpdate(
       '[ELEMENT CLOSED] The child closed the element view and is back on the periodic table. ' +
@@ -341,8 +471,9 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
     const close = () => {
       requestVersion.current++;
       clearTimeout(connectionTimer.current);
-      if (lifecycle.active) {
+      if (lifecycle.active || textSession.current) {
         lifecycle.finish('page_exit');
+        textSession.current = false;
         try { endSession(); } catch { /* Already disconnected. */ }
       }
     };
@@ -367,6 +498,10 @@ export function useElementConversation({ onNavigate, onGoBack, onSetAtomViewMode
     notifyElementChange,
     notifyElementClosed,
     toggle,
+    askStatus,
+    askMessages,
+    ask,
+    closeAsk,
     agentId,
   };
 }

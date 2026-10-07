@@ -23,8 +23,10 @@ export function ElementDetail({ element, onClose, atomViewMode, onAtomViewModeCh
   const containerRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
 
-  // Focus close button on mount
+  // Focus close button on mount — unless a typed question brought us here,
+  // so the reader can keep typing follow-ups
   useEffect(() => {
+    if (document.activeElement?.closest('.voice-agent__ask')) return;
     closeRef.current?.focus();
   }, []);
 

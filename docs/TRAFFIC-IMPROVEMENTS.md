@@ -28,6 +28,10 @@ Custom events go independently to the existing GA and PostHog destinations. Prod
 | `voice_cancelled` | User cancellation or page exit before connecting. |
 | `voice_session_ended` | A connected session ended; `duration_ms` and a bounded reason. Ended does not establish a successful educational outcome. |
 | `atom_display_changed` | Explicit selection of still view or 3D. |
+| `ask_opened` | The typed-question panel was opened. |
+| `ask_sent` | A typed question was sent; `new_session` is true when it had to open a text-only agent session first. Question text is never recorded. |
+| `ask_answered` | First reply to a typed question, with `latency_ms` from send to reply. |
+| `ask_failed` | A typed question got no reply; bounded reason `timeout`, `connection_error`, or `remote`. |
 
 Diagnostics are capped at five events per name per document lifetime: `application_error`, `video_loaded`, `video_stalled`, `video_error`, `image_error`, `atom_quality_reduced`, `atom_fallback`, and `voice_unavailable`. Caps make them diagnostic samples, not exact population error rates. Diagnostic payloads contain bounded categories, element identifiers, timings, and numeric media error codes; no transcripts or raw exception messages were added.
 

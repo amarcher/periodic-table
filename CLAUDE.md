@@ -35,6 +35,7 @@ Interactive periodic table web app for general science education (students, teac
 ## Voice Agent (ElevenLabs)
 
 - **Hook**: `src/hooks/useElementConversation.ts` — manages the ElevenLabs voice session, sends contextual updates on element clicks/closes, and registers client tools. Sessions use `connectionType: 'webrtc'` (not `'websocket'`): WebRTC's acoustic echo cancellation stops the agent from hearing its own voice through the device speaker, which on phones/tablets made it interrupt itself. Don't switch back to websocket without a real-device speaker test.
+- **Typed questions**: the "or type a question" link under the orb opens a small panel that runs a **text-only** session on the same agent (`textOnly: true` over `websocket`, no microphone or audio), for classrooms and blocked mics. It shares the one `useConversation` connection with voice, so starting voice ends the typed session and vice versa. The agent's spoken greeting is dropped in typed sessions. This depends on the agent allowing the `conversation.text_only` override — keep that enabled when pushing configs.
 - **Client tools**: `navigate_to_element` and `go_back_to_table` are registered via `useConversation({ clientTools })` so the voice agent can control the UI
 - **Agent config**: `agent_configs/Chemical-Element-Periodic-Table-Guide.json` — the agent's prompt, voice, and tool settings (managed via `@elevenlabs/cli`)
 - **Tool configs**: `tool_configs/` — JSON schemas for client tools, also managed via CLI

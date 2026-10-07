@@ -107,7 +107,8 @@ body::before {
 /* Floating voice agent orb — always visible, even over detail overlay */
 .app__voice-float {
   position: fixed;
-  bottom: max(28px, env(safe-area-inset-bottom));
+  /* --ask-keyboard lifts it above the on-screen keyboard while a question is typed */
+  bottom: calc(max(28px, env(safe-area-inset-bottom)) + var(--ask-keyboard, 0px));
   right: max(28px, env(safe-area-inset-right));
   z-index: 120;
 }
@@ -122,7 +123,7 @@ body::before {
   }
 
   .app__voice-float {
-    bottom: max(16px, env(safe-area-inset-bottom));
+    bottom: calc(max(16px, env(safe-area-inset-bottom)) + var(--ask-keyboard, 0px));
     right: max(16px, env(safe-area-inset-right));
   }
 }
