@@ -78,7 +78,9 @@ export function pageMetadata(element?: Element | null, cdn = DEFAULT_VIDEO_CDN) 
           name: `${element.name} (${element.symbol})`, description: element.summary,
           url, image, inLanguage: 'en',
           isAccessibleForFree: true, learningResourceType: 'Interactive element explorer',
-          isPartOf: { '@type': 'WebApplication', name: SITE_NAME, url: `${SITE_ORIGIN}/` },
+          // WebSite, not WebApplication: Google validates a nested WebApplication as a Software App
+          // rich result and fails it for lacking offers/category, which this reference is not.
+          isPartOf: { '@type': 'WebSite', name: SITE_NAME, url: `${SITE_ORIGIN}/` },
           // Google's video rich results require name, thumbnailUrl and uploadDate; the date is
           // the real CDN publish date recorded in videoData.ts, never a placeholder.
           ...(video ? { video: {
