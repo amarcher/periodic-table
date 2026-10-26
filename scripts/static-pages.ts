@@ -3,22 +3,59 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { elements } from '../src/data/elements';
 import type { Element } from '../src/types/element';
-import { escapeHtml as e, pageMetadata, SITE_ORIGIN } from '../src/utils/seo';
+import { categoryLabels } from '../src/utils/colors';
+import { escapeHtml as e, pageMetadata, SITE_ORIGIN, wikipediaUrl } from '../src/utils/seo';
 
-export function staticContent(element?: Element) {
-  const links = elements.map(el => `<a href="/element/${el.symbol}">${el.name} (${el.symbol})</a>`).join(' · ');
-  const content = element ? `<article>
-    <h1>${e(element.name)} (${element.symbol})</h1><p>${e(element.summary)}</p>
-    <dl><dt>Atomic number</dt><dd>${element.atomicNumber}</dd>
-    <dt>Atomic mass</dt><dd>${element.atomicMass} u</dd>
-    <dt>Electron configuration</dt><dd>${e(element.electronConfiguration)}</dd>
-    <dt>Appearance</dt><dd>${e(element.appearance)}</dd>
-    <dt>Discovered by</dt><dd>${e(element.discoveredBy)} (${e(String(element.yearDiscovered))})</dd></dl>
-    <h2>Facts about ${e(element.name)}</h2><ul>${element.funFacts.map(f => `<li>${e(f)}</li>`).join('')}</ul>
-    <p><a href="/">Back to the periodic table</a></p></article>` :
-    '<h1>The Periodic Table</h1><p>Explore the properties, electron configurations, and facts of all 118 elements. Enable JavaScript for interactive atoms, phase diagrams, and the optional voice guide.</p>';
-  return `<main class="static-content">${content}<nav aria-label="Explore the elements">${links}</nav></main>`;
+const round = (n: number) => Number(n.toFixed(2)).toString();
+const temperature = (kelvin: number | null) =>
+  kelvin == null ? null : `${round(kelvin)} K (${round(kelvin - 273.15)} °C)`;
+const discovery = (element: Element) =>
+  typeof element.yearDiscovered === 'number'
+    ? `${element.discoveredBy} (${element.yearDiscovered})` : element.discoveredBy;
+
+// Physical properties are visible text, not just numbers in the app's visualizations,
+// so "gold melting point" style queries and AI lookups find them without running JS.
+export function propertyRows(element: Element): [string, string][] {
+  const rows: [string, string | null][] = [
+    ['Atomic number', String(element.atomicNumber)],
+    ['Category', categoryLabels[element.category]],
+    ['Atomic mass', `${element.atomicMass} u`],
+    ['Electron configuration', element.electronConfiguration],
+    ['Melting point', temperature(element.meltingPoint)],
+    ['Boiling point', temperature(element.boilingPoint)],
+    ['Density', element.density == null ? null : `${element.density} g/cm³`],
+    ['Electronegativity (Pauling)', element.electronegativity == null ? null : String(element.electronegativity)],
+    ['Appearance', element.appearance],
+    ['Discovered by', discovery(element)],
+  ];
+  return rows.filter((row): row is [string, string] => row[1] != null);
 }
+
+// Grouping the 118 links under category headings gives every page the category
+// vocabulary ("noble gases", "alkali metals") as real text, not just a colour.
+function elementNav() {
+  const groups = (Object.keys(categoryLabels) as Element['category'][]).map(category => {
+    const label = categoryLabels[category];
+    const links = elements.filter(el => el.category === category)
+      .map(el => `<a href="/element/${el.symbol}">${e(el.name)} (${el.symbol})</a>`).join(' · ');
+    return `<section><h2>${label.endsWith('s') ? `${label}es` : `${label}s`}</h2><p>${links}</p></section>`;
+  });
+  return `<nav aria-label="Explore the elements by category">${groups.join('')}</nav>`;
+}
+
+export function staticContent(element?: Element, cdn?: string) {
+  const meta = pageMetadata(element, cdn);
+  const figure = element && meta.video ? `<figure><img src="${e(meta.image)}" width="${meta.imageWidth}" height="${meta.imageHeight}" alt="${e(meta.videoDescription ?? meta.imageAlt)}" /><figcaption>Video: ${e(meta.videoDescription ?? '')}</figcaption></figure>` : '';
+  const content = element ? `<article>
+    <h1>${e(element.name)} (${element.symbol})</h1><p>${e(element.summary)}</p>${figure}
+    <h2>Properties of ${e(element.name)}</h2>
+    <dl>${propertyRows(element).map(([term, value]) => `<dt>${e(term)}</dt><dd>${e(value)}</dd>`).join('')}</dl>
+    <h2>Facts about ${e(element.name)}</h2><ul>${element.funFacts.map(f => `<li>${e(f)}</li>`).join('')}</ul>
+    <p><a href="/">Back to the periodic table</a> · <a href="${wikipediaUrl(element)}" rel="noopener">${e(element.name)} on Wikipedia</a></p></article>` :
+    '<h1>The Periodic Table</h1><p>Explore the properties, electron configurations, and facts of all 118 elements. Enable JavaScript for interactive atoms, phase diagrams, and the optional voice guide.</p>';
+  return `<main class="static-content">${content}${elementNav()}</main>`;
+}
+
 
 export function renderStaticPage(template: string, element?: Element, cdn?: string) {
   const meta = pageMetadata(element, cdn);
@@ -26,13 +63,14 @@ export function renderStaticPage(template: string, element?: Element, cdn?: stri
     .replace(/<link rel="canonical"[^>]*>/, `<link rel="canonical" href="${meta.url}" />`)
     .replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/,
       `<script type="application/ld+json">${JSON.stringify(meta.structuredData).replace(/</g, '\\u003c')}</script>`)
-    .replace('<div id="root"></div>', `<div id="root">${staticContent(element)}</div>`);
+    .replace('<div id="root"></div>', `<div id="root">${staticContent(element, cdn)}</div>`);
   for (const [attr, name, content] of [
     ['name', 'description', meta.description], ['property', 'og:title', meta.title],
     ['property', 'og:description', meta.description], ['property', 'og:url', meta.url],
     ['property', 'og:image', meta.image], ['name', 'twitter:title', meta.title],
     ['name', 'twitter:description', meta.description], ['name', 'twitter:image', meta.image],
-    ['property', 'og:image:alt', element ? `${element.name} — element ${element.atomicNumber}` : 'The periodic table'],
+    ['property', 'og:image:alt', meta.imageAlt],
+    ['property', 'og:image:width', String(meta.imageWidth)], ['property', 'og:image:height', String(meta.imageHeight)],
   ]) {
     html = html.replace(new RegExp(`<meta ${attr}="${name}"[^>]*>`), `<meta ${attr}="${name}" content="${e(content)}" />`);
   }
