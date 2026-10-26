@@ -44,23 +44,13 @@
       "description": "Explore all 118 elements with facts, properties, electron configurations, videos, and 3D atom models, plus an optional AI voice guide. Free, no sign-up.",
       "applicationCategory": "EducationalApplication",
       "operatingSystem": "Any",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      },
-      "audience": {
-        "@type": "EducationalAudience",
-        "educationalRole": "student",
-        "suggestedMinAge": 8,
-        "suggestedMaxAge": 16
-      },
-      "image": "https://periodictable.tech/og-image.png",
-      "inLanguage": "en",
       "isAccessibleForFree": true,
+      "inLanguage": "en",
+      "image": "https://periodictable.tech/og-image.png",
       "about": {
         "@type": "Thing",
         "name": "Periodic table",
+        "sameAs": "https://en.wikipedia.org/wiki/Periodic_table",
         "description": "A tabular display of the chemical elements organized by atomic number and electron configuration"
       }
     }
@@ -88,6 +78,7 @@
       .static-content { max-width: 72rem; margin: 2rem auto; padding: 1rem; font: 1rem/1.6 system-ui, sans-serif; }
       .static-content nav { margin-top: 2rem; }
       .static-content dt { font-weight: bold; }
+      .static-content img { max-width: 100%; height: auto; }
     </style>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>

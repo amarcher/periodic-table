@@ -13,7 +13,9 @@ export function updatePageMetadata(element?: Element | null) {
   set('meta[property="og:description"]', meta.description);
   set('meta[property="og:url"]', meta.url);
   set('meta[property="og:image"]', meta.image);
-  set('meta[property="og:image:alt"]', element ? `${element.name} — element ${element.atomicNumber}` : 'The periodic table');
+  set('meta[property="og:image:width"]', String(meta.imageWidth));
+  set('meta[property="og:image:height"]', String(meta.imageHeight));
+  set('meta[property="og:image:alt"]', meta.imageAlt);
   set('meta[name="twitter:title"]', meta.title);
   set('meta[name="twitter:description"]', meta.description);
   set('meta[name="twitter:image"]', meta.image);
