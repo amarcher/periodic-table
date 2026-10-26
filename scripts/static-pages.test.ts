@@ -94,7 +94,8 @@ describe('searchable pages', () => {
     for (const element of elements) {
       const video = jsonLd(renderStaticPage(template, element))['@graph'][0].video;
       expect(video['@type']).toBe('VideoObject');
-      expect(video.uploadDate).toMatch(/^20\d\d-\d\d-\d\d$/);
+      expect(video.uploadDate).toMatch(/^20\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ$/); // Google requires a timezone
+      expect(jsonLd(renderStaticPage(template, element))['@graph'][0].isPartOf['@type']).toBe('WebSite');
       expect(video.thumbnailUrl).toMatch(/\.jpg$/);
       expect(video.contentUrl).toMatch(/\.mp4$/);
       expect(video.name).toContain(element.name);
