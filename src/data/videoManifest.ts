@@ -1,4 +1,5 @@
 import { VIDEO_DATA } from './videoData';
+import type { Clip } from './clips';
 
 export interface VideoEntry {
   url: string;
@@ -31,4 +32,9 @@ export const videoManifest: Partial<Record<number, VideoEntry>> = Object.fromEnt
 
 export function getVideoEntry(atomicNumber: number): VideoEntry | undefined {
   return videoManifest[atomicNumber];
+}
+
+/** Media URLs for any clip, hero or authored, on the same CDN. */
+export function clipMedia(clip: Clip): VideoEntry {
+  return { url: `${BASE_URL}/${clip.filename}`, poster: `${BASE_URL}/${posterFilename(clip.filename)}`, description: clip.fact };
 }

@@ -36,7 +36,7 @@ const jobs = Object.entries(FACT_CLIPS).flatMap(([symbol, clips]) =>
   (clips ?? []).filter(() => !args.includes('--element') || symbol === onlyElement).map(clip => {
     const prompt = CLIP_PROMPTS[`${symbol}/${clip.slug}`];
     if (!prompt) throw new Error(`No prompt for ${symbol}/${clip.slug}`);
-    return { key: `${symbol}/${clip.slug}`, filename: clip.filename, prompt: `${prompt} ${CLIP_STYLE_ANCHOR}` };
+    return { key: `${symbol}/${clip.slug}`, filename: clip.filename, aspect: clip.aspect, prompt: `${prompt} ${CLIP_STYLE_ANCHOR}` };
   }),
 ).filter(job => !fs.existsSync(path.join(VIDEOS_DIR, job.filename)));
 
@@ -69,13 +69,13 @@ function findVideo(res: InteractionResponse): Content | undefined {
   return res.steps?.flatMap(step => step.content ?? []).find(c => c.type === 'video');
 }
 
-async function generate(prompt: string) {
+async function generate(prompt: string, aspect: '16:9' | '9:16') {
   const response = await fetch(`${API}/interactions?key=${key}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-Server-Timeout': '600' },
     body: JSON.stringify({
       model: MODEL, input: prompt,
-      response_format: { type: 'video', aspect_ratio: '16:9', resolution: '720p', duration: `${DURATION_SECONDS}s`, delivery: 'uri' },
+      response_format: { type: 'video', aspect_ratio: aspect, resolution: '720p', duration: `${DURATION_SECONDS}s`, delivery: 'uri' },
     }),
   });
   const body = (await response.json()) as InteractionResponse;
@@ -103,7 +103,7 @@ async function downloadFile(uri: string, outputPath: string) {
 
 async function run(job: (typeof jobs)[number]) {
   const started = Date.now();
-  const video = await generate(job.prompt);
+  const video = await generate(job.prompt, job.aspect);
   const staged = path.join(STAGING_DIR, job.filename);
   if (video.uri) { ledger[job.key] = video.uri; fs.writeFileSync(LEDGER, JSON.stringify(ledger, null, 2)); }
   if (video.uri) await downloadFile(video.uri, staged);

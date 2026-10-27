@@ -72,7 +72,7 @@ export function clipStaticContent(element: Element, clip: Clip, cdn?: string) {
   const meta = clipPageMetadata(element, clip, cdn);
   return `<main class="static-content"><article>
     <h1>${e(clip.title)}</h1>
-    <figure><video controls muted loop playsinline preload="none" width="1280" height="720" poster="${e(meta.image)}" aria-label="${e(clip.fact)}"><source src="${e(meta.video ?? '')}" type="video/mp4" /></video>
+    <figure><video controls muted loop playsinline preload="none" width="${meta.videoWidth}" height="${meta.videoHeight}" poster="${e(meta.image)}" aria-label="${e(clip.fact)}"><source src="${e(meta.video ?? '')}" type="video/mp4" /></video>
     <figcaption>${e(clip.fact)}</figcaption></figure>
     <p>A short silent video about <a href="${elementPath(element)}">${e(element.name)} (${element.symbol})</a>, element ${element.atomicNumber}, ${e(categoryLabels[element.category].toLowerCase())}. ${e(element.summary)}</p>
     <h2>More ${e(element.name)} videos</h2>${clipList(element, clip)}
@@ -100,7 +100,7 @@ export function renderStaticPage(template: string, element?: Element, cdn?: stri
   if (meta.video) html = html.replace('</head>', `<meta property="og:video" content="${e(meta.video)}" />
     <meta property="og:video:secure_url" content="${e(meta.video)}" />
     <meta property="og:video:type" content="video/mp4" />
-    <meta property="og:video:width" content="1280" /><meta property="og:video:height" content="720" /></head>`);
+    <meta property="og:video:width" content="${meta.videoWidth}" /><meta property="og:video:height" content="${meta.videoHeight}" /></head>`);
   return html;
 }
 

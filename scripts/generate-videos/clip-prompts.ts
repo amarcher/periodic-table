@@ -40,3 +40,36 @@ export const CLIP_PROMPTS: Record<string, string> = {
   'Na/nerve-signals':
     'Microscopic scientific visualization inside a neuron: a long pale axon stretching into darkness, and a bright electric pulse racing along it, sodium ions shown as swarms of tiny glowing golden particles rushing through channels in the membrane as the signal passes, volumetric light, dark background.',
 };
+
+// Portrait shorts (9:16). Compose for a phone held upright: the subject fills the
+// frame top to bottom. Captions come from the research factoids.
+Object.assign(CLIP_PROMPTS, {
+  'Au/made-of-stardust':
+    'Vertical framing. Deep space: two neutron stars spiral into each other at terrifying speed and collide in a blinding kilonova flash, a vast cloud of incandescent debris blooming upward through the frame, and within it countless flecks of newly forged gold cooling from white to warm yellow and drifting toward the camera, stars beyond.',
+  'Au/thinner-than-light':
+    'Vertical close-up of a sheet of beaten gold leaf, impossibly thin, suspended against a brilliant white light so the light shines through the metal with a soft blue-green glow, the leaf rippling and trembling like silk in a faint breath of air, its edges fluttering, tiny gold flakes drifting, dark background.',
+  'Au/egyptian-gold':
+    'Vertical shot inside a dark Egyptian tomb as torchlight sweeps slowly across a gold funerary mask, its surface flawless and mirror-bright, warm light sliding over untouched gold while the carved stone walls around it are cracked and dusty, dust motes drifting in the beam.',
+  'Au/ocean-of-gold':
+    'Vertical underwater shot in a sunlit tropical ocean, shafts of light piercing clear blue water from above, countless microscopic glittering flecks of gold drifting through the water column like golden plankton, the camera slowly rising toward the shimmering surface.',
+  'H/fuel-of-the-stars':
+    'Vertical extreme telephoto view of the surface of the Sun filling the frame: a roiling ocean of golden-orange plasma granules boiling and churning, an immense prominence of glowing hydrogen plasma towering upward through the frame and curling back along invisible magnetic field lines, deep black space above.',
+  'H/water-maker':
+    'Vertical close-up of a small pale-blue hydrogen flame burning beneath a cold clear glass dome; as the flame burns, fog forms on the inside of the glass and gathers into clear water droplets that swell, catch the light and run down the glass, the only thing the flame produces being water, dark background.',
+  'H/invisible-flame':
+    'Vertical shot of an industrial steel hydrogen vent pipe in dim light with no visible flame, only a shimmering column of heat haze rising above it; the head of a straw broom on a long handle extends slowly into that empty-looking air and its bristles burst into bright orange flame, revealing the invisible fire, embers drifting upward.',
+  'H/rocket-fuel-short':
+    'Vertical night launch close-up of a rocket engine burning liquid hydrogen: the nozzle erupting with a nearly invisible pale-blue flame rimmed by heat haze, frost and vapor sheeting off the cryogenic tank walls above it, billowing white steam clouds rolling across the pad as the rocket begins to rise, camera low, looking up.',
+  'Hg/cannonball-floats':
+    'Vertical slow motion: a heavy black iron cannonball dropped into a deep pool of liquid mercury, the mirror surface bulging and splashing upward in slow silver waves as the cannonball bobs and settles, floating on top of the liquid metal, reflections rippling across the pool, dark background.',
+  'Hg/quicksilver-alive':
+    'Vertical shot of a sheet of black glass tilted toward the camera, and beads of quicksilver racing down it in slow motion, impossibly fast and bright, splitting into smaller droplets that sprint ahead and snap back together as if alive, an overhead spotlight reflected in every moving droplet, dark background.',
+  'Hg/liquid-metal-mirror':
+    'Vertical close-up of liquid mercury pouring from a glass vial held in a laboratory clamp onto a dark slate surface below, flowing like water but mirror-bright, spreading into a trembling silver pool that reflects the overhead light and the vial above it, slow motion, dark background.',
+  'Na/soft-then-explosive':
+    'Vertical shot: a dull silvery block of sodium metal on a dark bench is sliced by a knife blade lowering into frame, cutting it like cold cheese to reveal a bright silver interior that tarnishes within seconds; the slice drops into a glass bowl of water below and skitters, hisses and erupts into a bright yellow-orange flame with a sharp pop, water splashing, dark background.',
+  'Na/ocean-of-salt':
+    'Vertical aerial shot rising over an endless white salt flat under a hard blue sky, the crystalline crust cracked into hexagonal plates stretching to the horizon, and in the distance the upper floors of city skyscrapers poking out of the salt as if the whole city were buried in it, heat shimmer, slow upward drift.',
+  'Na/streetlight-glow-short':
+    'Vertical shot of a tall sodium vapor streetlamp warming up at dusk on a foggy empty road: the lamp flickers on with a faint red-pink glow at the top of the frame and slowly brightens into the deep amber-orange of sodium light, the fog around it turning gold and the wet asphalt below reflecting the color, static low-angle camera.',
+});

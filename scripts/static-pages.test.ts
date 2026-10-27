@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { elements } from '../src/data/elements';
-import { FACT_CLIPS, getClips, heroClip } from '../src/data/clips';
+import { FACT_CLIPS, getClips, getLandscapeClips, getShorts, heroClip } from '../src/data/clips';
 import { clipPageMetadata, pageMetadata, wikipediaUrl } from '../src/utils/seo';
 import { sitemapPaths } from '../src/utils/sitemap';
 import { CLIP_PROMPTS } from './generate-videos/clip-prompts';
@@ -124,7 +124,7 @@ describe('watch pages', () => {
       const hero = heroClip(element)!;
       expect(hero.slug).toMatch(/^[a-z0-9]+(-[a-z0-9]+){0,4}$/);
       expect(hero.uploadDate).toBeTruthy();
-      expect(getClips(element)[0]).toEqual(hero);
+      expect(getLandscapeClips(element)[0]).toEqual(hero);
     }
   });
 
@@ -135,12 +135,18 @@ describe('watch pages', () => {
       const slugs = new Set<string>();
       for (const clip of clips ?? []) {
         expect(CLIP_PROMPTS[`${symbol}/${clip.slug}`]).toBeTruthy();
-        expect(clip.filename).toBe(`${String(element.atomicNumber).padStart(3, '0')}-${symbol}-${clip.slug}.mp4`);
-        expect(element.funFacts).toContain(clip.fact);
+        expect(clip.filename).toMatch(new RegExp(`^${String(element.atomicNumber).padStart(3, '0')}-${symbol}-(short-)?[a-z0-9-]+\\.mp4$`));
+        expect(clip.fact.length).toBeGreaterThan(20);
+        expect(clip.fact.length).toBeLessThanOrEqual(260);
+        expect(['16:9', '9:16']).toContain(clip.aspect);
         expect(slugs.has(clip.slug)).toBe(false);
         slugs.add(clip.slug);
       }
       expect(getClips(element).every(clip => clip.uploadDate)).toBe(true);
+      expect(getShorts(element).every(clip => clip.aspect === '9:16')).toBe(true);
+      expect(getLandscapeClips(element)[0]).toEqual(heroClip(element));
+      expect(getLandscapeClips(element).every(clip => clip.aspect === '16:9')).toBe(true);
+      expect(getClips(element)).toEqual([...getShorts(element), ...getLandscapeClips(element)]);
     }
   });
 
@@ -165,6 +171,10 @@ describe('watch pages', () => {
         expect(video.mainEntityOfPage).toBe(meta.url);
         expect(video.uploadDate).toMatch(/^20\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ$/);
         expect(video.duration).toBe('PT8S');
+        const portrait = clip.aspect === '9:16';
+        expect([video.width, video.height]).toEqual(portrait ? [720, 1280] : [1280, 720]);
+        expect(html).toContain(`<meta property="og:video:width" content="${portrait ? 720 : 1280}" />`);
+        expect(html).toContain(`<meta property="og:image:height" content="${portrait ? 2134 : 676}" />`);
         expect(breadcrumbs.itemListElement).toHaveLength(3);
         expect(breadcrumbs.itemListElement[2].item).toBe(meta.url);
       }

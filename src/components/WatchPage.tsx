@@ -1,125 +1,165 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { getElementBySymbol } from '../data/elements';
-import { getClips, type Clip } from '../data/clips';
-import { categoryColors, categoryLabels } from '../utils/colors';
-import { clipPath, elementPath, posterFilename } from '../utils/seo';
+import { elements, getElementBySymbol } from '../data/elements';
+import { getClips, getShorts, type Clip } from '../data/clips';
+import { clipMedia } from '../data/videoManifest';
+import { categoryColors } from '../utils/colors';
+import { clipPath, elementPath } from '../utils/seo';
 import { updateClipMetadata } from '../utils/pageMetadata';
 import { trackEvent } from '../utils/analytics';
 import { useReducedMotion, useSaveData } from '../hooks/useDisplayPreferences';
 import './WatchPage.css';
 
-const BASE_URL = import.meta.env.VITE_VIDEO_CDN_URL || '/element-videos';
-const videoUrl = (clip: Clip) => `${BASE_URL}/${clip.filename}`;
-const posterUrl = (clip: Clip) => `${BASE_URL}/${posterFilename(clip.filename)}`;
-
 /**
- * One clip per page, captioned with the fact it shows, with the element's
- * other clips as a channel underneath. Keyboard arrows move between clips.
+ * The reel: one full-viewport slide per clip, swiped vertically like a
+ * short-form feed. The URL follows the active slide so every clip stays a
+ * shareable, indexable page. Shorts (9:16) fill the frame; landscape clips
+ * letterbox over a blurred poster. Only the active slide and its neighbours
+ * carry a video source.
  */
 export default function WatchPage() {
   const { symbol = '', slug = '' } = useParams();
   const navigate = useNavigate();
   const element = getElementBySymbol(symbol) ?? null;
   const clips = element ? getClips(element) : [];
-  const index = clips.findIndex(clip => clip.slug === slug);
-  const clip = index >= 0 ? clips[index] : undefined;
-  const previous = index > 0 ? clips[index - 1] : undefined;
-  const next = index >= 0 ? clips[index + 1] : undefined;
+  const urlIndex = clips.findIndex(clip => clip.slug === slug);
   const reducedMotion = useReducedMotion();
   const saveData = useSaveData();
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const autoplay = !reducedMotion && !saveData;
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(Math.max(0, urlIndex));
+  const [paused, setPaused] = useState(!autoplay);
 
+  // A bad symbol or slug falls back to the element page, or the table.
   useEffect(() => {
-    if (!element || !clip) navigate(element ? elementPath(element) : '/', { replace: true });
-  }, [element, clip, navigate]);
+    if (!element || urlIndex < 0) navigate(element ? elementPath(element) : '/', { replace: true });
+  }, [element, urlIndex, navigate]);
 
+  // Start on the slide the URL names, without animating there.
   useEffect(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller || urlIndex < 0) return;
+    scroller.scrollTo({ top: urlIndex * scroller.clientHeight, behavior: 'instant' as ScrollBehavior });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [element?.symbol]);
+
+  // The slide covering most of the viewport is the active one.
+  useEffect(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller || !('IntersectionObserver' in window)) return;
+    const observer = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) setActive(Number((entry.target as HTMLElement).dataset.index));
+      }
+    }, { root: scroller, threshold: 0.6 });
+    scroller.querySelectorAll('[data-index]').forEach(slide => observer.observe(slide));
+    return () => observer.disconnect();
+  }, [clips.length]);
+
+  // The URL, metadata and analytics follow the active slide.
+  useEffect(() => {
+    const clip = clips[active];
     if (!element || !clip) return;
+    if (clip.slug !== slug) navigate(clipPath(element, clip), { replace: true });
     updateClipMetadata(element, clip);
     trackEvent('clip_view', { symbol: element.symbol, atomic_number: element.atomicNumber, clip: clip.slug });
-    window.scrollTo(0, 0);
-  }, [element, clip]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active, element?.symbol]);
+
+  const scrollToSlide = useCallback((index: number) => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+    const target = Math.max(0, Math.min(clips.length, index));
+    scroller.scrollTo({ top: target * scroller.clientHeight, behavior: reducedMotion ? 'instant' as ScrollBehavior : 'smooth' });
+  }, [clips.length, reducedMotion]);
 
   useEffect(() => {
-    if (!element) return;
     const onKey = (event: KeyboardEvent) => {
       if (event.altKey || event.ctrlKey || event.metaKey) return;
-      if (event.key === 'ArrowRight' && next) navigate(clipPath(element, next));
-      if (event.key === 'ArrowLeft' && previous) navigate(clipPath(element, previous));
+      if (event.key === 'ArrowDown' || event.key === 'j') { event.preventDefault(); scrollToSlide(active + 1); }
+      if (event.key === 'ArrowUp' || event.key === 'k') { event.preventDefault(); scrollToSlide(active - 1); }
+      if (event.key === ' ') { event.preventDefault(); setPaused(p => !p); }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [element, next, previous, navigate]);
+  }, [active, scrollToSlide]);
 
-  if (!element || !clip) return null;
-  const autoplay = !reducedMotion && !saveData;
+  if (!element || urlIndex < 0) return null;
+  const nextElement = elements.find(candidate => candidate.atomicNumber > element.atomicNumber && getShorts(candidate).length > 0)
+    ?? elements[(element.atomicNumber) % elements.length];
 
   return (
-    <main className="watch" style={{ '--cat-color': categoryColors[element.category] } as React.CSSProperties}>
-      <header className="watch__header">
-        <Link to={elementPath(element)} className="watch__element">
-          <span className="watch__symbol" aria-hidden="true">{element.symbol}</span>
-          <span className="watch__element-name">{element.name}<small>{categoryLabels[element.category]} · element {element.atomicNumber}</small></span>
-        </Link>
-        <Link to="/" className="watch__home">Periodic table</Link>
-      </header>
-
-      <figure className="watch__stage">
-        <video
-          key={clip.slug}
-          ref={videoRef}
-          className="watch__video"
-          src={videoUrl(clip)}
-          poster={posterUrl(clip)}
-          width={1280}
-          height={720}
-          controls
-          muted
-          loop
-          playsInline
-          autoPlay={autoplay}
-          preload="metadata"
-          aria-label={clip.fact}
-        />
-        <figcaption className="watch__caption">{clip.fact}</figcaption>
-      </figure>
-
-      <h1 className="watch__title">{clip.title}</h1>
-
-      <nav className="watch__pager" aria-label="Previous and next video">
-        {previous ? <Link to={clipPath(element, previous)} className="watch__pager-link" rel="prev">
-          <span aria-hidden="true">←</span> <span className="watch__pager-label">Previous</span>
-        </Link> : <span />}
-        <span className="watch__count">{index + 1} of {clips.length}</span>
-        {next ? <Link to={clipPath(element, next)} className="watch__pager-link watch__pager-link--next" rel="next">
-          <span className="watch__pager-label">Next</span> <span aria-hidden="true">→</span>
-        </Link> : <span />}
-      </nav>
-
-      {clips.length > 1 && (
-        <section className="watch__channel" aria-labelledby="watch-channel-heading">
-          <h2 id="watch-channel-heading">More {element.name} videos</h2>
-          <ul className="watch__list">
-            {clips.map((item, i) => (
-              <li key={item.slug}>
-                <Link
-                  to={clipPath(element, item)}
-                  className={`watch__item${i === index ? ' watch__item--current' : ''}`}
-                  aria-current={i === index ? 'page' : undefined}
-                >
-                  <img src={posterUrl(item)} alt="" width={160} height={90} loading="lazy" decoding="async" />
-                  <span className="watch__item-title">{item.title}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+    <main className="reel" style={{ '--cat-color': categoryColors[element.category] } as React.CSSProperties}>
+      <div className="reel__scroller" ref={scrollerRef} aria-label={`${element.name} videos`}>
+        {clips.map((clip, i) => (
+          <ReelSlide key={clip.slug} element={element} clip={clip} index={i} count={clips.length}
+            active={i === active} near={Math.abs(i - active) <= 1} paused={paused} onToggle={() => setPaused(p => !p)} />
+        ))}
+        <section className="reel__slide reel__slide--end" data-index={clips.length} aria-label="More to explore">
+          <div className="reel__end">
+            <p className="reel__end-symbol" aria-hidden="true">{element.symbol}</p>
+            <h2>That's {element.name}.</h2>
+            <Link to={elementPath(element)} className="reel__button">Explore {element.name}: facts, properties and a 3D atom</Link>
+            {nextElement.symbol !== element.symbol && (
+              <Link to={clipPath(nextElement, getClips(nextElement)[0])} className="reel__button reel__button--next">
+                Next: {nextElement.name} ({nextElement.symbol})
+              </Link>
+            )}
+            <Link to="/" className="reel__link">Back to the periodic table</Link>
+          </div>
         </section>
-      )}
-
-      <p className="watch__about">
-        <Link to={elementPath(element)}>Explore {element.name}: facts, properties and a 3D atom →</Link>
-      </p>
+      </div>
+      <header className="reel__chrome">
+        <Link to={elementPath(element)} className="reel__element" aria-label={`Back to ${element.name}`}>
+          <span className="reel__symbol" aria-hidden="true">{element.symbol}</span>
+          <span>{element.name}</span>
+        </Link>
+        <span className="reel__count" aria-live="polite">{Math.min(active + 1, clips.length)} / {clips.length}</span>
+        <Link to={elementPath(element)} className="reel__close" aria-label="Close">×</Link>
+      </header>
     </main>
+  );
+}
+
+function ReelSlide({ element, clip, index, count, active, near, paused, onToggle }: {
+  element: typeof elements[number]; clip: Clip; index: number; count: number;
+  active: boolean; near: boolean; paused: boolean; onToggle: () => void;
+}) {
+  const media = clipMedia(clip);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const portrait = clip.aspect === '9:16';
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (active && !paused) video.play().catch(() => undefined);
+    else { video.pause(); if (!active) video.currentTime = 0; }
+  }, [active, paused, near]);
+
+  return (
+    <section className={`reel__slide${portrait ? '' : ' reel__slide--landscape'}`} data-index={index}
+      aria-roledescription="slide" aria-label={`${index + 1} of ${count}: ${clip.title}`}>
+      {!portrait && <div className="reel__backdrop" style={{ backgroundImage: `url(${media.poster})` }} aria-hidden="true" />}
+      <video
+        ref={videoRef}
+        className="reel__video"
+        src={near ? media.url : undefined}
+        poster={media.poster}
+        muted loop playsInline
+        preload={active ? 'auto' : near ? 'metadata' : 'none'}
+        aria-label={clip.fact}
+        onClick={onToggle}
+      />
+      {active && paused && (
+        <button className="reel__play" onClick={onToggle} aria-label="Play">
+          <svg viewBox="0 0 24 24" width="36" height="36" fill="currentColor" aria-hidden="true"><path d="M7 4l13 8-13 8z" /></svg>
+        </button>
+      )}
+      <div className="reel__caption">
+        <h1 className="reel__title">{clip.title}</h1>
+        <p className="reel__fact">{clip.fact}</p>
+        <Link to={elementPath(element)} className="reel__more">More about {element.name} →</Link>
+      </div>
+    </section>
   );
 }

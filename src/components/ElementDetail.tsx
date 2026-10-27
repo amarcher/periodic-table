@@ -4,9 +4,9 @@ import type { AtomViewMode } from './atom/atomConfig';
 import { categoryColors, categoryLabels } from '../utils/colors';
 import { Link } from 'react-router-dom';
 import { getVideoEntry } from '../data/videoManifest';
-import { getClips } from '../data/clips';
+import { getClips, getShorts } from '../data/clips';
 import { clipPath } from '../utils/seo';
-import { ElementVideo } from './ElementVideo';
+import { ElementVideoCarousel } from './ElementVideoCarousel';
 import { ElementPhoto } from './ElementPhoto';
 import { DensityViz } from './viz/DensityViz';
 import { PhaseDiagramViz } from './viz/PhaseDiagramViz';
@@ -79,6 +79,7 @@ export function ElementDetail({ element, onClose, atomViewMode, onAtomViewModeCh
   const catColor = categoryColors[element.category];
   const hasVideo = !!getVideoEntry(element.atomicNumber);
   const clips = getClips(element);
+  const shorts = getShorts(element);
 
   return (
     <div
@@ -137,7 +138,7 @@ export function ElementDetail({ element, onClose, atomViewMode, onAtomViewModeCh
             style={{ '--vt-name': `hero-${element.symbol}` } as React.CSSProperties}
           >
             {hasVideo ? (
-              <ElementVideo element={element} />
+              <ElementVideoCarousel element={element} />
             ) : (
               <ElementPhoto element={element} />
             )}
@@ -159,7 +160,7 @@ export function ElementDetail({ element, onClose, atomViewMode, onAtomViewModeCh
             <p className="detail__summary">{element.summary}</p>
             {clips.length > 0 && (
               <Link className="detail__clips-link" to={clipPath(element, clips[0])}>
-                <span aria-hidden="true">▶</span> Watch {clips.length === 1 ? `the ${element.name} video` : `${clips.length} short videos about ${element.name}`}
+                <span aria-hidden="true">▶</span> {shorts.length ? `Watch ${shorts.length} shorts about ${element.name}` : `Watch the ${element.name} video full screen`}
               </Link>
             )}
             {element.funFacts.map((fact, i) => (

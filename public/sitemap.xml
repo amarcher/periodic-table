@@ -2,6 +2,10 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://periodictable.tech/</loc></url>
   <url><loc>https://periodictable.tech/element/H</loc></url>
+  <url><loc>https://periodictable.tech/element/H/video/fuel-of-the-stars</loc></url>
+  <url><loc>https://periodictable.tech/element/H/video/water-maker</loc></url>
+  <url><loc>https://periodictable.tech/element/H/video/invisible-flame</loc></url>
+  <url><loc>https://periodictable.tech/element/H/video/rocket-fuel-short</loc></url>
   <url><loc>https://periodictable.tech/element/H/video/hydrogen-filled-soap-bubbles-igniting</loc></url>
   <url><loc>https://periodictable.tech/element/H/video/fuel-of-the-sun</loc></url>
   <url><loc>https://periodictable.tech/element/H/video/two-thirds-of-water</loc></url>
@@ -26,6 +30,9 @@
   <url><loc>https://periodictable.tech/element/Ne</loc></url>
   <url><loc>https://periodictable.tech/element/Ne/video/neon-gas-discharge-tube-erupting</loc></url>
   <url><loc>https://periodictable.tech/element/Na</loc></url>
+  <url><loc>https://periodictable.tech/element/Na/video/soft-then-explosive</loc></url>
+  <url><loc>https://periodictable.tech/element/Na/video/ocean-of-salt</loc></url>
+  <url><loc>https://periodictable.tech/element/Na/video/streetlight-glow-short</loc></url>
   <url><loc>https://periodictable.tech/element/Na/video/sodium-metal-reacting-violently-with</loc></url>
   <url><loc>https://periodictable.tech/element/Na/video/table-salt</loc></url>
   <url><loc>https://periodictable.tech/element/Na/video/streetlight-glow</loc></url>
@@ -165,12 +172,19 @@
   <url><loc>https://periodictable.tech/element/Pt</loc></url>
   <url><loc>https://periodictable.tech/element/Pt/video/platinum-melted-and-poured-as</loc></url>
   <url><loc>https://periodictable.tech/element/Au</loc></url>
+  <url><loc>https://periodictable.tech/element/Au/video/made-of-stardust</loc></url>
+  <url><loc>https://periodictable.tech/element/Au/video/thinner-than-light</loc></url>
+  <url><loc>https://periodictable.tech/element/Au/video/egyptian-gold</loc></url>
+  <url><loc>https://periodictable.tech/element/Au/video/ocean-of-gold</loc></url>
   <url><loc>https://periodictable.tech/element/Au/video/gold-being-melted-and-poured</loc></url>
   <url><loc>https://periodictable.tech/element/Au/video/three-olympic-pools</loc></url>
   <url><loc>https://periodictable.tech/element/Au/video/soft-enough-to-shape</loc></url>
   <url><loc>https://periodictable.tech/element/Au/video/never-tarnishes</loc></url>
   <url><loc>https://periodictable.tech/element/Au/video/gold-in-the-ocean</loc></url>
   <url><loc>https://periodictable.tech/element/Hg</loc></url>
+  <url><loc>https://periodictable.tech/element/Hg/video/cannonball-floats</loc></url>
+  <url><loc>https://periodictable.tech/element/Hg/video/quicksilver-alive</loc></url>
+  <url><loc>https://periodictable.tech/element/Hg/video/liquid-metal-mirror</loc></url>
   <url><loc>https://periodictable.tech/element/Hg/video/liquid-mercury-pooling-in-a</loc></url>
   <url><loc>https://periodictable.tech/element/Hg/video/liquid-at-room-temperature</loc></url>
   <url><loc>https://periodictable.tech/element/Hg/video/quicksilver</loc></url>
