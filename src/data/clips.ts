@@ -102,7 +102,7 @@ export const FACT_CLIPS: Partial<Record<string, Clip[]>> = {
   Na: [
     { slug: 'soft-then-explosive', aspect: '9:16', title: 'Sodium: Soft as Cheese, Explosive in Water',
       fact: 'Sodium is so soft you can slice it with a butter knife like cold cheese — but don\'t let that fool you, because the moment it touches water, it explodes into flames!',
-      filename: '011-Na-short-soft-then-explosive.mp4', uploadDate: '2026-10-27T19:35:52Z' },
+      filename: '011-Na-short-soft-then-explosive.mp4', uploadDate: '2026-10-27T20:37:52Z' },
     { slug: 'ocean-of-salt', aspect: '9:16', title: 'All the Salt in the Ocean, 500 Feet Deep',
       fact: 'If you could extract all the salt (sodium chloride) dissolved in Earth\'s oceans, it would cover every continent in a layer nearly 500 feet deep — that\'s a 50-story building made of salt.',
       filename: '011-Na-short-ocean-of-salt.mp4', uploadDate: '2026-10-27T19:35:51Z' },
