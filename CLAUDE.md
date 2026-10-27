@@ -12,7 +12,8 @@ Interactive periodic table web app for general science education (students, teac
 - `npm test` — run vitest suite once
 - `npm run test:watch` — watch mode
 - `npx tsc --noEmit` — type check without emitting
-- `npm run generate:sitemap` — regenerate `public/sitemap.xml` from `src/data/elements.ts` (also runs as part of `build`)
+- `npm run generate:sitemap` — regenerate `public/sitemap.xml` from the element and clip data (also runs as part of `build`)
+- `npm run generate:clips` — generate any fact clip whose MP4 is missing (see Video Watch Pages)
 - `vercel dev --listen 3000` — exercise the serverless OG function locally (see Routing below)
 
 ## Architecture
@@ -56,6 +57,14 @@ Interactive periodic table web app for general science education (students, teac
 - **Sitemap**: `scripts/generate-sitemap.mjs` writes `public/sitemap.xml` with 119 entries (homepage + 118 elements) via `npm run generate:sitemap`, and the `staticPages` plugin writes the same list to `dist/sitemap.xml` at the end of the build. Both run as part of `npm run build`. After deploy, resubmit `https://periodictable.tech/sitemap.xml` in Google Search Console.
 - **IndexNow (Bing)**: Bing sends more search visitors than Google here. After a production deploy that changes page content or metadata, run `npm run indexnow` (all sitemap URLs) or `npm run indexnow -- /element/Au` (specific paths). The key lives in `public/<32-hex>.txt` and must be live before pinging; the script checks. Google ignores IndexNow.
 - **Thumbnails**: all 118 elements have videos. Run `npx tsx scripts/r2-upload/thumbnails.ts --all` with R2 creds in `.env` to generate poster JPGs locally and upload them to R2 alongside the MP4s. The R2 scripts read `process.env` and there is no dotenv in this project, so sourcing `.env` into the shell can trip the sandbox — wrap the command in a small node runner that reads `.env` itself and spawns with that env.
+## Video Watch Pages ("channels")
+
+- **Why**: Search Console's video report classified every element page as "Video isn't on a watch page": Google only indexes a video that is the page's main content. So each published clip gets its own page at `/element/<Symbol>/video/<slug>`, rendered by `src/components/WatchPage.tsx` (a separate lazy route in `main.tsx`, not the table with a modal). The clips are silent; the caption under the player is the fact, as HTML text.
+- **Data**: `src/data/clips.ts`. Every element with a video gets a *hero clip* derived from `VIDEO_DATA` (slug = first five words of the description, so changing a description changes the URL). Authored *fact clips* live in `FACT_CLIPS` keyed by symbol; `fact` must be one of the element's `funFacts` verbatim (a test checks). A fact clip is **unpublished until it has an `uploadDate`**, which is the R2 `Last-Modified` timestamp, so add it only after the upload.
+- **Generating clips**: prompts are in `scripts/generate-videos/clip-prompts.ts` keyed `<Symbol>/<slug>`. `npm run generate:clips` (optionally `-- --element Au`, `-- --dry-run`) generates every clip whose MP4 is missing from `public/element-videos/` with **Gemini Omni 1.1 Flash** through the Interactions API (about /bin/zsh.80 per 8s clip at 720p), strips the audio, and writes the silent MP4. Veo 3.1 was retired by Google in October 2026; `api-client.ts` still targets it and will 404. The script records each generated file id in `output/staging/clips/file-ids.json` because the File API keeps generations for 48h, so a failed download is recoverable without paying again. `duration` must be a string like `"8s"`. Google echoes the API key in some error bodies; the script masks it, keep it that way.
+- **Ship path**: `npm run generate:clips` → `node scripts/run-with-env.mjs npx tsx scripts/r2-upload/thumbnails.ts --all` → `... upload.ts --sync` → set each clip's `uploadDate` from the CDN's `Last-Modified` → build. `scripts/run-with-env.mjs` feeds `.env` to a command without sourcing it into the shell.
+- **SEO**: `clipPageMetadata` in `seo.ts` emits `og:type video.other`, a top-level `VideoObject` with `mainEntityOfPage` and a three-level `BreadcrumbList`. Watch pages are prerendered to `dist/element/<Symbol>/video/<slug>.html` and listed in the sitemap via `sitemapPaths()` in `src/utils/sitemap.ts`, which both the build plugin and `npm run generate:sitemap` (now a tsx script) use.
+
 ## Accessibility
 
 - `ElementDetail` is a focus-trapped `role="dialog"` modal — close button is auto-focused on mount, Tab cycles within

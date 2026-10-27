@@ -1,14 +1,16 @@
 import type { Element } from '../types/element';
-import { pageMetadata } from './seo';
+import type { Clip } from '../data/clips';
+import { clipPageMetadata, pageMetadata, type PageMetadata } from './seo';
 
-export function updatePageMetadata(element?: Element | null) {
-  const meta = pageMetadata(element, import.meta.env.VITE_VIDEO_CDN_URL);
+/** Writes page metadata into the live <head> on client-side route changes. */
+export function applyPageMetadata(meta: PageMetadata) {
   document.title = meta.title;
   const set = (selector: string, content: string) => {
     document.querySelector(selector)?.setAttribute('content', content);
   };
   document.querySelector('link[rel="canonical"]')?.setAttribute('href', meta.url);
   set('meta[name="description"]', meta.description);
+  set('meta[property="og:type"]', meta.ogType);
   set('meta[property="og:title"]', meta.title);
   set('meta[property="og:description"]', meta.description);
   set('meta[property="og:url"]', meta.url);
@@ -33,4 +35,12 @@ export function updatePageMetadata(element?: Element | null) {
   }
   const json = document.querySelector('script[type="application/ld+json"]');
   if (json) json.textContent = JSON.stringify(meta.structuredData);
+}
+
+export function updatePageMetadata(element?: Element | null) {
+  applyPageMetadata(pageMetadata(element, import.meta.env.VITE_VIDEO_CDN_URL));
+}
+
+export function updateClipMetadata(element: Element, clip: Clip) {
+  applyPageMetadata(clipPageMetadata(element, clip, import.meta.env.VITE_VIDEO_CDN_URL));
 }

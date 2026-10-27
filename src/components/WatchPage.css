@@ -1,0 +1,222 @@
+/* Watch page: the video is the page. Category colour arrives as --cat-color. */
+
+.watch {
+  position: relative;
+  z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  /* viewport-fit=cover is on, so the horizontal insets and the home indicator are ours to reserve. */
+  padding: 14px max(16px, env(safe-area-inset-right)) max(28px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+}
+
+.watch__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.watch__element {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  color: #e8e8f0;
+  text-decoration: none;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 1.1rem;
+  border-radius: 12px;
+}
+
+.watch__symbol {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--cat-color);
+  background: color-mix(in srgb, var(--cat-color) 22%, transparent);
+  border: 1px solid color-mix(in srgb, var(--cat-color) 45%, transparent);
+}
+
+.watch__element-name {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.watch__element-name small {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 0.74rem;
+  color: var(--cat-color);
+}
+
+.watch__home {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.06);
+  text-decoration: none;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.watch__stage {
+  margin: 0;
+  overflow: hidden;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  background: #000;
+}
+
+.watch__video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+
+/* The caption is the fact itself: big, readable, and real text for search. */
+.watch__caption {
+  padding: 14px 18px;
+  font-size: clamp(1.05rem, 2.4vw, 1.35rem);
+  font-weight: 500;
+  line-height: 1.4;
+  color: #fff;
+  background: color-mix(in srgb, var(--cat-color) 16%, rgba(10, 10, 26, 0.9));
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.watch__title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(1.25rem, 3vw, 1.9rem);
+  font-weight: 700;
+  line-height: 1.2;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.watch__pager {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+}
+
+.watch__pager-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #e8e8f0;
+  text-decoration: none;
+  font-size: 0.9rem;
+  justify-self: start;
+}
+
+.watch__pager-link--next {
+  justify-self: end;
+}
+
+.watch__count {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.watch__channel h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 10px;
+}
+
+.watch__list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
+}
+
+.watch__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 66px;
+  padding: 6px;
+  border-radius: 12px;
+  color: #e8e8f0;
+  text-decoration: none;
+  font-size: 0.88rem;
+  line-height: 1.3;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.watch__item img {
+  flex: 0 0 auto;
+  width: 96px;
+  height: 54px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #000;
+}
+
+/* The playing clip is marked by a tinted fill, not an edge accent. */
+.watch__item--current {
+  background: color-mix(in srgb, var(--cat-color) 24%, transparent);
+  font-weight: 600;
+}
+
+.watch__about a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--cat-color);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* Hover is not a touch state: every link also has an active and a focus treatment. */
+.watch__home:hover, .watch__pager-link:hover, .watch__item:hover { background: rgba(255, 255, 255, 0.12); }
+.watch__home:active, .watch__pager-link:active, .watch__item:active { background: rgba(255, 255, 255, 0.18); }
+.watch__item--current:hover, .watch__item--current:active { background: color-mix(in srgb, var(--cat-color) 32%, transparent); }
+.watch a:focus-visible { outline: 2px solid rgba(255, 255, 255, 0.7); outline-offset: 2px; }
+
+@media (max-width: 599px) {
+  .watch { gap: 14px; }
+  .watch__stage { border-radius: 12px; }
+  .watch__home { display: none; }
+
+  /* One row of cards the thumb can flick through. Contain the chaining so the
+     page does not rubber-band when the row hits its end. */
+  .watch__list {
+    display: flex;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 6px;
+    margin-inline: -16px;
+    padding-inline: 16px;
+  }
+
+  .watch__list li { flex: 0 0 260px; scroll-snap-align: start; }
+}

@@ -1,7 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { elements } from '../src/data/elements';
-import { pageMetadata, wikipediaUrl } from '../src/utils/seo';
+import { FACT_CLIPS, getClips, heroClip } from '../src/data/clips';
+import { clipPageMetadata, pageMetadata, wikipediaUrl } from '../src/utils/seo';
+import { sitemapPaths } from '../src/utils/sitemap';
+import { CLIP_PROMPTS } from './generate-videos/clip-prompts';
 import { propertyRows, renderStaticPage } from './static-pages';
 
 const template = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
@@ -24,6 +27,7 @@ describe('searchable pages', () => {
       const [resource, breadcrumbs] = jsonLd(html)['@graph'];
       expect(resource.url).toBe(metadata.url);
       expect(resource.about.sameAs).toBe(wikipediaUrl(element));
+      expect(resource.isPartOf['@type']).toBe('WebSite');
       expect(breadcrumbs['@type']).toBe('BreadcrumbList');
       expect(breadcrumbs.itemListElement[1].item).toBe(metadata.url);
     }
@@ -44,7 +48,7 @@ describe('searchable pages', () => {
   it('preserves authored video sharing and has a complete homepage without JavaScript', () => {
     expect(renderStaticPage(template, gold, 'https://cdn.example.test')).toContain('https://cdn.example.test/079-Au-veo31fast.mp4');
     const home = renderStaticPage(template);
-    expect(home.match(/href="\/element\//g)).toHaveLength(118);
+    expect(home.match(/href="\/element\/[A-Z][a-z]?"/g)).toHaveLength(118);
     expect(home).not.toContain('<div id="root"></div>');
     // Category vocabulary is visible text, with correct plurals.
     for (const heading of ['Alkali Metals', 'Noble Gases', 'Lanthanides', 'Halogens']) expect(home).toContain(`<h2>${heading}</h2>`);
@@ -95,7 +99,6 @@ describe('searchable pages', () => {
       const video = jsonLd(renderStaticPage(template, element))['@graph'][0].video;
       expect(video['@type']).toBe('VideoObject');
       expect(video.uploadDate).toMatch(/^20\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ$/); // Google requires a timezone
-      expect(jsonLd(renderStaticPage(template, element))['@graph'][0].isPartOf['@type']).toBe('WebSite');
       expect(video.thumbnailUrl).toMatch(/\.jpg$/);
       expect(video.contentUrl).toMatch(/\.mp4$/);
       expect(video.name).toContain(element.name);
@@ -112,5 +115,70 @@ describe('searchable pages', () => {
     // No content attribute may run to end-of-line with its value unterminated.
     expect(html).not.toMatch(/content="[^"]*\n/);
     expect(pageMetadata(gold, 'https://cdn.example.test/\n').image).not.toMatch(/\s/);
+  });
+});
+
+describe('watch pages', () => {
+  it('gives every element a hero clip with a stable, URL-safe slug and a publish date', () => {
+    for (const element of elements) {
+      const hero = heroClip(element)!;
+      expect(hero.slug).toMatch(/^[a-z0-9]+(-[a-z0-9]+){0,4}$/);
+      expect(hero.uploadDate).toBeTruthy();
+      expect(getClips(element)[0]).toEqual(hero);
+    }
+  });
+
+  it('publishes only fact clips that have been uploaded, and every fact clip has a prompt', () => {
+    for (const [symbol, clips] of Object.entries(FACT_CLIPS)) {
+      const element = elements.find(e => e.symbol === symbol)!;
+      expect(element).toBeTruthy();
+      const slugs = new Set<string>();
+      for (const clip of clips ?? []) {
+        expect(CLIP_PROMPTS[`${symbol}/${clip.slug}`]).toBeTruthy();
+        expect(clip.filename).toBe(`${String(element.atomicNumber).padStart(3, '0')}-${symbol}-${clip.slug}.mp4`);
+        expect(element.funFacts).toContain(clip.fact);
+        expect(slugs.has(clip.slug)).toBe(false);
+        slugs.add(clip.slug);
+      }
+      expect(getClips(element).every(clip => clip.uploadDate)).toBe(true);
+    }
+  });
+
+  it('prerenders each clip as a video page with schema, breadcrumbs and a channel', () => {
+    let pages = 0;
+    for (const element of elements) {
+      for (const clip of getClips(element)) {
+        const html = renderStaticPage(template, element, 'https://cdn.example.test', clip);
+        const meta = clipPageMetadata(element, clip, 'https://cdn.example.test');
+        pages++;
+        // Authored fact-clip titles stay search-length; hero pages reuse the full video description.
+        const authored = FACT_CLIPS[element.symbol]?.some(c => c.slug === clip.slug);
+        expect(meta.title.length).toBeLessThanOrEqual(authored ? 70 : 180);
+        expect(meta.description.length).toBeLessThanOrEqual(160);
+        expect(html).toContain(`<link rel="canonical" href="https://periodictable.tech/element/${element.symbol}/video/${clip.slug}" />`);
+        expect(html).toContain('<meta property="og:type" content="video.other" />');
+        expect(html).toContain(`<h1>${clip.title.replace(/&/g, '&amp;').replace(/'/g, '&#39;').replace(/"/g, '&quot;')}</h1>`);
+        expect(html).toContain(`<source src="https://cdn.example.test/${clip.filename}" type="video/mp4" />`);
+        expect(html).toContain(`href="/element/${element.symbol}"`);
+        const [video, breadcrumbs] = jsonLd(html)['@graph'];
+        expect(video['@type']).toBe('VideoObject');
+        expect(video.mainEntityOfPage).toBe(meta.url);
+        expect(video.uploadDate).toMatch(/^20\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ$/);
+        expect(video.duration).toBe('PT8S');
+        expect(breadcrumbs.itemListElement).toHaveLength(3);
+        expect(breadcrumbs.itemListElement[2].item).toBe(meta.url);
+      }
+    }
+    expect(pages).toBeGreaterThanOrEqual(118);
+  });
+
+  it('lists watch pages in the sitemap and links them from the element page', () => {
+    const paths = sitemapPaths();
+    const clipCount = elements.reduce((n, element) => n + getClips(element).length, 0);
+    expect(paths).toHaveLength(1 + 118 + clipCount);
+    expect(new Set(paths).size).toBe(paths.length);
+    const hero = heroClip(gold)!;
+    expect(paths).toContain(`/element/Au/video/${hero.slug}`);
+    expect(renderStaticPage(template, gold)).toContain(`href="/element/Au/video/${hero.slug}"`);
   });
 });

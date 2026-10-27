@@ -2,7 +2,10 @@ import { useEffect, useRef } from 'react';
 import type { Element } from '../types/element';
 import type { AtomViewMode } from './atom/atomConfig';
 import { categoryColors, categoryLabels } from '../utils/colors';
+import { Link } from 'react-router-dom';
 import { getVideoEntry } from '../data/videoManifest';
+import { getClips } from '../data/clips';
+import { clipPath } from '../utils/seo';
 import { ElementVideo } from './ElementVideo';
 import { ElementPhoto } from './ElementPhoto';
 import { DensityViz } from './viz/DensityViz';
@@ -75,6 +78,7 @@ export function ElementDetail({ element, onClose, atomViewMode, onAtomViewModeCh
 
   const catColor = categoryColors[element.category];
   const hasVideo = !!getVideoEntry(element.atomicNumber);
+  const clips = getClips(element);
 
   return (
     <div
@@ -153,6 +157,11 @@ export function ElementDetail({ element, onClose, atomViewMode, onAtomViewModeCh
             style={{ '--vt-name': 'detail-facts' } as React.CSSProperties}
           >
             <p className="detail__summary">{element.summary}</p>
+            {clips.length > 0 && (
+              <Link className="detail__clips-link" to={clipPath(element, clips[0])}>
+                <span aria-hidden="true">▶</span> Watch {clips.length === 1 ? `the ${element.name} video` : `${clips.length} short videos about ${element.name}`}
+              </Link>
+            )}
             {element.funFacts.map((fact, i) => (
               <div key={i} className="detail__fact-card">
                 <span className="detail__fact-icon">
