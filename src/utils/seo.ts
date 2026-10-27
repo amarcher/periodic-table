@@ -1,5 +1,5 @@
 import type { Element } from '../types/element';
-import type { Clip } from '../data/clips';
+import { CLIP_DURATION, clipSize, type Clip } from '../data/clips';
 import { VIDEO_DATA } from '../data/videoData';
 import { categoryLabels } from './colors';
 
@@ -14,8 +14,9 @@ export const DEFAULT_VIDEO_CDN = 'https://pub-31265833619c4b07a0d5cae75480e369.r
 // an even height). og:image:width/height must describe the image actually sent,
 // not the homepage PNG, or social cards are cropped on first share.
 export const POSTER_SIZE = { width: 1200, height: 676 } as const;
+// Portrait shorts are 720×1280; the same scale gives a 1200×2134 poster.
+export const PORTRAIT_POSTER_SIZE = { width: 1200, height: 2134 } as const;
 const OG_IMAGE_SIZE = { width: 1200, height: 630 } as const;
-const CLIP_SECONDS = 8;
 
 export function escapeHtml(value: string): string {
   return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -43,8 +44,17 @@ export function clipTitle(element: Element, clip: Clip): string {
   return `${clip.title} | ${element.name} Video`;
 }
 
+// Research captions can run past a snippet. Keep the first sentence or clause, and if that is
+// still too long cut at a word boundary with an ellipsis, before appending the optional clauses.
+function snippetLead(fact: string): string {
+  if (fact.length <= DESCRIPTION_LIMIT) return fact;
+  const sentence = fact.split(/(?<=[.!?])\s/)[0];
+  if (sentence.length <= DESCRIPTION_LIMIT) return sentence;
+  return `${sentence.slice(0, DESCRIPTION_LIMIT - 1).replace(/[\s,;:—-]+\S*$/, '')}…`;
+}
+
 export function clipDescription(element: Element, clip: Clip): string {
-  return fitClauses(clip.fact, [
+  return fitClauses(snippetLead(clip.fact), [
     ` A short silent video about ${element.name}, element ${element.atomicNumber}.`,
     ` More ${element.name} facts, properties and a 3D atom on Periodic Table.`,
   ]);
@@ -97,6 +107,8 @@ export interface PageMetadata {
   imageHeight: number;
   imageAlt: string;
   video: string | null;
+  videoWidth: number;
+  videoHeight: number;
   videoDescription: string | null;
   structuredData: Record<string, unknown>;
 }
@@ -117,6 +129,8 @@ export function pageMetadata(element?: Element | null, cdn = DEFAULT_VIDEO_CDN):
     imageHeight: imageSize.height,
     imageAlt: element ? `${element.name} — element ${element.atomicNumber}` : 'The periodic table',
     video: video ? `${base}/${video.filename}` : null,
+    videoWidth: 1280,
+    videoHeight: 720,
     videoDescription: video?.description ?? null,
     // One <script type="application/ld+json"> per page. Element pages carry two
     // nodes in an @graph: the learning resource itself (with a Wikipedia sameAs
@@ -167,16 +181,20 @@ export function clipPageMetadata(element: Element, clip: Clip, cdn = DEFAULT_VID
   const url = `${SITE_ORIGIN}${clipPath(element, clip)}`;
   const image = `${base}/${posterFilename(clip.filename)}`;
   const video = `${base}/${clip.filename}`;
+  const size = clipSize(clip.aspect);
+  const poster = clip.aspect === '9:16' ? PORTRAIT_POSTER_SIZE : POSTER_SIZE;
   return {
     title: clipTitle(element, clip),
     description: clipDescription(element, clip),
     url,
     ogType: 'video.other',
     image,
-    imageWidth: POSTER_SIZE.width,
-    imageHeight: POSTER_SIZE.height,
+    imageWidth: poster.width,
+    imageHeight: poster.height,
     imageAlt: clip.fact,
     video,
+    videoWidth: size.width,
+    videoHeight: size.height,
     videoDescription: clip.fact,
     structuredData: {
       '@context': 'https://schema.org',
@@ -185,7 +203,7 @@ export function clipPageMetadata(element: Element, clip: Clip, cdn = DEFAULT_VID
           '@type': 'VideoObject', '@id': url, mainEntityOfPage: url,
           name: clip.title, description: clip.fact,
           thumbnailUrl: image, contentUrl: video, uploadDate: clip.uploadDate,
-          duration: `PT${CLIP_SECONDS}S`, width: 1280, height: 720,
+          duration: CLIP_DURATION, width: size.width, height: size.height,
           inLanguage: 'en', isFamilyFriendly: true, isAccessibleForFree: true,
           isPartOf: siteNode, about: elementThing(element),
         },

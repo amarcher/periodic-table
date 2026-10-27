@@ -1,13 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
 import type { Element } from '../types/element';
-import { getVideoEntry } from '../data/videoManifest';
+import type { Clip } from '../data/clips';
+import { getVideoEntry, clipMedia } from '../data/videoManifest';
 import { trackDiagnostic, trackEvent, trackVideoPlayToggle, trackVideoLoop } from '../utils/analytics';
 import { VideoPlaybackTracker } from '../utils/mediaTracking';
 import { useMediaVisible, useReducedMotion, useSaveData } from '../hooks/useDisplayPreferences';
 import './ElementVideo.css';
 
-export function ElementVideo({ element }: { element: Element }) {
-  const entry = getVideoEntry(element.atomicNumber);
+/** The element's landscape player. Plays the hero video unless given a clip. */
+export function ElementVideo({ element, clip }: { element: Element; clip?: Clip }) {
+  const entry = clip ? clipMedia(clip) : getVideoEntry(element.atomicNumber);
   const videoRef = useRef<HTMLVideoElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const visible = useMediaVisible(wrapperRef);
@@ -21,7 +23,7 @@ export function ElementVideo({ element }: { element: Element }) {
   const tracker = useRef(new VideoPlaybackTracker());
   const started = useRef(false);
   const loadedAt = useRef(0);
-  const props = { symbol: element.symbol, atomic_number: element.atomicNumber };
+  const props = { symbol: element.symbol, atomic_number: element.atomicNumber, ...(clip ? { clip: clip.slug } : {}) };
 
   useEffect(() => {
     const video = videoRef.current;
@@ -37,7 +39,7 @@ export function ElementVideo({ element }: { element: Element }) {
     const playback = tracker.current;
     const flush = () => {
       const watched = playback.takeWatchedMs();
-      if (watched > 0) trackEvent('video_engagement', { symbol: element.symbol, atomic_number: element.atomicNumber, watched_ms: watched });
+      if (watched > 0) trackEvent('video_engagement', { ...props, watched_ms: watched });
     };
     const hide = () => { if (document.hidden) flush(); };
     const timer = setInterval(flush, 30_000);
@@ -49,7 +51,8 @@ export function ElementVideo({ element }: { element: Element }) {
       document.removeEventListener('visibilitychange', hide);
       flush();
     };
-  }, [element]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [element, clip?.slug]);
 
   const sampleVideo = (video: HTMLVideoElement) => {
     if (tracker.current.sample(video.currentTime, video.duration, !video.paused && visible && !document.hidden, video.seeking)) {

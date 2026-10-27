@@ -25,7 +25,7 @@ export function applyPageMetadata(meta: PageMetadata) {
   if (meta.video) {
     for (const [property, content] of Object.entries({
       'og:video': meta.video, 'og:video:secure_url': meta.video,
-      'og:video:type': 'video/mp4', 'og:video:width': '1280', 'og:video:height': '720',
+      'og:video:type': 'video/mp4', 'og:video:width': String(meta.videoWidth), 'og:video:height': String(meta.videoHeight),
     })) {
       const tag = document.createElement('meta');
       tag.setAttribute('property', property);
