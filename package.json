@@ -10,8 +10,9 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "generate:sitemap": "node scripts/generate-sitemap.mjs",
-    "indexnow": "node scripts/indexnow.mjs"
+    "generate:sitemap": "tsx scripts/generate-sitemap.ts",
+    "indexnow": "node scripts/indexnow.mjs",
+    "generate:clips": "node scripts/run-with-env.mjs npx tsx scripts/generate-videos/clips.ts"
   },
   "dependencies": {
     "@elevenlabs/react": "^1.15.0",
@@ -40,6 +41,7 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
+    "tsx": "^4.23.15",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.56.1",
     "vite": "^8.0.0",

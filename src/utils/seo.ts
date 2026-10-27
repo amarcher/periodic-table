@@ -1,4 +1,5 @@
 import type { Element } from '../types/element';
+import type { Clip } from '../data/clips';
 import { VIDEO_DATA } from '../data/videoData';
 import { categoryLabels } from './colors';
 
@@ -14,6 +15,7 @@ export const DEFAULT_VIDEO_CDN = 'https://pub-31265833619c4b07a0d5cae75480e369.r
 // not the homepage PNG, or social cards are cropped on first share.
 export const POSTER_SIZE = { width: 1200, height: 676 } as const;
 const OG_IMAGE_SIZE = { width: 1200, height: 630 } as const;
+const CLIP_SECONDS = 8;
 
 export function escapeHtml(value: string): string {
   return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -22,6 +24,8 @@ export function escapeHtml(value: string): string {
 
 // Search result snippets are cut off around 160 characters, so optional clauses are only added while they fit.
 const DESCRIPTION_LIMIT = 160;
+const fitClauses = (lead: string, clauses: string[]) =>
+  clauses.reduce((text, clause) => text.length + clause.length <= DESCRIPTION_LIMIT ? text + clause : text, lead);
 
 export function elementTitle(element: Element): string {
   return `${element.name} (${element.symbol}): Facts & Properties of Element ${element.atomicNumber}`;
@@ -29,12 +33,21 @@ export function elementTitle(element: Element): string {
 
 export function elementDescription(element: Element, hasVideo: boolean): string {
   const category = categoryLabels[element.category].toLowerCase();
-  const clauses = [
+  return fitClauses(element.summary, [
     ` Atomic number ${element.atomicNumber}, ${/^[aeiou]/.test(category) ? 'an' : 'a'} ${category}.`,
     hasVideo ? ' See it in a video and a 3D atom model.' : ' Explore its 3D atom model.',
-  ];
-  return clauses.reduce((text, clause) =>
-    text.length + clause.length <= DESCRIPTION_LIMIT ? text + clause : text, element.summary);
+  ]);
+}
+
+export function clipTitle(element: Element, clip: Clip): string {
+  return `${clip.title} | ${element.name} Video`;
+}
+
+export function clipDescription(element: Element, clip: Clip): string {
+  return fitClauses(clip.fact, [
+    ` A short silent video about ${element.name}, element ${element.atomicNumber}.`,
+    ` More ${element.name} facts, properties and a 3D atom on Periodic Table.`,
+  ]);
 }
 
 // Every element name is also its English Wikipedia article title, except Mercury,
@@ -44,23 +57,61 @@ export function wikipediaUrl(element: Element): string {
   return `https://en.wikipedia.org/wiki/${title}`;
 }
 
-export function pageMetadata(element?: Element | null, cdn = DEFAULT_VIDEO_CDN) {
-  const video = element ? VIDEO_DATA[element.atomicNumber] : undefined;
-  // Relative development media paths are never used in public metadata.
-  // Trim first: the configured CDN value has carried a trailing newline, and
-  // stripping only a trailing slash left it in, so every og:image and og:video
-  // URL was emitted broken across two lines and rejected by crawlers.
+export function elementPath(element: Element): string {
+  return `/element/${element.symbol}`;
+}
+
+export function clipPath(element: Element, clip: Clip): string {
+  return `${elementPath(element)}/video/${clip.slug}`;
+}
+
+// Relative development media paths are never used in public metadata.
+// Trim first: the configured CDN value has carried a trailing newline, and
+// stripping only a trailing slash left it in, so every og:image and og:video
+// URL was emitted broken across two lines and rejected by crawlers.
+export function mediaBase(cdn = DEFAULT_VIDEO_CDN): string {
   const configured = cdn.trim();
-  const base = /^https:\/\//.test(configured)
-    ? configured.replace(/\/+$/, '')
-    : DEFAULT_VIDEO_CDN;
-  const url = `${SITE_ORIGIN}${element ? `/element/${element.symbol}` : '/'}`;
-  const image = video ? `${base}/${video.filename.replace(/\.mp4$/i, '.jpg')}` : `${SITE_ORIGIN}/og-image.png`;
+  return /^https:\/\//.test(configured) ? configured.replace(/\/+$/, '') : DEFAULT_VIDEO_CDN;
+}
+
+export const posterFilename = (filename: string) => filename.replace(/\.mp4$/i, '.jpg');
+
+const siteNode = { '@type': 'WebSite', name: SITE_NAME, url: `${SITE_ORIGIN}/` };
+const elementThing = (element: Element) => ({
+  '@type': 'Thing', name: element.name, alternateName: element.symbol,
+  description: `Chemical element with atomic number ${element.atomicNumber}`,
+  sameAs: wikipediaUrl(element),
+});
+const breadcrumbs = (items: Array<[string, string]>) => ({
+  '@type': 'BreadcrumbList',
+  itemListElement: items.map(([name, item], i) => ({ '@type': 'ListItem', position: i + 1, name, item })),
+});
+
+export interface PageMetadata {
+  title: string;
+  description: string;
+  url: string;
+  ogType: 'website' | 'video.other';
+  image: string;
+  imageWidth: number;
+  imageHeight: number;
+  imageAlt: string;
+  video: string | null;
+  videoDescription: string | null;
+  structuredData: Record<string, unknown>;
+}
+
+export function pageMetadata(element?: Element | null, cdn = DEFAULT_VIDEO_CDN): PageMetadata {
+  const video = element ? VIDEO_DATA[element.atomicNumber] : undefined;
+  const base = mediaBase(cdn);
+  const url = `${SITE_ORIGIN}${element ? elementPath(element) : '/'}`;
+  const image = video ? `${base}/${posterFilename(video.filename)}` : `${SITE_ORIGIN}/og-image.png`;
   const imageSize = video ? POSTER_SIZE : OG_IMAGE_SIZE;
   return {
     title: element ? elementTitle(element) : SITE_TITLE,
     description: element ? elementDescription(element, Boolean(video)) : SITE_DESCRIPTION,
     url,
+    ogType: 'website',
     image,
     imageWidth: imageSize.width,
     imageHeight: imageSize.height,
@@ -80,7 +131,7 @@ export function pageMetadata(element?: Element | null, cdn = DEFAULT_VIDEO_CDN) 
           isAccessibleForFree: true, learningResourceType: 'Interactive element explorer',
           // WebSite, not WebApplication: Google validates a nested WebApplication as a Software App
           // rich result and fails it for lacking offers/category, which this reference is not.
-          isPartOf: { '@type': 'WebSite', name: SITE_NAME, url: `${SITE_ORIGIN}/` },
+          isPartOf: siteNode,
           // Google's video rich results require name, thumbnailUrl and uploadDate; the date is
           // the real CDN publish date recorded in videoData.ts, never a placeholder.
           ...(video ? { video: {
@@ -89,19 +140,9 @@ export function pageMetadata(element?: Element | null, cdn = DEFAULT_VIDEO_CDN) 
             thumbnailUrl: image, contentUrl: `${base}/${video.filename}`, uploadDate: video.uploadDate,
             width: 1280, height: 720, inLanguage: 'en', isFamilyFriendly: true,
           } } : {}),
-          about: {
-            '@type': 'Thing', name: element.name, alternateName: element.symbol,
-            description: `Chemical element with atomic number ${element.atomicNumber}`,
-            sameAs: wikipediaUrl(element),
-          },
+          about: elementThing(element),
         },
-        {
-          '@type': 'BreadcrumbList',
-          itemListElement: [
-            { '@type': 'ListItem', position: 1, name: SITE_NAME, item: `${SITE_ORIGIN}/` },
-            { '@type': 'ListItem', position: 2, name: `${element.name} (${element.symbol})`, item: url },
-          ],
-        },
+        breadcrumbs([[SITE_NAME, `${SITE_ORIGIN}/`], [`${element.name} (${element.symbol})`, url]]),
       ],
     } : {
       '@context': 'https://schema.org', '@type': 'WebApplication', name: SITE_NAME,
@@ -112,6 +153,48 @@ export function pageMetadata(element?: Element | null, cdn = DEFAULT_VIDEO_CDN) 
         '@type': 'Thing', name: 'Periodic table', sameAs: 'https://en.wikipedia.org/wiki/Periodic_table',
         description: 'A tabular display of the chemical elements organized by atomic number and electron configuration',
       },
+    },
+  };
+}
+
+/**
+ * A clip's watch page. The video is the page's main content, which is what
+ * Google requires before it will index a video ("watch page"); the element
+ * page itself is classified as a page about the element, not the video.
+ */
+export function clipPageMetadata(element: Element, clip: Clip, cdn = DEFAULT_VIDEO_CDN): PageMetadata {
+  const base = mediaBase(cdn);
+  const url = `${SITE_ORIGIN}${clipPath(element, clip)}`;
+  const image = `${base}/${posterFilename(clip.filename)}`;
+  const video = `${base}/${clip.filename}`;
+  return {
+    title: clipTitle(element, clip),
+    description: clipDescription(element, clip),
+    url,
+    ogType: 'video.other',
+    image,
+    imageWidth: POSTER_SIZE.width,
+    imageHeight: POSTER_SIZE.height,
+    imageAlt: clip.fact,
+    video,
+    videoDescription: clip.fact,
+    structuredData: {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'VideoObject', '@id': url, mainEntityOfPage: url,
+          name: clip.title, description: clip.fact,
+          thumbnailUrl: image, contentUrl: video, uploadDate: clip.uploadDate,
+          duration: `PT${CLIP_SECONDS}S`, width: 1280, height: 720,
+          inLanguage: 'en', isFamilyFriendly: true, isAccessibleForFree: true,
+          isPartOf: siteNode, about: elementThing(element),
+        },
+        breadcrumbs([
+          [SITE_NAME, `${SITE_ORIGIN}/`],
+          [`${element.name} (${element.symbol})`, `${SITE_ORIGIN}${elementPath(element)}`],
+          [clip.title, url],
+        ]),
+      ],
     },
   };
 }
