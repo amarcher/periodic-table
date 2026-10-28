@@ -29,6 +29,9 @@ export default function WatchPage() {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(Math.max(0, urlIndex));
   const [paused, setPaused] = useState(!autoplay);
+  // A refused play() (Low Power Mode, Data Saver, "never autoplay" settings) must
+  // surface the play button rather than leave the poster looking frozen.
+  const onBlocked = useCallback(() => setPaused(true), []);
 
   // A bad symbol or slug falls back to the element page, or the table.
   useEffect(() => {
@@ -93,7 +96,7 @@ export default function WatchPage() {
       <div className="reel__scroller" ref={scrollerRef} aria-label={`${element.name} videos`}>
         {clips.map((clip, i) => (
           <ReelSlide key={clip.slug} element={element} clip={clip} index={i} count={clips.length}
-            active={i === active} near={Math.abs(i - active) <= 1} paused={paused} onToggle={() => setPaused(p => !p)} />
+            active={i === active} near={Math.abs(i - active) <= 1} paused={paused} onToggle={() => setPaused(p => !p)} onBlocked={onBlocked} />
         ))}
         <section className="reel__slide reel__slide--end" data-index={clips.length} aria-label="More to explore">
           <div className="reel__end">
@@ -121,9 +124,9 @@ export default function WatchPage() {
   );
 }
 
-function ReelSlide({ element, clip, index, count, active, near, paused, onToggle }: {
+function ReelSlide({ element, clip, index, count, active, near, paused, onToggle, onBlocked }: {
   element: typeof elements[number]; clip: Clip; index: number; count: number;
-  active: boolean; near: boolean; paused: boolean; onToggle: () => void;
+  active: boolean; near: boolean; paused: boolean; onToggle: () => void; onBlocked: () => void;
 }) {
   const media = clipMedia(clip);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -132,9 +135,12 @@ function ReelSlide({ element, clip, index, count, active, near, paused, onToggle
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-    if (active && !paused) video.play().catch(() => undefined);
-    else { video.pause(); if (!active) video.currentTime = 0; }
-  }, [active, paused, near]);
+    if (active && !paused) {
+      // AbortError just means a swipe paused it mid-start; NotAllowedError means
+      // the browser wants a tap first, so show the button and wait for one.
+      video.play().catch((error: DOMException) => { if (error.name === 'NotAllowedError') onBlocked(); });
+    } else { video.pause(); if (!active) video.currentTime = 0; }
+  }, [active, paused, near, onBlocked]);
 
   return (
     <section className={`reel__slide${portrait ? '' : ' reel__slide--landscape'}`} data-index={index}

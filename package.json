@@ -12,7 +12,8 @@
     "test:watch": "vitest",
     "generate:sitemap": "tsx scripts/generate-sitemap.ts",
     "indexnow": "node scripts/indexnow.mjs",
-    "generate:clips": "node scripts/run-with-env.mjs npx tsx scripts/generate-videos/clips.ts"
+    "generate:clips": "node scripts/run-with-env.mjs npx tsx scripts/generate-videos/clips.ts",
+    "export:social": "tsx scripts/social/export.ts"
   },
   "dependencies": {
     "@elevenlabs/react": "^1.15.0",
