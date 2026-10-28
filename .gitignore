@@ -57,3 +57,6 @@ agent_configs/Milo.json
 agent_configs/New-agent.json
 test_configs/
 .env*.local
+
+# Social exports (rendered from public/element-videos, large binaries)
+output/

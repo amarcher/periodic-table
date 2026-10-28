@@ -14,6 +14,7 @@ Interactive periodic table web app for general science education (students, teac
 - `npx tsc --noEmit` — type check without emitting
 - `npm run generate:sitemap` — regenerate `public/sitemap.xml` from the element and clip data (also runs as part of `build`)
 - `npm run generate:clips` — generate any fact clip whose MP4 is missing (see Video Watch Pages)
+- `npm run export:social` — render the published shorts as captioned 1080×1920 posts plus per-element compilations in `output/social/` (see Social exports)
 - `vercel dev --listen 3000` — exercise the serverless OG function locally (see Routing below)
 
 ## Architecture
@@ -79,3 +80,10 @@ Interactive periodic table web app for general science education (students, teac
 - Category colors are passed as `--cat-color` CSS custom property via inline styles
 - Component CSS files are co-located with their `.tsx` files
 - BEM-like class naming: `.component__element--modifier`
+
+## Social exports (YouTube Shorts, TikTok, Instagram Reels)
+
+- **Why a separate render**: the site keeps captions in HTML beside the video so pages stay indexable and translatable. Short-form platforms show nothing but the video, so `npm run export:social` (`scripts/social/export.ts`, optionally `-- --element Na --force`) burns the same `clips.ts` text into the frame: a category-coloured element chip, the clip title, the fact, and a `periodictable.tech` mark. One source of truth, two render targets.
+- **Output** goes to `output/social/<Symbol>/` (git-ignored): `<slug>.mp4` (1080×1920 upscaled from the 720×1280 short, H.264, a silent AAC track because some uploaders reject video with no audio stream), `<slug>.txt` (title, caption with the watch-page link, hashtags, upload settings), and `<Symbol>-shorts.mp4` (+ `.txt`), a compilation of a title card, every short and an end card. Existing files are skipped unless `--force`.
+- **Text is set by ImageMagick, not ffmpeg**: this machine's ffmpeg has no `drawtext` (no libfreetype), so captions are rendered to PNG with `magick caption:` (which word-wraps) and composited with ffmpeg's `overlay`. Fonts are system files: `Avenir Next.ttc` (first face is Bold) for headlines and `HelveticaNeue.ttc` (Regular) for body text. The caption box bottoms out at 72% of the height and the mark sits at 150px so neither collides with TikTok's tab bar or caption overlay.
+- **Uploading is manual** and every post needs the platform's AI-generated content label (all footage is AI-generated) and a track from the platform's music library. YouTube descriptions carry the watch-page link; Instagram and TikTok only link from the bio. Accounts are created by a person, not by tooling.
