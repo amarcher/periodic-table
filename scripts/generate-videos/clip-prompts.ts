@@ -67,7 +67,7 @@ Object.assign(CLIP_PROMPTS, {
   'Hg/liquid-metal-mirror':
     'Vertical close-up of liquid mercury pouring from a glass vial held in a laboratory clamp onto a dark slate surface below, flowing like water but mirror-bright, spreading into a trembling silver pool that reflects the overhead light and the vial above it, slow motion, dark background.',
   'Na/soft-then-explosive':
-    'Vertical shot: a dull silvery block of sodium metal on a dark bench is sliced by a knife blade lowering into frame, cutting it like cold cheese to reveal a bright silver interior that tarnishes within seconds; the slice drops into a glass bowl of water below and skitters, hisses and erupts into a bright yellow-orange flame with a sharp pop, water splashing, dark background.',
+    'Vertical shot, no hands anywhere in frame. Within the first two seconds a knife blade on a mechanical arm slices a dull silvery block of sodium metal on a dark bench like cold cheese, exposing a bright silver face. The cut slice then drops into a glass bowl of water below, and the water reaction fills the whole second half of the clip, never rushed: the sodium skitters across the surface hissing and fizzing, then bursts into a large, brilliant yellow-orange flame that flares and dances on the water, with a sharp popping burst of sparks and splashing water at the end, the flame lighting the whole bowl, dark background.',
   'Na/ocean-of-salt':
     'Vertical aerial shot rising over an endless white salt flat under a hard blue sky, the crystalline crust cracked into hexagonal plates stretching to the horizon, and in the distance the upper floors of city skyscrapers poking out of the salt as if the whole city were buried in it, heat shimmer, slow upward drift.',
   'Na/streetlight-glow-short':
