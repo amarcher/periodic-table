@@ -33,8 +33,13 @@ const sourceDir = join(root, 'public', 'element-videos');
 const outRoot = resolve(root, flag('--out') ?? 'output/social');
 
 const W = 1080, H = 1920, FPS = 24;
-const CAPTION_BOTTOM = Math.round(H * 0.72); // above TikTok's caption/handle overlay
-const MARK_TOP = 150;                         // below the For You / Following tabs
+// Everything sits in the top fifth of the frame, under the For You / Following
+// tabs and clear of the action, with a soft scrim instead of a box. The full
+// fact goes in the post caption, not the pixels.
+const TOP_ROW = 150;      // chip and site mark
+const HEADLINE_TOP = 230; // the hook, two lines at most
+const SCRIM_HEIGHT = 720;
+const MARGIN = 60;
 const HEADLINE_FONT = '/System/Library/Fonts/Avenir Next.ttc';   // first face is Bold
 const BODY_FONT = '/System/Library/Fonts/HelveticaNeue.ttc';     // first face is Regular
 const INK = '#0b1020';
@@ -60,22 +65,30 @@ function textBlock(text: string, out: string, font: string, points: number, fill
     '-interline-spacing', String(Math.round(points * -0.08)), '-gravity', 'west', `caption:${text}`, '-trim', '+repage', out]);
 }
 
-function renderCaption(element: Element, clip: Clip, work: string, out: string) {
-  const chip = join(work, 'chip.png'), head = join(work, 'head.png'), body = join(work, 'body.png');
-  const chipText = join(work, 'chip-text.png'), stack = join(work, 'stack.png');
-  magick(['-background', 'none', '-fill', INK, '-font', HEADLINE_FONT, '-pointsize', '30', `label:${element.symbol}  ·  ${element.name.toUpperCase()}`, chipText]);
-  roundedBox(chipText, chip, categoryColors[element.category], [22, 10], 24);
-  textBlock(clip.title, head, HEADLINE_FONT, 60, 'white', 900);
-  textBlock(clip.fact, body, BODY_FONT, 46, '#ffffffe6', 900);
-  // Stack chip, headline and fact left-aligned with breathing room between them.
-  magick([chip, '-size', '1x26', 'xc:none', head, '-size', '1x22', 'xc:none', body, '-background', 'none', '-gravity', 'west', '-append', stack]);
-  roundedBox(stack, out, `${INK}cc`, [48, 40], 36);
+/** The element chip: symbol and name on the category colour. */
+function renderChip(element: Element, work: string, out: string) {
+  const text = join(work, 'chip-text.png');
+  magick(['-background', 'none', '-fill', INK, '-font', HEADLINE_FONT, '-pointsize', '30', `label:${element.symbol}  ·  ${element.name.toUpperCase()}`, text]);
+  roundedBox(text, out, categoryColors[element.category], [22, 10], 24);
 }
 
+/** The hook: the clip title alone, white with a soft shadow, no box. */
+function renderHeadline(clip: Clip, work: string, out: string) {
+  const text = join(work, 'headline-text.png');
+  textBlock(clip.title, text, HEADLINE_FONT, 62, 'white', W - MARGIN * 2);
+  magick([text, '(', '+clone', '-background', 'black', '-shadow', '70x8+0+4', ')', '+swap', '-background', 'none', '-layers', 'merge', '+repage', out]);
+}
+
+/** Small site mark, no box; the shadow carries it over bright footage. */
 function renderMark(out: string) {
   const text = join(outRoot, '_mark-text.png');
-  magick(['-background', 'none', '-fill', '#ffffffd9', '-font', BODY_FONT, '-pointsize', '36', 'label:periodictable.tech', text]);
-  roundedBox(text, out, `${INK}99`, [30, 14], 40);
+  magick(['-background', 'none', '-fill', '#ffffffcc', '-font', BODY_FONT, '-pointsize', '32', 'label:periodictable.tech', text]);
+  magick([text, '(', '+clone', '-background', 'black', '-shadow', '70x6+0+3', ')', '+swap', '-background', 'none', '-layers', 'merge', '+repage', out]);
+}
+
+/** A top-down scrim so the headline reads over anything, fading out well above mid-frame. */
+function renderScrim(out: string) {
+  magick(['-size', `${W}x${SCRIM_HEIGHT}`, 'gradient:rgba(0,0,0,0.62)-rgba(0,0,0,0)', out]);
 }
 
 function renderCard(element: Element, kind: 'title' | 'end', count: number, out: string) {
@@ -94,10 +107,16 @@ function renderCard(element: Element, kind: 'title' | 'end', count: number, out:
 const encode = ['-c:v', 'libx264', '-preset', 'slow', '-crf', '18', '-pix_fmt', 'yuv420p', '-r', String(FPS), '-c:a', 'aac', '-b:a', '96k', '-ar', '48000', '-movflags', '+faststart'];
 const silence = ['-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=48000'];
 
-function encodeShort(source: string, caption: string, mark: string, out: string) {
-  run('ffmpeg', ['-y', '-loglevel', 'error', '-i', source, '-i', caption, '-i', mark, ...silence,
-    '-filter_complex', `[0:v]scale=${W}:${H}:flags=lanczos,setsar=1[v0];[v0][1:v]overlay=(W-w)/2:${CAPTION_BOTTOM}-h[v1];[v1][2:v]overlay=(W-w)/2:${MARK_TOP}[v]`,
-    '-map', '[v]', '-map', '3:a', '-shortest', ...encode, out]);
+function encodeShort(source: string, layers: { scrim: string; chip: string; mark: string; headline: string }, out: string) {
+  run('ffmpeg', ['-y', '-loglevel', 'error', '-i', source, '-i', layers.scrim, '-i', layers.chip, '-i', layers.mark, '-i', layers.headline, ...silence,
+    '-filter_complex', [
+      `[0:v]scale=${W}:${H}:flags=lanczos,setsar=1[v0]`,
+      `[v0][1:v]overlay=0:0[v1]`,
+      `[v1][2:v]overlay=${MARGIN}:${TOP_ROW}[v2]`,
+      `[v2][3:v]overlay=W-w-${MARGIN}:${TOP_ROW}+8[v3]`,
+      `[v3][4:v]overlay=${MARGIN}:${HEADLINE_TOP}[v]`,
+    ].join(';'),
+    '-map', '[v]', '-map', '5:a', '-shortest', ...encode, out]);
 }
 
 function encodeCard(png: string, seconds: number, out: string) {
@@ -126,12 +145,14 @@ function post(title: string, caption: string, element: Element, extra: string[])
   ].join('\n');
 }
 
-function exportElement(element: Element, mark: string) {
+function exportElement(element: Element, shared: { scrim: string; mark: string }) {
   const shorts = getShorts(element);
   if (!shorts.length) return [];
   const dir = join(outRoot, element.symbol);
   const work = join(dir, '_work');
   mkdirSync(work, { recursive: true });
+  const chip = join(work, 'chip.png');
+  renderChip(element, work, chip);
   const written: string[] = [];
   const parts: string[] = [];
   for (const clip of shorts) {
@@ -140,9 +161,9 @@ function exportElement(element: Element, mark: string) {
     const mp4 = join(dir, `${clip.slug}.mp4`);
     parts.push(mp4);
     if (existsSync(mp4) && !force) continue;
-    const caption = join(work, `${clip.slug}-caption.png`);
-    renderCaption(element, clip, work, caption);
-    encodeShort(source, caption, mark, mp4);
+    const headline = join(work, `${clip.slug}-headline.png`);
+    renderHeadline(clip, work, headline);
+    encodeShort(source, { ...shared, chip, headline }, mp4);
     writeFileSync(join(dir, `${clip.slug}.txt`), post(clip.title, [clip.fact, '',
       `Watch all ${shorts.length} ${element.name} shorts: ${SITE_ORIGIN}${clipPath(element, clip)}`,
       `Interactive periodic table: ${SITE_ORIGIN}/`].join('\n'), element, ['- Duration: 8 seconds. Loops cleanly.']));
@@ -170,12 +191,13 @@ function exportElement(element: Element, mark: string) {
 }
 
 mkdirSync(outRoot, { recursive: true });
-const mark = join(outRoot, '_mark.png');
-renderMark(mark);
+const shared = { mark: join(outRoot, '_mark.png'), scrim: join(outRoot, '_scrim.png') };
+renderMark(shared.mark);
+renderScrim(shared.scrim);
 const manifest: Record<string, string[]> = {};
 for (const element of elements) {
   if (only && element.symbol !== only) continue;
-  const files = exportElement(element, mark);
+  const files = exportElement(element, shared);
   if (files.length) manifest[element.symbol] = files.map(file => file.slice(outRoot.length + 1));
 }
 writeFileSync(join(outRoot, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
